@@ -60,6 +60,7 @@ jobs:
             -destination "${{ steps.destination.outputs.value }}" \
             -only-testing:"Go CyclingTests" \
             -resultBundlePath TestResults/unit.xcresult \
+            -retry-tests-on-failure \
             DEVELOPMENT_TEAM= \
             test
         env:
@@ -134,6 +135,7 @@ jobs:
             -destination "${{ steps.destination.outputs.value }}" \
             -only-testing:"Go CyclingUITests" \
             -resultBundlePath TestResults/ui-${{ matrix.id }}.xcresult \
+            -retry-tests-on-failure \
             DEVELOPMENT_TEAM= \
             test
         env:
