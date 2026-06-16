@@ -1,5 +1,7 @@
 # GoCycling
 
+[![Tests](https://github.com/hubertgajewski/gocycling/actions/workflows/tests.yml/badge.svg)](https://github.com/hubertgajewski/gocycling/actions/workflows/tests.yml)
+
 ## Available on the iOS App Store
 https://apps.apple.com/app/go-cycling/id1565861313
 
@@ -50,6 +52,44 @@ Upstream bundle identifiers and the author development team (`QMBJV5C74X`) belon
 4. If you change the app bundle ID, update the iCloud container in `Go Cycling/Go Cycling.entitlements` to match (for example `iCloud.com.example.GoCycling`) and let Xcode create the container for your team. In **Signing & Capabilities** for the **Go Cycling** app target, enable **iCloud** (CloudKit) and **HealthKit** if Xcode prompts or those features fail at runtime.
 
 Simulator builds typically work with a free Personal Team once signing is configured.
+
+## Continuous integration
+
+GitHub Actions runs on every push to `main` and on pull requests:
+
+- **Unit tests** — `Go CyclingTests` on an iPhone simulator
+- **UI smoke tests** — `Go CyclingUITests` on six iPhone and iPad simulator sizes (compact, standard, and large form factors)
+
+CI copies `TelemetryDeck.xcconfig.example` to `TelemetryDeck.xcconfig` when the gitignored file is absent, so no TelemetryDeck account is required. Simulator builds pass `DEVELOPMENT_TEAM=` so no committed development team is needed.
+
+Reproduce the unit tests locally:
+
+```bash
+cp -n TelemetryDeck.xcconfig.example TelemetryDeck.xcconfig
+DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17')
+xcodebuild \
+  -project "Go Cycling.xcodeproj" \
+  -scheme "Go Cycling" \
+  -configuration Debug \
+  -destination "$DEST" \
+  -only-testing:"Go CyclingTests" \
+  DEVELOPMENT_TEAM= \
+  test
+```
+
+Reproduce a UI smoke run (substitute the device name as needed):
+
+```bash
+DEST=$(.github/scripts/ios-simulator-destination.sh iPad 'iPad Pro 11-inch (M5)')
+xcodebuild \
+  -project "Go Cycling.xcodeproj" \
+  -scheme "Go Cycling" \
+  -configuration Debug \
+  -destination "$DEST" \
+  -only-testing:"Go CyclingUITests" \
+  DEVELOPMENT_TEAM= \
+  test
+```
 
 ## Usage
 
