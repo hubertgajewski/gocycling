@@ -1,5 +1,5 @@
 //
-//  Go_CyclingTests.swift
+//  GoCyclingTests.swift
 //  Go CyclingTests
 //
 //  Created by Anthony Hopkins on 2021-03-14.
@@ -8,26 +8,24 @@
 import XCTest
 @testable import Go_Cycling
 
-class Go_CyclingTests: XCTestCase {
+// CI scaffolding: minimal unit coverage until a follow-up issue refactors tests
+// (Swift Testing, shared fixtures, and broader model coverage).
+class GoCyclingTests: XCTestCase {
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
+    private let totalCyclingRoutesKey = "totalCyclingRoutes"
 
     override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        UserDefaults.standard.removeObject(forKey: totalCyclingRoutesKey)
+        NSUbiquitousKeyValueStore.default.removeObject(forKey: totalCyclingRoutesKey)
     }
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
+    func testResetStatisticsZerosTotalCyclingRoutesInLocalAndICloudStores() throws {
+        UserDefaults.standard.set(7, forKey: totalCyclingRoutesKey)
+        NSUbiquitousKeyValueStore.default.set(7 as Int, forKey: totalCyclingRoutesKey)
 
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
-    }
+        CyclingRecords.resetStatistics()
 
+        XCTAssertEqual(UserDefaults.standard.integer(forKey: totalCyclingRoutesKey), 0)
+        XCTAssertEqual(NSUbiquitousKeyValueStore.default.longLong(forKey: totalCyclingRoutesKey), 0)
+    }
 }

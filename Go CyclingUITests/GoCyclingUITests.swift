@@ -1,5 +1,5 @@
 //
-//  Go_CyclingUITests.swift
+//  GoCyclingUITests.swift
 //  Go CyclingUITests
 //
 //  Created by Anthony Hopkins on 2021-03-14.
@@ -7,36 +7,83 @@
 
 import XCTest
 
-class Go_CyclingUITests: XCTestCase {
+// CI scaffolding: minimal UI smoke coverage until a follow-up issue refactors tests.
+// Must match UITesting.launchArgument in the app target.
+private let uiTestingLaunchArgument = "-ui-testing"
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+class GoCyclingUITests: XCTestCase {
 
-        // In UI tests it is usually best to stop immediately when a failure occurs.
-        continueAfterFailure = false
+    private enum MainTab {
+        case cycle
+        case history
+        case statistics
+        case settings
 
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
-        app.launch()
-
-        // Use recording to get started writing UI tests.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
-    func testLaunchPerformance() throws {
-        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, *) {
-            // This measures how long it takes to launch your application.
-            measure(metrics: [XCTApplicationLaunchMetric()]) {
-                XCUIApplication().launch()
+        var imageIdentifier: String {
+            switch self {
+            case .cycle: return "bicycle"
+            case .history: return "clock.arrow.circlepath"
+            case .statistics: return "chart.bar.xaxis"
+            case .settings: return "gear"
             }
         }
+
+        var englishLabel: String {
+            switch self {
+            case .cycle: return "Cycle"
+            case .history: return "History"
+            case .statistics: return "Statistics"
+            case .settings: return "Settings"
+            }
+        }
+    }
+
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+    }
+
+    func testMainTabBarNavigatesToAllTabs() throws {
+        let app = XCUIApplication()
+        app.launchArguments = [uiTestingLaunchArgument]
+        app.launch()
+
+        XCTAssertTrue(waitForMainChrome(in: app), "Expected Cycle tab chrome after launch")
+
+        XCTAssertTrue(app.buttons["Start"].waitForExistence(timeout: 3))
+
+        tapTab(.history, in: app)
+        XCTAssertTrue(app.navigationBars["Cycling History"].waitForExistence(timeout: 3))
+
+        tapTab(.statistics, in: app)
+        XCTAssertTrue(app.navigationBars["Cycling Statistics"].waitForExistence(timeout: 3))
+
+        tapTab(.settings, in: app)
+        XCTAssertTrue(app.staticTexts["Customization"].waitForExistence(timeout: 5))
+    }
+
+    /// iPhone uses a bottom `TabBar`; iPad uses nested floating tab item buttons.
+    private func waitForMainChrome(in app: XCUIApplication) -> Bool {
+        if app.tabBars.firstMatch.waitForExistence(timeout: 2) {
+            return true
+        }
+        return tabButton(.cycle, in: app).waitForExistence(timeout: 8)
+    }
+
+    private func tabButton(_ tab: MainTab, in app: XCUIApplication) -> XCUIElement {
+        let tabBarByLabel = app.tabBars.buttons[tab.englishLabel]
+        if tabBarByLabel.exists {
+            return tabBarByLabel.firstMatch
+        }
+        let tabBarByIdentifier = app.tabBars.buttons[tab.imageIdentifier]
+        if tabBarByIdentifier.exists {
+            return tabBarByIdentifier.firstMatch
+        }
+        return app.buttons.matching(identifier: tab.imageIdentifier).firstMatch
+    }
+
+    private func tapTab(_ tab: MainTab, in app: XCUIApplication) {
+        let button = tabButton(tab, in: app)
+        XCTAssertTrue(button.waitForExistence(timeout: 3))
+        button.tap()
     }
 }
