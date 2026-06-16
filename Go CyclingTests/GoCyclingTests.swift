@@ -12,18 +12,6 @@ import XCTest
 // (Swift Testing, shared fixtures, and broader model coverage).
 class GoCyclingTests: XCTestCase {
 
-    private let statisticsKeys = [
-        "totalCyclingTime",
-        "totalCyclingDistance",
-        "longestCyclingDistance",
-        "longestCyclingTime",
-        "fastestAverageSpeed",
-        "fastestAverageSpeedDate",
-        "longestCyclingDistanceDate",
-        "longestCyclingTimeDate",
-        "totalCyclingRoutes",
-    ]
-
     private var savedUserDefaultsValues = [String: Any]()
     private var savedUserDefaultsKeys = Set<String>()
     private var savedICloudValues = [String: Any]()
@@ -37,7 +25,7 @@ class GoCyclingTests: XCTestCase {
         savedICloudValues = [:]
         savedICloudKeys = []
 
-        for key in statisticsKeys {
+        for key in CyclingRecords.persistedStoreKeys {
             if let value = UserDefaults.standard.object(forKey: key), !(value is NSNull) {
                 savedUserDefaultsKeys.insert(key)
                 savedUserDefaultsValues[key] = value
@@ -50,11 +38,12 @@ class GoCyclingTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
-        for key in statisticsKeys {
+        for key in CyclingRecords.persistedStoreKeys {
             restore(key: key, hadKey: savedUserDefaultsKeys.contains(key), value: savedUserDefaultsValues[key], in: UserDefaults.standard)
             restore(key: key, hadKey: savedICloudKeys.contains(key), value: savedICloudValues[key], in: NSUbiquitousKeyValueStore.default)
         }
         NSUbiquitousKeyValueStore.default.synchronize()
+        CyclingRecords.shared.writeToClassMembers()
     }
 
     func testResetStatisticsZerosTotalCyclingRoutesInLocalAndICloudStores() throws {
@@ -82,4 +71,5 @@ class GoCyclingTests: XCTestCase {
             store.removeObject(forKey: key)
         }
     }
+
 }

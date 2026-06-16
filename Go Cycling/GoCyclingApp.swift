@@ -20,10 +20,6 @@ struct GoCyclingApp: App {
     @StateObject var records = CyclingRecords.shared
     
     init() {
-        #if DEBUG
-        UITesting.configureFromLaunchArguments()
-        #endif
-
         // Initialize TelemetryDeck
         // Attempt to find App ID
         if let appID = Bundle.main.object(forInfoDictionaryKey: "GoCyclingAppID") {

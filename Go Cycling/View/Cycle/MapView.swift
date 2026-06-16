@@ -64,7 +64,7 @@ struct MapView: UIViewRepresentable {
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView(frame: .zero)
         mapView.delegate = context.coordinator
-        mapView.showsUserLocation = true
+        mapView.showsUserLocation = UITesting.shouldShowUserLocation
         mapView.showsCompass = false
         mapView.mapType = preferences.mapTypeChoiceConverted.mkMapType
         return mapView
@@ -77,8 +77,9 @@ struct MapView: UIViewRepresentable {
         }
 
         let authStatus = locationManager.statusString
+        let isLocationAuthorized = authStatus == "authorizedAlways" || authStatus == "authorizedWhenInUse"
 
-        if (authStatus == "authorizedAlways" || authStatus == "authorizedWhenInUse") {
+        if UITesting.shouldShowUserLocation && isLocationAuthorized {
             if centerMapOnLocation {
                 if view.userTrackingMode != .followWithHeading {
                     view.setUserTrackingMode(.followWithHeading, animated: true)
@@ -88,7 +89,9 @@ struct MapView: UIViewRepresentable {
                     view.setUserTrackingMode(.none, animated: false)
                 }
             }
+        }
 
+        if isLocationAuthorized {
             // Need to maintain the cyclists route if they are currently cycling
             if cyclingStatus.isCycling {
                 if (!startedCycling) {
