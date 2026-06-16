@@ -26,6 +26,31 @@ This app is designed to support all iPhones and iPads with iOS14/iPadOS14 and ab
 
 For iPads, this includes support for both landscape and portait modes along with Slide Over and multitasking screen sizes.
 
+## Local development (fork)
+
+After cloning this repository, complete the steps below before building in Xcode.
+
+### TelemetryDeck configuration
+
+The app target references `TelemetryDeck.xcconfig` at the repository root for the optional TelemetryDeck App ID (`GoCyclingAppID` in `Go Cycling/Info.plist`). That file is gitignored.
+
+```bash
+cp TelemetryDeck.xcconfig.example TelemetryDeck.xcconfig
+```
+
+Leave `GoCyclingAppID` empty for local development without a TelemetryDeck account, or set an App ID from [TelemetryDeck](https://telemetrydeck.com) if you want analytics.
+
+### Code signing (fork owners)
+
+Upstream bundle identifiers and the author development team (`QMBJV5C74X`) belong to the original maintainer. To build on your machine:
+
+1. Open `Go Cycling.xcodeproj` in Xcode and add your Apple ID under **Settings → Accounts**.
+2. For the **Go Cycling**, **Go CyclingTests**, and **Go CyclingUITests** targets, enable **Automatically manage signing** and select your **Development Team**.
+3. Change each target **Bundle Identifier** from `com.hopkins.*` to a unique ID in your namespace (for example `com.example.GoCycling`).
+4. If you change the app bundle ID, update the iCloud container in `Go Cycling/Go Cycling.entitlements` to match (for example `iCloud.com.example.GoCycling`) and let Xcode create the container for your team. In **Signing & Capabilities** for the **Go Cycling** app target, enable **iCloud** (CloudKit) and **HealthKit** if Xcode prompts or those features fail at runtime.
+
+Simulator builds typically work with a free Personal Team once signing is configured.
+
 ## Usage
 
 Note: For Go Cycling to track your current location, you must allow location access in Settings (the app will also ask for permission on the first launch). The location permissions must be set to "Always Allow" for location updates to occur while the app is not on the screen.
