@@ -1,5 +1,5 @@
 //
-//  Go_CyclingTests.swift
+//  GoCyclingTests.swift
 //  Go CyclingTests
 //
 //  Created by Anthony Hopkins on 2021-03-14.
@@ -8,25 +8,67 @@
 import XCTest
 @testable import Go_Cycling
 
-class Go_CyclingTests: XCTestCase {
+// CI scaffolding: minimal unit coverage until a follow-up issue refactors tests
+// (Swift Testing, shared fixtures, and broader model coverage).
+class GoCyclingTests: XCTestCase {
+
+    private var savedUserDefaultsValues = [String: Any]()
+    private var savedUserDefaultsKeys = Set<String>()
+    private var savedICloudValues = [String: Any]()
+    private var savedICloudKeys = Set<String>()
 
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        continueAfterFailure = false
+
+        savedUserDefaultsValues = [:]
+        savedUserDefaultsKeys = []
+        savedICloudValues = [:]
+        savedICloudKeys = []
+
+        for key in CyclingRecords.persistedStoreKeys {
+            if let value = UserDefaults.standard.object(forKey: key), !(value is NSNull) {
+                savedUserDefaultsKeys.insert(key)
+                savedUserDefaultsValues[key] = value
+            }
+            if let value = NSUbiquitousKeyValueStore.default.object(forKey: key), !(value is NSNull) {
+                savedICloudKeys.insert(key)
+                savedICloudValues[key] = value
+            }
+        }
     }
 
     override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        for key in CyclingRecords.persistedStoreKeys {
+            restore(key: key, hadKey: savedUserDefaultsKeys.contains(key), value: savedUserDefaultsValues[key], in: UserDefaults.standard)
+            restore(key: key, hadKey: savedICloudKeys.contains(key), value: savedICloudValues[key], in: NSUbiquitousKeyValueStore.default)
+        }
+        NSUbiquitousKeyValueStore.default.synchronize()
+        CyclingRecords.shared.writeToClassMembers()
     }
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    func testResetStatisticsZerosTotalCyclingRoutesInLocalAndICloudStores() throws {
+        UserDefaults.standard.set(7, forKey: "totalCyclingRoutes")
+        NSUbiquitousKeyValueStore.default.set(7 as Int, forKey: "totalCyclingRoutes")
+
+        CyclingRecords.resetStatistics()
+
+        XCTAssertEqual(UserDefaults.standard.integer(forKey: "totalCyclingRoutes"), 0)
+        XCTAssertEqual(NSUbiquitousKeyValueStore.default.longLong(forKey: "totalCyclingRoutes"), 0)
     }
 
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    private func restore(key: String, hadKey: Bool, value: Any?, in defaults: UserDefaults) {
+        if hadKey, let value {
+            defaults.set(value, forKey: key)
+        } else {
+            defaults.removeObject(forKey: key)
+        }
+    }
+
+    private func restore(key: String, hadKey: Bool, value: Any?, in store: NSUbiquitousKeyValueStore) {
+        if hadKey, let value {
+            store.set(value, forKey: key)
+        } else {
+            store.removeObject(forKey: key)
         }
     }
 

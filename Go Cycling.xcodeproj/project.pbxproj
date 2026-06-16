@@ -110,6 +110,8 @@
 		9D8169F5263FA48500DED7F8 /* Light@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D8169F3263FA48500DED7F8 /* Light@2x.png */; };
 		9D8169FA263FA4CE00DED7F8 /* IconNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8169F9263FA4CE00DED7F8 /* IconNames.swift */; };
 		9D816A0F263FBD0600DED7F8 /* CyclingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D816A0E263FBD0600DED7F8 /* CyclingStatus.swift */; };
+		AA0000032026061600000001 /* UITesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022026061600000001 /* UITesting.swift */; };
+		AA0000042026061600000001 /* UITesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022026061600000001 /* UITesting.swift */; };
 		9D816A152640A4F000DED7F8 /* Default@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D816A132640A4F000DED7F8 /* Default@3x.png */; };
 		9D816A162640A4F000DED7F8 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D816A142640A4F000DED7F8 /* Default@2x.png */; };
 		9D816A1E2641BAD000DED7F8 /* ResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D816A1D2641BAD000DED7F8 /* ResetView.swift */; };
@@ -292,6 +294,7 @@
 		9D8169F3263FA48500DED7F8 /* Light@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Light@2x.png"; sourceTree = "<group>"; };
 		9D8169F9263FA4CE00DED7F8 /* IconNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconNames.swift; sourceTree = "<group>"; };
 		9D816A0E263FBD0600DED7F8 /* CyclingStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CyclingStatus.swift; sourceTree = "<group>"; };
+		AA0000022026061600000001 /* UITesting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITesting.swift; sourceTree = "<group>"; };
 		9D816A132640A4F000DED7F8 /* Default@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@3x.png"; sourceTree = "<group>"; };
 		9D816A142640A4F000DED7F8 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		9D816A1D2641BAD000DED7F8 /* ResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetView.swift; sourceTree = "<group>"; };
@@ -540,6 +543,14 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		AA0000052026061600000001 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000022026061600000001 /* UITesting.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
 		9D8169E2263F84C900DED7F8 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -666,6 +677,7 @@
 				9D1ED54E2643D38D005A97ED /* UIKit */,
 				9D8169E2263F84C900DED7F8 /* Resources */,
 				9D2F48FC26508DF200094575 /* Extensions */,
+				AA0000052026061600000001 /* Support */,
 				9D76355E262298490026D948 /* Model */,
 				9DAB837A25FEDEC000F5C42E /* View Model */,
 				9DAB836525FED02A00F5C42E /* View */,
@@ -997,6 +1009,7 @@
 				9DEAD6BE262FBFF900392D88 /* MapSystemImageButton.swift in Sources */,
 				9D1ED54D2643CF5A005A97ED /* UIAppearViewController.swift in Sources */,
 				9D816A0F263FBD0600DED7F8 /* CyclingStatus.swift in Sources */,
+				AA0000032026061600000001 /* UITesting.swift in Sources */,
 				9D55B9F726522D8D00B622E5 /* RouteRenameModalView.swift in Sources */,
 				9D6E5357262BB299008FD7C1 /* ColourView.swift in Sources */,
 				9D8169DC263F815600DED7F8 /* ChangeAppIconView.swift in Sources */,
@@ -1055,6 +1068,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9DAB833525FECAD400F5C42E /* GoCyclingUITests.swift in Sources */,
+				AA0000042026061600000001 /* UITesting.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
