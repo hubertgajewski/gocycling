@@ -111,6 +111,7 @@
 		9D8169FA263FA4CE00DED7F8 /* IconNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8169F9263FA4CE00DED7F8 /* IconNames.swift */; };
 		9D816A0F263FBD0600DED7F8 /* CyclingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D816A0E263FBD0600DED7F8 /* CyclingStatus.swift */; };
 		AA0000032026061600000001 /* UITesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022026061600000001 /* UITesting.swift */; };
+		AA0000042026061600000001 /* UITesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022026061600000001 /* UITesting.swift */; };
 		9D816A152640A4F000DED7F8 /* Default@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D816A132640A4F000DED7F8 /* Default@3x.png */; };
 		9D816A162640A4F000DED7F8 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D816A142640A4F000DED7F8 /* Default@2x.png */; };
 		9D816A1E2641BAD000DED7F8 /* ResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D816A1D2641BAD000DED7F8 /* ResetView.swift */; };
@@ -538,9 +539,16 @@
 				9DC7583A2809506300BB2953 /* CyclingRecords.swift */,
 				9DA60D5F287558D000072DA2 /* ReviewManager.swift */,
 				9DC845432D9CDF4A0068519E /* TelemetryManager.swift */,
-				AA0000022026061600000001 /* UITesting.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		AA0000052026061600000001 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000022026061600000001 /* UITesting.swift */,
+			);
+			path = Support;
 			sourceTree = "<group>";
 		};
 		9D8169E2263F84C900DED7F8 /* Resources */ = {
@@ -669,6 +677,7 @@
 				9D1ED54E2643D38D005A97ED /* UIKit */,
 				9D8169E2263F84C900DED7F8 /* Resources */,
 				9D2F48FC26508DF200094575 /* Extensions */,
+				AA0000052026061600000001 /* Support */,
 				9D76355E262298490026D948 /* Model */,
 				9DAB837A25FEDEC000F5C42E /* View Model */,
 				9DAB836525FED02A00F5C42E /* View */,
@@ -1059,6 +1068,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9DAB833525FECAD400F5C42E /* GoCyclingUITests.swift in Sources */,
+				AA0000042026061600000001 /* UITesting.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

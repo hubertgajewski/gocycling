@@ -50,7 +50,7 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         locationManager.delegate = self
         locationManager.distanceFilter = 10
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        if !UITesting.isEnabled {
+        if UITesting.shouldRequestLocationAuthorization {
             locationManager.requestWhenInUseAuthorization()
             locationManager.requestAlwaysAuthorization()
             locationManager.startUpdatingLocation()

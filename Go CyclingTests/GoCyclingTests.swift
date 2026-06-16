@@ -12,20 +12,74 @@ import XCTest
 // (Swift Testing, shared fixtures, and broader model coverage).
 class GoCyclingTests: XCTestCase {
 
-    private let totalCyclingRoutesKey = "totalCyclingRoutes"
+    private let statisticsKeys = [
+        "totalCyclingTime",
+        "totalCyclingDistance",
+        "longestCyclingDistance",
+        "longestCyclingTime",
+        "fastestAverageSpeed",
+        "fastestAverageSpeedDate",
+        "longestCyclingDistanceDate",
+        "longestCyclingTimeDate",
+        "totalCyclingRoutes",
+    ]
+
+    private var savedUserDefaultsValues = [String: Any]()
+    private var savedUserDefaultsKeys = Set<String>()
+    private var savedICloudValues = [String: Any]()
+    private var savedICloudKeys = Set<String>()
+
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+
+        savedUserDefaultsValues = [:]
+        savedUserDefaultsKeys = []
+        savedICloudValues = [:]
+        savedICloudKeys = []
+
+        for key in statisticsKeys {
+            if let value = UserDefaults.standard.object(forKey: key), !(value is NSNull) {
+                savedUserDefaultsKeys.insert(key)
+                savedUserDefaultsValues[key] = value
+            }
+            if let value = NSUbiquitousKeyValueStore.default.object(forKey: key), !(value is NSNull) {
+                savedICloudKeys.insert(key)
+                savedICloudValues[key] = value
+            }
+        }
+    }
 
     override func tearDownWithError() throws {
-        UserDefaults.standard.removeObject(forKey: totalCyclingRoutesKey)
-        NSUbiquitousKeyValueStore.default.removeObject(forKey: totalCyclingRoutesKey)
+        for key in statisticsKeys {
+            restore(key: key, hadKey: savedUserDefaultsKeys.contains(key), value: savedUserDefaultsValues[key], in: UserDefaults.standard)
+            restore(key: key, hadKey: savedICloudKeys.contains(key), value: savedICloudValues[key], in: NSUbiquitousKeyValueStore.default)
+        }
+        NSUbiquitousKeyValueStore.default.synchronize()
     }
 
     func testResetStatisticsZerosTotalCyclingRoutesInLocalAndICloudStores() throws {
-        UserDefaults.standard.set(7, forKey: totalCyclingRoutesKey)
-        NSUbiquitousKeyValueStore.default.set(7 as Int, forKey: totalCyclingRoutesKey)
+        UserDefaults.standard.set(7, forKey: "totalCyclingRoutes")
+        NSUbiquitousKeyValueStore.default.set(7 as Int, forKey: "totalCyclingRoutes")
 
         CyclingRecords.resetStatistics()
 
-        XCTAssertEqual(UserDefaults.standard.integer(forKey: totalCyclingRoutesKey), 0)
-        XCTAssertEqual(NSUbiquitousKeyValueStore.default.longLong(forKey: totalCyclingRoutesKey), 0)
+        XCTAssertEqual(UserDefaults.standard.integer(forKey: "totalCyclingRoutes"), 0)
+        XCTAssertEqual(NSUbiquitousKeyValueStore.default.longLong(forKey: "totalCyclingRoutes"), 0)
+    }
+
+    private func restore(key: String, hadKey: Bool, value: Any?, in defaults: UserDefaults) {
+        if hadKey, let value {
+            defaults.set(value, forKey: key)
+        } else {
+            defaults.removeObject(forKey: key)
+        }
+    }
+
+    private func restore(key: String, hadKey: Bool, value: Any?, in store: NSUbiquitousKeyValueStore) {
+        if hadKey, let value {
+            store.set(value, forKey: key)
+        } else {
+            store.removeObject(forKey: key)
+        }
     }
 }

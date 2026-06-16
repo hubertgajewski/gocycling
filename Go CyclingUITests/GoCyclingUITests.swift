@@ -8,9 +8,6 @@
 import XCTest
 
 // CI scaffolding: minimal UI smoke coverage until a follow-up issue refactors tests.
-// Must match UITesting.launchArgument in the app target.
-private let uiTestingLaunchArgument = "-ui-testing"
-
 class GoCyclingUITests: XCTestCase {
 
     private enum MainTab {
@@ -44,7 +41,7 @@ class GoCyclingUITests: XCTestCase {
 
     func testMainTabBarNavigatesToAllTabs() throws {
         let app = XCUIApplication()
-        app.launchArguments = [uiTestingLaunchArgument]
+        app.launchArguments = [UITesting.launchArgument]
         app.launch()
 
         XCTAssertTrue(waitForMainChrome(in: app), "Expected Cycle tab chrome after launch")
