@@ -1,0 +1,3 @@
+// Copy to TelemetryDeck.xcconfig (gitignored) at the repository root.
+// Optional: register at https://telemetrydeck.com and set your App ID below.
+GoCyclingAppID =
