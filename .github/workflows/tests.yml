@@ -11,7 +11,6 @@ on:
 
 permissions:
   contents: read
-  actions: write
 
 concurrency:
   group: tests-${{ github.workflow }}-${{ github.ref }}
@@ -76,7 +75,7 @@ jobs:
 
   ui-tests:
     if: github.repository == 'hubertgajewski/gocycling' && vars.CI_RUN_UI_TESTS != 'false'
-    name: UI smoke (${{ matrix.id }})
+    name: UI smoke (${{ matrix.label }})
     runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'macos-26' || vars.RUNNER || 'macos-26' }}
     timeout-minutes: 20
     strategy:
@@ -84,21 +83,27 @@ jobs:
       matrix:
         include:
           - id: iphone-se
+            label: iPhone SE
             family: iPhone
             device: "iPhone SE (3rd generation)"
           - id: iphone
+            label: iPhone
             family: iPhone
             device: "iPhone 17"
           - id: iphone-max
+            label: iPhone Max
             family: iPhone
             device: "iPhone 17 Pro Max"
           - id: ipad-mini
+            label: iPad mini
             family: iPad
             device: "iPad mini (A17 Pro)"
           - id: ipad-11
+            label: iPad 11-inch
             family: iPad
             device: "iPad Pro 11-inch (M5)"
           - id: ipad-13
+            label: iPad 13-inch
             family: iPad
             device: "iPad Pro 13-inch (M5)"
     steps:
