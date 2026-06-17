@@ -111,8 +111,8 @@ struct BikeRideListView: View {
                     }
                 })
             }
-            .navigationViewStyle(StackNavigationViewStyle())
         }
+        .navigationViewStyle(StackNavigationViewStyle())
         // Move alert outside of navigation view due to a SwiftUI bug
         .alert(isPresented: $showingDeleteAlert) {
             Alert(title: Text("Are you sure that you want to delete this route?"),
