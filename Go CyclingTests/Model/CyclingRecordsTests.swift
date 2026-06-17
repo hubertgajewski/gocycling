@@ -66,6 +66,61 @@ struct CyclingRecordsTests {
     )
   }
 
+  @Test("keeps existing personal records when a ride does not beat them")
+  @MainActor
+  func keepsExistingPersonalRecordsWhenRideDoesNotBeatThem() {
+    let snapshot = PersistedStoreSnapshot(keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+    defer { snapshot.restore() }
+    let assertICloud = ubiquitousStorePersistsValues()
+
+    let oldDistanceDate = date(2026, 5, 2)
+    let oldTimeDate = date(2026, 5, 3)
+    let oldSpeedDate = date(2026, 5, 4)
+    seedRecordStores(
+      totalTime: 1_000,
+      totalDistance: 40_000,
+      unlockedIcons: [true, false, false, false, false, false],
+      longestDistance: 20_000,
+      longestTime: 1_800,
+      fastestAverageSpeed: 12,
+      fastestAverageSpeedDate: oldSpeedDate,
+      longestDistanceDate: oldDistanceDate,
+      longestTimeDate: oldTimeDate,
+      totalRoutes: 4
+    )
+    let records = CyclingRecords()
+
+    records.updateCyclingRecords(
+      speeds: [12, 13],
+      distance: 5_000,
+      startTime: date(2026, 6, 18),
+      time: 600
+    )
+
+    #expect(records.totalCyclingDistance == 45_000)
+    #expect(records.totalCyclingTime == 1_600)
+    #expect(records.totalCyclingRoutes == 5)
+    #expect(records.longestCyclingDistance == 20_000)
+    #expect(records.longestCyclingTime == 1_800)
+    #expect(records.longestCyclingDistanceDate == oldDistanceDate)
+    #expect(records.longestCyclingTimeDate == oldTimeDate)
+    #expect(records.fastestAverageSpeed == 12)
+    #expect(records.fastestAverageSpeedDate == oldSpeedDate)
+    expectPersistedRecords(
+      totalTime: 1_600,
+      totalDistance: 45_000,
+      unlockedIcons: [true, false, false, false, false, false],
+      longestDistance: 20_000,
+      longestTime: 1_800,
+      fastestAverageSpeed: 12,
+      fastestAverageSpeedDate: oldSpeedDate,
+      longestDistanceDate: oldDistanceDate,
+      longestTimeDate: oldTimeDate,
+      totalRoutes: 5,
+      assertICloud: assertICloud
+    )
+  }
+
   @Test("updates unlocked icons from individual and total distance thresholds")
   @MainActor
   func updatesUnlockedIconsFromDistanceThresholds() {
@@ -101,6 +156,53 @@ struct CyclingRecordsTests {
           == [true, true, true, true, true, true]
       )
     }
+  }
+
+  @Test("unlocks cumulative awards when a completed ride crosses the total threshold")
+  @MainActor
+  func unlocksCumulativeAwardsWhenRideCrossesTotalThreshold() {
+    let snapshot = PersistedStoreSnapshot(keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+    defer { snapshot.restore() }
+    let assertICloud = ubiquitousStorePersistsValues()
+
+    let oldSpeedDate = date(2026, 5, 1)
+    let oldDistanceDate = date(2026, 5, 2)
+    let oldTimeDate = date(2026, 5, 3)
+    seedRecordStores(
+      totalTime: 1_000,
+      totalDistance: 99_000,
+      unlockedIcons: [false, false, false, false, false, false],
+      longestDistance: 9_000,
+      longestTime: 1_500,
+      fastestAverageSpeed: 12,
+      fastestAverageSpeedDate: oldSpeedDate,
+      longestDistanceDate: oldDistanceDate,
+      longestTimeDate: oldTimeDate,
+      totalRoutes: 9
+    )
+    let records = CyclingRecords()
+
+    records.updateCyclingRecords(
+      speeds: [12],
+      distance: 2_000,
+      startTime: date(2026, 6, 18),
+      time: 200
+    )
+
+    #expect(records.unlockedIcons == [false, false, false, true, false, false])
+    expectPersistedRecords(
+      totalTime: 1_200,
+      totalDistance: 101_000,
+      unlockedIcons: [false, false, false, true, false, false],
+      longestDistance: 9_000,
+      longestTime: 1_500,
+      fastestAverageSpeed: 12,
+      fastestAverageSpeedDate: oldSpeedDate,
+      longestDistanceDate: oldDistanceDate,
+      longestTimeDate: oldTimeDate,
+      totalRoutes: 10,
+      assertICloud: assertICloud
+    )
   }
 
   @Test("ignores missing speeds when updating fastest average speed")
@@ -144,6 +246,117 @@ struct CyclingRecordsTests {
         NSUbiquitousKeyValueStore.default.object(forKey: "fastestAverageSpeedDate") as? Date
           == oldSpeedDate)
     }
+  }
+
+  @Test("ignores sub one kilometer rides when updating fastest average speed")
+  @MainActor
+  func ignoresSubOneKilometerRidesWhenUpdatingFastestAverageSpeed() {
+    let snapshot = PersistedStoreSnapshot(keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+    defer { snapshot.restore() }
+    let assertICloud = ubiquitousStorePersistsValues()
+
+    let oldSpeedDate = date(2026, 5, 1)
+    seedRecordStores(
+      totalTime: 1_000,
+      totalDistance: 10_000,
+      unlockedIcons: [false, false, false, false, false, false],
+      longestDistance: 8_000,
+      longestTime: 900,
+      fastestAverageSpeed: 5,
+      fastestAverageSpeedDate: oldSpeedDate,
+      longestDistanceDate: date(2026, 5, 2),
+      longestTimeDate: date(2026, 5, 3),
+      totalRoutes: 2
+    )
+    let records = CyclingRecords()
+
+    records.updateCyclingRecords(
+      speeds: [20],
+      distance: 999,
+      startTime: date(2026, 6, 18),
+      time: 50
+    )
+
+    expectFastestAverageSpeedUnchanged(
+      records: records,
+      fastestAverageSpeed: 5,
+      fastestAverageSpeedDate: oldSpeedDate,
+      assertICloud: assertICloud
+    )
+  }
+
+  @Test("ignores averages faster than the sampled maximum speed")
+  @MainActor
+  func ignoresAveragesFasterThanSampledMaximumSpeed() {
+    let snapshot = PersistedStoreSnapshot(keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+    defer { snapshot.restore() }
+    let assertICloud = ubiquitousStorePersistsValues()
+
+    let oldSpeedDate = date(2026, 5, 1)
+    seedRecordStores(
+      totalTime: 1_000,
+      totalDistance: 10_000,
+      unlockedIcons: [false, false, false, false, false, false],
+      longestDistance: 8_000,
+      longestTime: 900,
+      fastestAverageSpeed: 5,
+      fastestAverageSpeedDate: oldSpeedDate,
+      longestDistanceDate: date(2026, 5, 2),
+      longestTimeDate: date(2026, 5, 3),
+      totalRoutes: 2
+    )
+    let records = CyclingRecords()
+
+    records.updateCyclingRecords(
+      speeds: [8],
+      distance: 3_000,
+      startTime: date(2026, 6, 18),
+      time: 300
+    )
+
+    expectFastestAverageSpeedUnchanged(
+      records: records,
+      fastestAverageSpeed: 5,
+      fastestAverageSpeedDate: oldSpeedDate,
+      assertICloud: assertICloud
+    )
+  }
+
+  @Test("ignores slower valid rides when updating fastest average speed")
+  @MainActor
+  func ignoresSlowerValidRidesWhenUpdatingFastestAverageSpeed() {
+    let snapshot = PersistedStoreSnapshot(keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+    defer { snapshot.restore() }
+    let assertICloud = ubiquitousStorePersistsValues()
+
+    let oldSpeedDate = date(2026, 5, 1)
+    seedRecordStores(
+      totalTime: 1_000,
+      totalDistance: 10_000,
+      unlockedIcons: [false, false, false, false, false, false],
+      longestDistance: 8_000,
+      longestTime: 900,
+      fastestAverageSpeed: 11,
+      fastestAverageSpeedDate: oldSpeedDate,
+      longestDistanceDate: date(2026, 5, 2),
+      longestTimeDate: date(2026, 5, 3),
+      totalRoutes: 2
+    )
+    let records = CyclingRecords()
+
+    records.updateCyclingRecords(
+      speeds: [10],
+      distance: 3_000,
+      startTime: date(2026, 6, 18),
+      time: 300
+    )
+
+    expectFastestAverageSpeedUnchanged(
+      records: records,
+      fastestAverageSpeed: 11,
+      fastestAverageSpeedDate: oldSpeedDate,
+      assertICloud: assertICloud
+    )
   }
 
   @Test("resets statistics while preserving unlocked icons")
@@ -199,6 +412,12 @@ struct CyclingRecordsTests {
     #expect(CyclingRecords.shared.totalCyclingTime == 0)
     #expect(CyclingRecords.shared.totalCyclingDistance == 0)
     #expect(CyclingRecords.shared.totalCyclingRoutes == 0)
+    #expect(CyclingRecords.shared.longestCyclingDistance == 0)
+    #expect(CyclingRecords.shared.longestCyclingTime == 0)
+    #expect(CyclingRecords.shared.fastestAverageSpeed == 0)
+    #expect(CyclingRecords.shared.fastestAverageSpeedDate == nil)
+    #expect(CyclingRecords.shared.longestCyclingDistanceDate == nil)
+    #expect(CyclingRecords.shared.longestCyclingTimeDate == nil)
     #expect(CyclingRecords.shared.unlockedIcons == unlockedIcons)
   }
 }
@@ -236,6 +455,29 @@ private func setRecordValue(_ value: Any?, forKey key: String) {
   } else {
     UserDefaults.standard.removeObject(forKey: key)
     NSUbiquitousKeyValueStore.default.removeObject(forKey: key)
+  }
+}
+
+private func expectFastestAverageSpeedUnchanged(
+  records: CyclingRecords,
+  fastestAverageSpeed: Double,
+  fastestAverageSpeedDate: Date,
+  assertICloud: Bool
+) {
+  #expect(records.fastestAverageSpeed == fastestAverageSpeed)
+  #expect(records.fastestAverageSpeedDate == fastestAverageSpeedDate)
+  #expect(UserDefaults.standard.double(forKey: "fastestAverageSpeed") == fastestAverageSpeed)
+  #expect(
+    UserDefaults.standard.object(forKey: "fastestAverageSpeedDate") as? Date
+      == fastestAverageSpeedDate)
+  // TODO(#24): Replace this runtime iCloud guard with deterministic unavailable-store coverage.
+  if assertICloud {
+    #expect(
+      NSUbiquitousKeyValueStore.default.double(forKey: "fastestAverageSpeed")
+        == fastestAverageSpeed)
+    #expect(
+      NSUbiquitousKeyValueStore.default.object(forKey: "fastestAverageSpeedDate") as? Date
+        == fastestAverageSpeedDate)
   }
 }
 
