@@ -61,6 +61,7 @@ struct SettingsView: View {
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())
+        .accessibilityIdentifier("main-tab-settings")
     }
 }
 

@@ -24,7 +24,7 @@ env:
 jobs:
   unit-tests:
     if: github.repository == 'hubertgajewski/gocycling' && vars.CI_RUN_UNIT_TESTS != 'false'
-    name: Unit tests (iPhone)
+    name: Unit tests (iPhone 17)
     runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'macos-26' || vars.RUNNER || 'macos-26' }}
     timeout-minutes: 12
     steps:
@@ -76,37 +76,51 @@ jobs:
 
   ui-tests:
     if: github.repository == 'hubertgajewski/gocycling' && vars.CI_RUN_UI_TESTS != 'false'
-    name: UI smoke (${{ matrix.label }})
-    runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'macos-26' || vars.RUNNER || 'macos-26' }}
+    name: UI smoke (${{ matrix.runtime }} / ${{ matrix.device_label }})
+    runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && matrix.os || vars.RUNNER || matrix.os }}
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
+        # GitHub-hosted runners do not provide iOS/iPadOS 14-16 simulators here;
+        # this matrix covers representative hosted runtimes from the current runner lines.
         include:
-          - id: iphone-se
-            label: iPhone SE
+          - id: ios17-iphone-se
+            os: macos-14
+            runtime: iOS 17
+            device_label: iPhone SE 3rd gen
             family: iPhone
             device: "iPhone SE (3rd generation)"
-          - id: iphone
-            label: iPhone
+          - id: ios17-ipad-mini
+            os: macos-14
+            runtime: iOS 17
+            device_label: iPad mini 6th gen
+            family: iPad
+            device: "iPad mini (6th generation)"
+          - id: ios18-iphone
+            os: macos-15
+            runtime: iOS 18
+            device_label: iPhone 16
+            family: iPhone
+            device: "iPhone 16"
+          - id: ios18-ipad
+            os: macos-15
+            runtime: iOS 18
+            device_label: iPad 10th gen
+            family: iPad
+            device: "iPad (10th generation)"
+          - id: ios26-iphone
+            os: macos-26
+            runtime: iOS 26
+            device_label: iPhone 17
             family: iPhone
             device: "iPhone 17"
-          - id: iphone-max
-            label: iPhone Max
-            family: iPhone
-            device: "iPhone 17 Pro Max"
-          - id: ipad-mini
-            label: iPad mini
-            family: iPad
-            device: "iPad mini (A17 Pro)"
-          - id: ipad-11
-            label: iPad 11-inch
+          - id: ios26-ipad
+            os: macos-26
+            runtime: iOS 26
+            device_label: iPad Pro 11 M5
             family: iPad
             device: "iPad Pro 11-inch (M5)"
-          - id: ipad-13
-            label: iPad 13-inch
-            family: iPad
-            device: "iPad Pro 13-inch (M5)"
     steps:
       - name: Checkout
         uses: actions/checkout@v6

@@ -52,9 +52,6 @@ if preferred:
     for device in devices:
         if device.get("name") == preferred:
             emit(device)
-    for device in devices:
-        if match_name(device, preferred.split(" (")[0]):
-            emit(device)
 
 preferred_fallbacks: dict[str, list[str]] = {
     "iPhone SE (3rd generation)": [
@@ -68,9 +65,19 @@ preferred_fallbacks: dict[str, list[str]] = {
         "iPhone 16 Pro Max",
         "iPhone 15 Pro Max",
     ],
+    "iPad mini (6th generation)": [
+        "iPad mini (6th generation)",
+        "iPad mini (A17 Pro)",
+        "iPad mini",
+    ],
     "iPad mini (A17 Pro)": [
         "iPad mini (A17 Pro)",
         "iPad mini",
+    ],
+    "iPad (10th generation)": [
+        "iPad (10th generation)",
+        "iPad (A16)",
+        "iPad (",
     ],
     "iPad Pro 11-inch (M5)": [
         "iPad Pro 11-inch (M5)",
@@ -86,6 +93,11 @@ preferred_fallbacks: dict[str, list[str]] = {
 for candidate in preferred_fallbacks.get(preferred, []):
     for device in devices:
         if match_name(device, candidate):
+            emit(device)
+
+if preferred:
+    for device in devices:
+        if match_name(device, preferred.split(" (")[0]):
             emit(device)
 
 fallback_names = {

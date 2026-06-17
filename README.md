@@ -58,10 +58,17 @@ Simulator builds typically work with a free Personal Team once signing is config
 GitHub Actions runs on every push to `main` and on pull requests:
 
 - **Unit tests** — `Go CyclingTests` on an iPhone simulator
-- **UI smoke tests** — `Go CyclingUITests` on six iPhone and iPad simulator sizes (compact, standard, and large form factors)
+- **UI smoke tests** — `Go CyclingUITests` on representative iPhone and iPad simulators across the hosted `macos-14`, `macos-15`, and `macos-26` runner lines
+
+The hosted UI smoke matrix currently requests these simulators:
+
+- `macos-14` - iPhone SE (3rd generation), iPad mini (6th generation)
+- `macos-15` - iPhone 16, iPad (10th generation)
+- `macos-26` - iPhone 17, iPad Pro 11-inch (M5)
 
 CI copies `TelemetryDeck.xcconfig.example` to `TelemetryDeck.xcconfig` when the gitignored file is absent, so no TelemetryDeck account is required. Simulator builds pass `DEVELOPMENT_TEAM=` so no committed development team is needed.
 CI also passes `-retry-tests-on-failure`, which retries failed tests using Xcode's default maximum of 3 iterations.
+GitHub-hosted CI does not provide iOS/iPadOS 14, 15, or 16 simulator coverage on those runner lines; the deployment target, availability checks, and optional physical-device, self-hosted-runner, or device-cloud testing remain the compatibility path for those OS versions.
 
 Reproduce the unit tests locally:
 

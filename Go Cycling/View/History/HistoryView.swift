@@ -10,6 +10,7 @@ import SwiftUI
 struct HistoryView: View {
     var body: some View {
         BikeRideListView()
+            .accessibilityIdentifier("main-tab-history")
     }
 }
 

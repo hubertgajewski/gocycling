@@ -146,6 +146,7 @@ struct CycleView: View {
                 }
             }
         }
+        .accessibilityIdentifier("main-tab-cycle")
     }
     
     func formatTimeString(accumulatedTime: TimeInterval) -> String {
