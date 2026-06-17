@@ -29,10 +29,6 @@ class CyclingRecords: ObservableObject {
     static private let initKey = "didSetupRecords"
     static private let keys = ["totalCyclingTime", "totalCyclingDistance", "unlockedIcons", "longestCyclingDistance", "longestCyclingTime", "fastestAverageSpeed", "fastestAverageSpeedDate", "longestCyclingDistanceDate", "longestCyclingTimeDate", "totalCyclingRoutes"]
     static private let keyTypes = [2, 2, 0, 2, 2, 2, 3, 3, 3, 1] // 0: [Bool], 1: Int, 2: Double, 3: Date
-    static var persistedStoreKeys: [String] {
-        [initKey] + keys
-    }
-    
     static private let numberOfUnlockableIcons = 6
     static let awardValues: [Double] = [10.0 * 1000, 25.0 * 1000, 50.0 * 1000, 100.0 * 1000, 250.0 * 1000, 500.0 * 1000]
     
@@ -86,7 +82,7 @@ class CyclingRecords: ObservableObject {
         // Set class attributes based on local copy of data
         self.totalCyclingTime = UserDefaults.standard.double(forKey: CyclingRecords.keys[0])
         self.totalCyclingDistance = UserDefaults.standard.double(forKey: CyclingRecords.keys[1])
-        self.unlockedIcons = UserDefaults.standard.array(forKey: CyclingRecords.keys[2]) as? [Bool] ?? [Bool].init(repeating: false, count: CyclingRecords.numberOfUnlockableIcons)
+        self.unlockedIcons = UserDefaults.standard.array(forKey: CyclingRecords.keys[2]) as! [Bool]
         self.longestCyclingDistance = UserDefaults.standard.double(forKey: CyclingRecords.keys[3])
         self.longestCyclingTime = UserDefaults.standard.double(forKey: CyclingRecords.keys[4])
         self.fastestAverageSpeed = UserDefaults.standard.double(forKey: CyclingRecords.keys[5])
@@ -109,10 +105,10 @@ class CyclingRecords: ObservableObject {
         }
     }
     
-    func writeToClassMembers() {
+    private func writeToClassMembers() {
         self.totalCyclingTime = UserDefaults.standard.double(forKey: CyclingRecords.keys[0])
         self.totalCyclingDistance = UserDefaults.standard.double(forKey: CyclingRecords.keys[1])
-        self.unlockedIcons = UserDefaults.standard.array(forKey: CyclingRecords.keys[2]) as? [Bool] ?? [Bool].init(repeating: false, count: CyclingRecords.numberOfUnlockableIcons)
+        self.unlockedIcons = UserDefaults.standard.array(forKey: CyclingRecords.keys[2]) as! [Bool]
         self.longestCyclingDistance = UserDefaults.standard.double(forKey: CyclingRecords.keys[3])
         self.longestCyclingTime = UserDefaults.standard.double(forKey: CyclingRecords.keys[4])
         self.fastestAverageSpeed = UserDefaults.standard.double(forKey: CyclingRecords.keys[5])

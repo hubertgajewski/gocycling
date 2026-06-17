@@ -17,6 +17,19 @@ class GoCyclingTests: XCTestCase {
   private var savedUserDefaultsKeys = Set<String>()
   private var savedICloudValues = [String: Any]()
   private var savedICloudKeys = Set<String>()
+  private let persistedStoreKeys = [
+    "didSetupRecords",
+    "totalCyclingTime",
+    "totalCyclingDistance",
+    "unlockedIcons",
+    "longestCyclingDistance",
+    "longestCyclingTime",
+    "fastestAverageSpeed",
+    "fastestAverageSpeedDate",
+    "longestCyclingDistanceDate",
+    "longestCyclingTimeDate",
+    "totalCyclingRoutes",
+  ]
 
   override func setUpWithError() throws {
     continueAfterFailure = false
@@ -26,7 +39,7 @@ class GoCyclingTests: XCTestCase {
     savedICloudValues = [:]
     savedICloudKeys = []
 
-    for key in CyclingRecords.persistedStoreKeys {
+    for key in persistedStoreKeys {
       if let value = UserDefaults.standard.object(forKey: key), !(value is NSNull) {
         savedUserDefaultsKeys.insert(key)
         savedUserDefaultsValues[key] = value
@@ -39,7 +52,7 @@ class GoCyclingTests: XCTestCase {
   }
 
   override func tearDownWithError() throws {
-    for key in CyclingRecords.persistedStoreKeys {
+    for key in persistedStoreKeys {
       restore(
         key: key, hadKey: savedUserDefaultsKeys.contains(key), value: savedUserDefaultsValues[key],
         in: UserDefaults.standard)
@@ -48,10 +61,12 @@ class GoCyclingTests: XCTestCase {
         in: NSUbiquitousKeyValueStore.default)
     }
     NSUbiquitousKeyValueStore.default.synchronize()
-    CyclingRecords.shared.writeToClassMembers()
   }
 
   func testResetStatisticsZerosTotalCyclingRoutesInLocalAndICloudStores() throws {
+    UserDefaults.standard.set([Bool](repeating: false, count: 6), forKey: "unlockedIcons")
+    NSUbiquitousKeyValueStore.default.set(
+      [Bool](repeating: false, count: 6), forKey: "unlockedIcons")
     UserDefaults.standard.set(7, forKey: "totalCyclingRoutes")
     NSUbiquitousKeyValueStore.default.set(7 as Int, forKey: "totalCyclingRoutes")
 
