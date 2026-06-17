@@ -77,6 +77,12 @@ struct GoCyclingApp: App {
 
                     // Gate mid-session telemetry signals based on stored preference
                     TelemetryManager.sharedTelemetryManager.userTelemetryEnabled = preferences.telemetryEnabled
+
+                    UITestingRouteSaveFixture.runIfNeeded(
+                        persistenceController: persistenceController,
+                        records: records,
+                        preferences: preferences
+                    )
                 })
         }
         .onChange(of: scenePhase) { _ in

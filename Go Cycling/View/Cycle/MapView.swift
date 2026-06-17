@@ -130,16 +130,21 @@ struct MapView: UIViewRepresentable {
                     context.coordinator.lastRenderedCount = 0
                     let overlays = view.overlays
                     view.removeOverlays(overlays)
-                    persistenceController.storeBikeRide(locations: locationManager.cyclingLocations,
-                                                        speeds: locationManager.cyclingSpeeds,
-                                                        distance: locationManager.cyclingTotalDistance,
-                                                        elevations: locationManager.cyclingAltitudes,
-                                                        startTime: cyclingStartTime,
-                                                        time: timeCycling) {
-                        records.updateCyclingRecords(speeds: locationManager.cyclingSpeeds, distance: locationManager.cyclingTotalDistance, startTime: cyclingStartTime, time: timeCycling)
+                    let completedRoute = CompletedRouteSnapshot(
+                        locations: locationManager.cyclingLocations,
+                        speeds: locationManager.cyclingSpeeds,
+                        distance: locationManager.cyclingTotalDistance,
+                        elevations: locationManager.cyclingAltitudes,
+                        startTime: cyclingStartTime,
+                        time: timeCycling
+                    )
+                    CompletedRouteSaveCoordinator(
+                        persistenceController: persistenceController,
+                        records: records
+                    ).save(completedRoute, cleanup: {
                         locationManager.clearLocationArray()
                         locationManager.stopTrackingBackgroundLocation()
-                    }
+                    })
                 }
             }
         }

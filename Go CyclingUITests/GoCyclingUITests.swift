@@ -68,6 +68,21 @@ class GoCyclingUITests: XCTestCase {
     XCTAssertTrue(tabContent(.settings, in: app).waitForExistence(timeout: 5))
   }
 
+  func testRouteSaveFixtureCreatesHistoryRide() throws {
+    let app = XCUIApplication()
+    app.launchArguments = [UITesting.launchArgument, UITesting.routeSaveFixtureArgument]
+    app.launch()
+
+    XCTAssertTrue(waitForMainChrome(in: app), "Expected Cycle tab chrome after launch")
+
+    tapTab(.history, in: app)
+    XCTAssertTrue(tabContent(.history, in: app).waitForExistence(timeout: 5))
+    XCTAssertTrue(app.staticTexts["Distance Cycled"].waitForExistence(timeout: 8))
+
+    tapTab(.cycle, in: app)
+    XCTAssertTrue(tabContent(.cycle, in: app).waitForExistence(timeout: 5))
+  }
+
   /// iPhone uses a bottom `TabBar`; iPad uses nested floating tab item buttons.
   private func waitForMainChrome(in app: XCUIApplication) -> Bool {
     if app.tabBars.firstMatch.waitForExistence(timeout: 2) {

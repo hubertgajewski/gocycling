@@ -7,10 +7,15 @@ import Foundation
 
 enum UITesting {
     static let launchArgument = "-ui-testing"
+    static let routeSaveFixtureArgument = "-ui-testing-route-save-fixture"
 
     #if DEBUG
     static var isEnabled: Bool {
         ProcessInfo.processInfo.arguments.contains(launchArgument)
+    }
+
+    static var shouldRunRouteSaveFixture: Bool {
+        isEnabled && ProcessInfo.processInfo.arguments.contains(routeSaveFixtureArgument)
     }
 
     static var shouldRequestLocationAuthorization: Bool {
@@ -22,6 +27,8 @@ enum UITesting {
     }
     #else
     static var isEnabled: Bool { false }
+
+    static var shouldRunRouteSaveFixture: Bool { false }
 
     static var shouldRequestLocationAuthorization: Bool { true }
 
