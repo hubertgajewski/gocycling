@@ -61,6 +61,7 @@ GitHub Actions runs on every push to `main` and on pull requests:
 - **UI smoke tests** — `Go CyclingUITests` on six iPhone and iPad simulator sizes (compact, standard, and large form factors)
 
 CI copies `TelemetryDeck.xcconfig.example` to `TelemetryDeck.xcconfig` when the gitignored file is absent, so no TelemetryDeck account is required. Simulator builds pass `DEVELOPMENT_TEAM=` so no committed development team is needed.
+CI also passes `-retry-tests-on-failure`, which retries failed tests using Xcode's default maximum of 3 iterations.
 
 Reproduce the unit tests locally:
 
@@ -73,6 +74,7 @@ xcodebuild \
   -configuration Debug \
   -destination "$DEST" \
   -only-testing:"Go CyclingTests" \
+  -retry-tests-on-failure \
   DEVELOPMENT_TEAM= \
   test
 ```
@@ -87,6 +89,7 @@ xcodebuild \
   -configuration Debug \
   -destination "$DEST" \
   -only-testing:"Go CyclingUITests" \
+  -retry-tests-on-failure \
   DEVELOPMENT_TEAM= \
   test
 ```
