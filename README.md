@@ -1,5 +1,7 @@
 # GoCycling
 
+> This repository is a fork of [AnthonyH93/GoCycling](https://github.com/AnthonyH93/GoCycling). Fork-specific setup notes, maintenance changes, CI updates, and feature differences are documented in [FORK_CHANGES.md](FORK_CHANGES.md).
+
 [![Tests](https://github.com/hubertgajewski/gocycling/actions/workflows/tests.yml/badge.svg)](https://github.com/hubertgajewski/gocycling/actions/workflows/tests.yml)
 
 ## Available on the iOS App Store
@@ -27,96 +29,6 @@ Go Cycling makes use of many of Apple's frameworks and API's including:
 This app is designed to support all iPhones and iPads with iOS14/iPadOS14 and above due to the use of the latest SwiftUI features.
 
 For iPads, this includes support for both landscape and portait modes along with Slide Over and multitasking screen sizes.
-
-## Local development (fork)
-
-After cloning this repository, complete the steps below before building in Xcode.
-
-### TelemetryDeck configuration
-
-The app target references `TelemetryDeck.xcconfig` at the repository root for the optional TelemetryDeck App ID (`GoCyclingAppID` in `Go Cycling/Info.plist`). That file is gitignored.
-
-```bash
-cp TelemetryDeck.xcconfig.example TelemetryDeck.xcconfig
-```
-
-Leave `GoCyclingAppID` empty for local development without a TelemetryDeck account, or set an App ID from [TelemetryDeck](https://telemetrydeck.com) if you want analytics.
-
-### Git hooks
-
-This repository commits local Git hooks in `.githooks`. Enable them once per clone:
-
-```bash
-git config core.hooksPath .githooks
-```
-
-The pre-commit hook checks staged Swift files under `Go CyclingTests/` and `Go CyclingUITests/` with `swift-format`. App source files under `Go Cycling/` are not part of this scoped formatting rollout yet.
-
-### Code signing (fork owners)
-
-Upstream bundle identifiers and the author development team (`QMBJV5C74X`) belong to the original maintainer. To build on your machine:
-
-1. Open `Go Cycling.xcodeproj` in Xcode and add your Apple ID under **Settings → Accounts**.
-2. For the **Go Cycling**, **Go CyclingTests**, and **Go CyclingUITests** targets, enable **Automatically manage signing** and select your **Development Team**.
-3. Change each target **Bundle Identifier** from `com.hopkins.*` to a unique ID in your namespace (for example `com.example.GoCycling`).
-4. If you change the app bundle ID, update the iCloud container in `Go Cycling/Go Cycling.entitlements` to match (for example `iCloud.com.example.GoCycling`) and let Xcode create the container for your team. In **Signing & Capabilities** for the **Go Cycling** app target, enable **iCloud** (CloudKit) and **HealthKit** if Xcode prompts or those features fail at runtime.
-
-Simulator builds typically work with a free Personal Team once signing is configured.
-
-## Continuous integration
-
-GitHub Actions runs on every push to `main` and on pull requests:
-
-- **Swift format** — `swift-format` linting for `Go CyclingTests` and `Go CyclingUITests`
-- **Unit tests** — `Go CyclingTests` on an iPhone simulator
-- **UI smoke tests** — `Go CyclingUITests` on representative iPhone and iPad simulators across the hosted `macos-14`, `macos-15`, and `macos-26` runner lines
-
-The hosted UI smoke matrix currently requests these simulators:
-
-- `macos-14` - iPhone SE (3rd generation), iPad mini (6th generation)
-- `macos-15` - iPhone 16, iPad (10th generation)
-- `macos-26` - iPhone 17, iPad Pro 11-inch (M5)
-
-CI copies `TelemetryDeck.xcconfig.example` to `TelemetryDeck.xcconfig` when the gitignored file is absent, so no TelemetryDeck account is required. Simulator builds pass `DEVELOPMENT_TEAM=` so no committed development team is needed.
-CI also passes `-retry-tests-on-failure`, which retries failed tests using Xcode's default maximum of 3 iterations.
-GitHub-hosted CI does not provide iOS/iPadOS 14, 15, or 16 simulator coverage on those runner lines; the deployment target, availability checks, and optional physical-device, self-hosted-runner, or device-cloud testing remain the compatibility path for those OS versions.
-
-Reproduce the Swift formatting check locally:
-
-```bash
-xcrun swift-format lint --recursive --strict "Go CyclingTests" "Go CyclingUITests"
-```
-
-Reproduce the unit tests locally:
-
-```bash
-cp -n TelemetryDeck.xcconfig.example TelemetryDeck.xcconfig
-DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17')
-xcodebuild \
-  -project "Go Cycling.xcodeproj" \
-  -scheme "Go Cycling" \
-  -configuration Debug \
-  -destination "$DEST" \
-  -only-testing:"Go CyclingTests" \
-  -retry-tests-on-failure \
-  DEVELOPMENT_TEAM= \
-  test
-```
-
-Reproduce a UI smoke run (substitute the device name as needed):
-
-```bash
-DEST=$(.github/scripts/ios-simulator-destination.sh iPad 'iPad Pro 11-inch (M5)')
-xcodebuild \
-  -project "Go Cycling.xcodeproj" \
-  -scheme "Go Cycling" \
-  -configuration Debug \
-  -destination "$DEST" \
-  -only-testing:"Go CyclingUITests" \
-  -retry-tests-on-failure \
-  DEVELOPMENT_TEAM= \
-  test
-```
 
 ## Usage
 
