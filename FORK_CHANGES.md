@@ -42,6 +42,7 @@ Simulator builds typically work with a free Personal Team once signing is config
 GitHub Actions runs on every push to `main` and on pull requests:
 
 - **Swift format** - `swift-format` linting for `Go CyclingTests` and `Go CyclingUITests`
+- **SwiftPM unit tests** - `swift test` for the package-compatible formatting unit-test slice
 - **Unit tests** - `Go CyclingTests` on an iPhone simulator, with Xcode code coverage published to the workflow summary
 - **UI smoke tests** - `Go CyclingUITests` on representative iPhone and iPad simulators across the hosted `macos-14`, `macos-15`, and `macos-26` runner lines
 
@@ -62,6 +63,12 @@ Reproduce the Swift formatting check locally:
 
 ```bash
 xcrun swift-format lint --recursive --strict "Go CyclingTests" "Go CyclingUITests"
+```
+
+Reproduce the SwiftPM unit-test lane locally:
+
+```bash
+swift test
 ```
 
 Reproduce the unit tests locally:
@@ -115,7 +122,8 @@ Current fork-specific differences include:
 - Focused Swift Testing unit coverage for cycling record sorting, aggregation, unlocked-icon, and reset-statistics behavior, plus UI smoke coverage for the main Cycle, History, Statistics, and Settings tabs.
 - UI testing support through the `-ui-testing` launch argument to avoid location authorization prompts during automated tests.
 - A shared `Go Cycling` Xcode scheme for command-line and CI testing.
-- GitHub Actions coverage for Swift formatting, unit tests, unit-test code coverage summaries, and UI smoke tests.
+- A focused SwiftPM package slice for package-compatible formatting logic, linked from the existing Xcode-owned source and test files so `swift test` complements the Xcode test action.
+- GitHub Actions coverage for Swift formatting, SwiftPM unit tests, Xcode unit tests, unit-test code coverage summaries, and UI smoke tests.
 - CI retries for failed XCTest and XCUITest cases via `-retry-tests-on-failure`.
 - Hosted simulator coverage across selected GitHub-hosted macOS runner lines.
 - Test-target `swift-format` enforcement in CI and the committed pre-commit hook.
