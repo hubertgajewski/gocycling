@@ -32,7 +32,12 @@ jobs:
 
       - name: Select Xcode
         if: env.ACT != 'true' && runner.environment == 'github-hosted'
-        run: sudo xcode-select -s /Applications/Xcode.app
+        run: |
+          if [[ "$(sw_vers -productVersion)" == 14.* ]]; then
+            sudo xcode-select -s /Applications/Xcode_16.2.app
+          else
+            sudo xcode-select -s /Applications/Xcode.app
+          fi
 
       - name: Lint test target Swift formatting
         run: xcrun swift-format lint --recursive --strict "Go CyclingTests" "Go CyclingUITests"
@@ -51,7 +56,12 @@ jobs:
 
       - name: Select Xcode
         if: env.ACT != 'true' && runner.environment == 'github-hosted'
-        run: sudo xcode-select -s /Applications/Xcode.app
+        run: |
+          if [[ "$(sw_vers -productVersion)" == 14.* ]]; then
+            sudo xcode-select -s /Applications/Xcode_16.2.app
+          else
+            sudo xcode-select -s /Applications/Xcode.app
+          fi
 
       - name: Show toolchain
         run: |
@@ -145,7 +155,12 @@ jobs:
 
       - name: Select Xcode
         if: env.ACT != 'true' && runner.environment == 'github-hosted'
-        run: sudo xcode-select -s /Applications/Xcode.app
+        run: |
+          if [[ "$(sw_vers -productVersion)" == 14.* ]]; then
+            sudo xcode-select -s /Applications/Xcode_16.2.app
+          else
+            sudo xcode-select -s /Applications/Xcode.app
+          fi
 
       - name: Resolve simulator destination
         id: destination
