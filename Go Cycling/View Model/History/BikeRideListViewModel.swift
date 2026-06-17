@@ -11,15 +11,34 @@ import CoreData
 
 class BikeRideListViewModel: ObservableObject {
 
-    @Published var bikeRides: [BikeRide] = BikeRide.allBikeRidesSorted()
-    @Published var categories: [Category] = BikeRide.allCategories()
-    @Published var currentSortChoice: SortChoice = Preferences.storedSortingChoice()
-    @Published var currentName: String = Preferences.storedSelectedRoute()
+    @Published var bikeRides: [BikeRide]
+    @Published var categories: [Category]
+    @Published var currentSortChoice: SortChoice
+    @Published var currentName: String
+
+    private let categoryProvider: () -> [Category]
     
-    init() {
+    init(
+        bikeRides: [BikeRide] = BikeRide.allBikeRidesSorted(),
+        categories: [Category] = BikeRide.allCategories(),
+        currentSortChoice: SortChoice = Preferences.storedSortingChoice(),
+        currentName: String = Preferences.storedSelectedRoute(),
+        categoryProvider: @escaping () -> [Category] = BikeRide.allCategories,
+        reviewActionsEnabled: Bool = true
+    ) {
+        self.bikeRides = bikeRides
+        self.categories = categories
+        self.currentSortChoice = currentSortChoice
+        self.currentName = currentName
+        self.categoryProvider = categoryProvider
+
         let valid = validateCategory(name: currentName)
         if (valid == false) {
-            currentName = ""
+            self.currentName = ""
+        }
+
+        guard reviewActionsEnabled else {
+            return
         }
         
         // Launching history tab is a review worthy action
@@ -140,7 +159,7 @@ class BikeRideListViewModel: ObservableObject {
     
     // Function to update categories
     func updateCategories() {
-        categories = BikeRide.allCategories()
+        categories = categoryProvider()
         let valid = validateCategory(name: currentName)
         if (valid == false) {
             currentName = ""
