@@ -122,7 +122,7 @@ struct ActivityAwardsViewModelTests {
         == "Cycle at least 10.0 km in a single route")
     #expect(
       viewModel.getAwardName(index: 3, usingMetric: false)
-        == "Cycle a total of at least 62.14 mi",
+        == "Cycle a total of at least 62.14 mi"
     )
   }
 }
