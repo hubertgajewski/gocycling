@@ -33,6 +33,15 @@ class GoCyclingUITests: XCTestCase {
             case .settings: return "Settings"
             }
         }
+
+        var contentIdentifier: String {
+            switch self {
+            case .cycle: return "main-tab-cycle"
+            case .history: return "main-tab-history"
+            case .statistics: return "main-tab-statistics"
+            case .settings: return "main-tab-settings"
+            }
+        }
     }
 
     override func setUpWithError() throws {
@@ -46,16 +55,17 @@ class GoCyclingUITests: XCTestCase {
 
         XCTAssertTrue(waitForMainChrome(in: app), "Expected Cycle tab chrome after launch")
 
+        XCTAssertTrue(tabContent(.cycle, in: app).waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["Start"].waitForExistence(timeout: 3))
 
         tapTab(.history, in: app)
-        XCTAssertTrue(app.navigationBars["Cycling History"].waitForExistence(timeout: 3))
+        XCTAssertTrue(tabContent(.history, in: app).waitForExistence(timeout: 5))
 
         tapTab(.statistics, in: app)
-        XCTAssertTrue(app.navigationBars["Cycling Statistics"].waitForExistence(timeout: 3))
+        XCTAssertTrue(tabContent(.statistics, in: app).waitForExistence(timeout: 5))
 
         tapTab(.settings, in: app)
-        XCTAssertTrue(app.staticTexts["Customization"].waitForExistence(timeout: 5))
+        XCTAssertTrue(tabContent(.settings, in: app).waitForExistence(timeout: 5))
     }
 
     /// iPhone uses a bottom `TabBar`; iPad uses nested floating tab item buttons.
@@ -76,6 +86,10 @@ class GoCyclingUITests: XCTestCase {
             return tabBarByIdentifier.firstMatch
         }
         return app.buttons.matching(identifier: tab.imageIdentifier).firstMatch
+    }
+
+    private func tabContent(_ tab: MainTab, in app: XCUIApplication) -> XCUIElement {
+        app.descendants(matching: .any).matching(identifier: tab.contentIdentifier).firstMatch
     }
 
     private func tapTab(_ tab: MainTab, in app: XCUIApplication) {
