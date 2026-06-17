@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import Testing
 
 let iCloudSyncPreferenceKey = "iCloudOn"
 
@@ -21,7 +22,46 @@ let cyclingRecordStoreKeys = [
   "totalCyclingRoutes",
 ]
 
+private let persistedStoreSnapshotGate = PersistedStoreSnapshotGate()
+
+private final class PersistedStoreSnapshotGate: @unchecked Sendable {
+  private let semaphore = DispatchSemaphore(value: 1)
+
+  func acquire() {
+    semaphore.wait()
+  }
+
+  func release() {
+    semaphore.signal()
+  }
+}
+
+private final class PersistedStoreSnapshotPermit: @unchecked Sendable {
+  private let stateLock = NSLock()
+  private var isReleased = false
+
+  init() {
+    persistedStoreSnapshotGate.acquire()
+  }
+
+  deinit {
+    release()
+  }
+
+  func release() {
+    stateLock.lock()
+    let shouldRelease = !isReleased
+    isReleased = true
+    stateLock.unlock()
+
+    if shouldRelease {
+      persistedStoreSnapshotGate.release()
+    }
+  }
+}
+
 struct PersistedStoreSnapshot {
+  private let permit: PersistedStoreSnapshotPermit
   private let keys: [String]
   private let userDefaultsValues: [String: Any]
   private let userDefaultsKeys: Set<String>
@@ -29,6 +69,7 @@ struct PersistedStoreSnapshot {
   private let iCloudKeys: Set<String>
 
   init(keys: [String]) {
+    self.permit = PersistedStoreSnapshotPermit()
     self.keys = keys
 
     var userDefaultsValues = [String: Any]()
@@ -54,6 +95,8 @@ struct PersistedStoreSnapshot {
   }
 
   func restore() {
+    defer { permit.release() }
+
     for key in keys {
       restore(
         key: key,
@@ -103,4 +146,76 @@ func ubiquitousStorePersistsValues() -> Bool {
   }
   store.synchronize()
   return persistsValues
+}
+
+@Suite("PersistedStoreSnapshot", .serialized)
+struct PersistedStoreSnapshotTests {
+  @Test("serializes overlapping snapshots")
+  func serializesOverlappingSnapshots() {
+    let key = "GoCyclingTests.persistedStoreSnapshotLock"
+    let userDefaultsValue = UserDefaults.standard.object(forKey: key)
+    let iCloudValue = NSUbiquitousKeyValueStore.default.object(forKey: key)
+    defer { restoreProbeValues(userDefaultsValue: userDefaultsValue, iCloudValue: iCloudValue) }
+
+    let firstSnapshotReady = DispatchSemaphore(value: 0)
+    let releaseFirstSnapshot = DispatchSemaphore(value: 0)
+    let secondSnapshotAttemptStarted = DispatchSemaphore(value: 0)
+    let secondSnapshotReturned = DispatchSemaphore(value: 0)
+    let completedSnapshots = DispatchSemaphore(value: 0)
+    defer { releaseFirstSnapshot.signal() }
+
+    DispatchQueue.global(qos: .userInitiated).async {
+      let firstSnapshot = PersistedStoreSnapshot(keys: [key])
+      firstSnapshotReady.signal()
+      releaseFirstSnapshot.wait()
+      firstSnapshot.restore()
+      completedSnapshots.signal()
+    }
+
+    #expect(firstSnapshotReady.wait(timeout: .now() + .seconds(2)) == .success)
+
+    DispatchQueue.global(qos: .userInitiated).async {
+      secondSnapshotAttemptStarted.signal()
+      let secondSnapshot = PersistedStoreSnapshot(keys: [key])
+      secondSnapshotReturned.signal()
+      secondSnapshot.restore()
+      completedSnapshots.signal()
+    }
+
+    #expect(secondSnapshotAttemptStarted.wait(timeout: .now() + .seconds(2)) == .success)
+    let secondReturnedBeforeRelease = secondSnapshotReturned.wait(
+      timeout: .now() + .milliseconds(200)
+    )
+    #expect(secondReturnedBeforeRelease == .timedOut)
+
+    releaseFirstSnapshot.signal()
+    if secondReturnedBeforeRelease == .timedOut {
+      #expect(secondSnapshotReturned.wait(timeout: .now() + .seconds(2)) == .success)
+    }
+    #expect(completedSnapshots.wait(timeout: .now() + .seconds(2)) == .success)
+    #expect(completedSnapshots.wait(timeout: .now() + .seconds(2)) == .success)
+  }
+
+  private func restoreProbeValues(userDefaultsValue: Any?, iCloudValue: Any?) {
+    let key = "GoCyclingTests.persistedStoreSnapshotLock"
+    restoreProbeValue(userDefaultsValue, key: key, in: UserDefaults.standard)
+    restoreProbeValue(iCloudValue, key: key, in: NSUbiquitousKeyValueStore.default)
+    NSUbiquitousKeyValueStore.default.synchronize()
+  }
+
+  private func restoreProbeValue(_ value: Any?, key: String, in defaults: UserDefaults) {
+    if let value {
+      defaults.set(value, forKey: key)
+    } else {
+      defaults.removeObject(forKey: key)
+    }
+  }
+
+  private func restoreProbeValue(_ value: Any?, key: String, in store: NSUbiquitousKeyValueStore) {
+    if let value {
+      store.set(value, forKey: key)
+    } else {
+      store.removeObject(forKey: key)
+    }
+  }
 }
