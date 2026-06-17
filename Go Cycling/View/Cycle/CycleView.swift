@@ -45,7 +45,7 @@ struct CycleView: View {
                     )
                 }
                 VStack(spacing: 4) {
-                    Text(formatTimeString(accumulatedTime: timer.totalAccumulatedTime))
+                    Text(Self.formatTimeString(accumulatedTime: timer.totalAccumulatedTime))
                         .font(.custom("Avenir", size: 40))
                     if isAutoPaused {
                         HStack(spacing: 6) {
@@ -149,7 +149,7 @@ struct CycleView: View {
         .accessibilityIdentifier("main-tab-cycle")
     }
     
-    func formatTimeString(accumulatedTime: TimeInterval) -> String {
+    static func formatTimeString(accumulatedTime: TimeInterval) -> String {
         let hours = Int(accumulatedTime) / 3600
         let minutes = Int(accumulatedTime) / 60 % 60
         let seconds = Int(accumulatedTime) % 60
