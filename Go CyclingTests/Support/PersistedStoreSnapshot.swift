@@ -5,6 +5,26 @@
 
 import Foundation
 
+private let persistedStoreSnapshotLock = NSRecursiveLock()
+
+private final class PersistedStoreSnapshotLockToken {
+  private var isUnlocked = false
+
+  init() {
+    persistedStoreSnapshotLock.lock()
+  }
+
+  deinit {
+    unlockIfNeeded()
+  }
+
+  func unlockIfNeeded() {
+    guard !isUnlocked else { return }
+    isUnlocked = true
+    persistedStoreSnapshotLock.unlock()
+  }
+}
+
 let iCloudSyncPreferenceKey = "iCloudOn"
 
 let cyclingRecordStoreKeys = [
@@ -22,6 +42,7 @@ let cyclingRecordStoreKeys = [
 ]
 
 struct PersistedStoreSnapshot {
+  private let lockToken = PersistedStoreSnapshotLockToken()
   private let keys: [String]
   private let userDefaultsValues: [String: Any]
   private let userDefaultsKeys: Set<String>
@@ -54,6 +75,8 @@ struct PersistedStoreSnapshot {
   }
 
   func restore() {
+    defer { lockToken.unlockIfNeeded() }
+
     for key in keys {
       restore(
         key: key,
