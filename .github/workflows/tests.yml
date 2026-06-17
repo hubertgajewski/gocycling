@@ -22,6 +22,21 @@ env:
   XCODE_SCHEME: Go Cycling
 
 jobs:
+  swift-format:
+    name: Swift format (test targets)
+    runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'macos-26' || vars.RUNNER || 'macos-26' }}
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Select Xcode
+        if: env.ACT != 'true' && runner.environment == 'github-hosted'
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Lint test target Swift formatting
+        run: xcrun swift-format lint --recursive --strict "Go CyclingTests" "Go CyclingUITests"
+
   unit-tests:
     if: github.repository == 'hubertgajewski/gocycling' && vars.CI_RUN_UNIT_TESTS != 'false'
     name: Unit tests (iPhone 17)
