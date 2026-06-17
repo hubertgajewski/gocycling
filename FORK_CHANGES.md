@@ -112,7 +112,7 @@ xcodebuild \
 Current fork-specific differences include:
 
 - Local build fixes for fork owners: `TelemetryDeck.xcconfig.example`, in-repository default alternate icon paths, generic signing guidance, and explicit `NSUbiquitousKeyValueStore` integer writes.
-- Minimal unit and UI smoke coverage for `CyclingRecords.resetStatistics()` and the main Cycle, History, Statistics, and Settings tabs.
+- Focused Swift Testing unit coverage for cycling record sorting, aggregation, unlocked-icon, and reset-statistics behavior, plus UI smoke coverage for the main Cycle, History, Statistics, and Settings tabs.
 - UI testing support through the `-ui-testing` launch argument to avoid location authorization prompts during automated tests.
 - A shared `Go Cycling` Xcode scheme for command-line and CI testing.
 - GitHub Actions coverage for Swift formatting, unit tests, unit-test code coverage summaries, and UI smoke tests.
