@@ -15,11 +15,24 @@ workflow = Path(sys.argv[1]).read_text()
 readme = Path(sys.argv[2]).read_text()
 failures: list[str] = []
 
+unit_match = re.search(r"(?ms)^  unit-tests:\n(?P<body>.*?)(?:\n  [A-Za-z0-9_-]+:\n|\Z)", workflow)
+if not unit_match:
+    failures.append("unit-tests job not found")
+else:
+    unit_body = unit_match.group("body")
+    unit_name = re.search(r"(?m)^\s+name:\s*(?P<value>.+)$", unit_body)
+    if not unit_name or "iPhone 17" not in unit_name.group("value"):
+        failures.append("unit-tests job name must mention the requested iPhone 17 simulator")
+
 match = re.search(r"(?ms)^  ui-tests:\n(?P<body>.*?)(?:\n  [A-Za-z0-9_-]+:\n|\Z)", workflow)
 if not match:
     failures.append("ui-tests job not found")
 else:
     body = match.group("body")
+    job_name = re.search(r"(?m)^\s+name:\s*(?P<value>.+)$", body)
+    if not job_name or "matrix.runtime" not in job_name.group("value") or "matrix.device_label" not in job_name.group("value"):
+        failures.append("ui-tests job name must include matrix.runtime and matrix.device_label")
+
     runs_on = re.search(r"(?m)^\s+runs-on:\s*(?P<value>.+)$", body)
     if not runs_on or "matrix.os" not in runs_on.group("value"):
         failures.append("ui-tests runs-on must reference matrix.os")
@@ -57,6 +70,12 @@ else:
     for entry in entries:
         if "os" in entry and "family" in entry:
             observed.setdefault(entry["os"], set()).add(entry["family"])
+        if "runtime" not in entry:
+            failures.append(f"ui-tests matrix entry {entry.get('id', '<unknown>')} is missing runtime")
+        if "device_label" not in entry:
+            failures.append(f"ui-tests matrix entry {entry.get('id', '<unknown>')} is missing device_label")
+        elif "(" in entry["device_label"] or ")" in entry["device_label"]:
+            failures.append(f"ui-tests device_label for {entry.get('id', entry['device_label'])} must not contain parentheses")
     for os_name, families in sorted(required.items()):
         missing = families - observed.get(os_name, set())
         if missing:
