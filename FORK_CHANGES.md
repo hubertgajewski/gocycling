@@ -42,7 +42,7 @@ Simulator builds typically work with a free Personal Team once signing is config
 GitHub Actions runs on every push to `main` and on pull requests:
 
 - **Swift format** - `swift-format` linting for `Go CyclingTests` and `Go CyclingUITests`
-- **Unit tests** - `Go CyclingTests` on an iPhone simulator
+- **Unit tests** - `Go CyclingTests` on an iPhone simulator, with Xcode code coverage published to the workflow summary
 - **UI smoke tests** - `Go CyclingUITests` on representative iPhone and iPad simulators across the hosted `macos-14`, `macos-15`, and `macos-26` runner lines
 
 The hosted UI smoke matrix currently requests these simulators:
@@ -53,6 +53,7 @@ The hosted UI smoke matrix currently requests these simulators:
 
 CI copies `TelemetryDeck.xcconfig.example` to `TelemetryDeck.xcconfig` when the gitignored file is absent, so no TelemetryDeck account is required. Simulator builds pass `DEVELOPMENT_TEAM=` so no committed development team is needed.
 CI also passes `-retry-tests-on-failure`, which retries failed tests using Xcode's default maximum of 3 iterations.
+Unit-test coverage is generated from `TestResults/unit.xcresult` with `xcrun xccov`, summarized in the GitHub Actions run summary, and uploaded with the unit-test result bundle as a workflow artifact.
 GitHub-hosted CI does not provide iOS/iPadOS 14, 15, or 16 simulator coverage on those runner lines; the deployment target, availability checks, and optional physical-device, self-hosted-runner, or device-cloud testing remain the compatibility path for those OS versions.
 
 ### Reproduce CI Locally
@@ -67,6 +68,8 @@ Reproduce the unit tests locally:
 
 ```bash
 cp -n TelemetryDeck.xcconfig.example TelemetryDeck.xcconfig
+mkdir -p TestResults
+rm -rf TestResults/unit.xcresult
 DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17')
 xcodebuild \
   -project "Go Cycling.xcodeproj" \
@@ -74,9 +77,19 @@ xcodebuild \
   -configuration Debug \
   -destination "$DEST" \
   -only-testing:"Go CyclingTests" \
+  -enableCodeCoverage YES \
+  -resultBundlePath TestResults/unit.xcresult \
   -retry-tests-on-failure \
   DEVELOPMENT_TEAM= \
   test
+```
+
+Inspect the local unit-test coverage report:
+
+```bash
+xcrun xccov view --report TestResults/unit.xcresult
+xcrun xccov view --report --json TestResults/unit.xcresult > TestResults/coverage.json
+python3 .github/scripts/write-xccov-summary.py TestResults/coverage.json --target "Go Cycling.app"
 ```
 
 Reproduce a UI smoke run, substituting the device name as needed:
@@ -102,7 +115,7 @@ Current fork-specific differences include:
 - Minimal unit and UI smoke coverage for `CyclingRecords.resetStatistics()` and the main Cycle, History, Statistics, and Settings tabs.
 - UI testing support through the `-ui-testing` launch argument to avoid location authorization prompts during automated tests.
 - A shared `Go Cycling` Xcode scheme for command-line and CI testing.
-- GitHub Actions coverage for Swift formatting, unit tests, and UI smoke tests.
+- GitHub Actions coverage for Swift formatting, unit tests, unit-test code coverage summaries, and UI smoke tests.
 - CI retries for failed XCTest and XCUITest cases via `-retry-tests-on-failure`.
 - Hosted simulator coverage across selected GitHub-hosted macOS runner lines.
 - Test-target `swift-format` enforcement in CI and the committed pre-commit hook.
