@@ -42,6 +42,16 @@ cp TelemetryDeck.xcconfig.example TelemetryDeck.xcconfig
 
 Leave `GoCyclingAppID` empty for local development without a TelemetryDeck account, or set an App ID from [TelemetryDeck](https://telemetrydeck.com) if you want analytics.
 
+### Git hooks
+
+This repository commits local Git hooks in `.githooks`. Enable them once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+The pre-commit hook checks staged Swift files under `Go CyclingTests/` and `Go CyclingUITests/` with `swift-format`. App source files under `Go Cycling/` are not part of this scoped formatting rollout yet.
+
 ### Code signing (fork owners)
 
 Upstream bundle identifiers and the author development team (`QMBJV5C74X`) belong to the original maintainer. To build on your machine:
@@ -57,6 +67,7 @@ Simulator builds typically work with a free Personal Team once signing is config
 
 GitHub Actions runs on every push to `main` and on pull requests:
 
+- **Swift format** — `swift-format` linting for `Go CyclingTests` and `Go CyclingUITests`
 - **Unit tests** — `Go CyclingTests` on an iPhone simulator
 - **UI smoke tests** — `Go CyclingUITests` on representative iPhone and iPad simulators across the hosted `macos-14`, `macos-15`, and `macos-26` runner lines
 
@@ -69,6 +80,12 @@ The hosted UI smoke matrix currently requests these simulators:
 CI copies `TelemetryDeck.xcconfig.example` to `TelemetryDeck.xcconfig` when the gitignored file is absent, so no TelemetryDeck account is required. Simulator builds pass `DEVELOPMENT_TEAM=` so no committed development team is needed.
 CI also passes `-retry-tests-on-failure`, which retries failed tests using Xcode's default maximum of 3 iterations.
 GitHub-hosted CI does not provide iOS/iPadOS 14, 15, or 16 simulator coverage on those runner lines; the deployment target, availability checks, and optional physical-device, self-hosted-runner, or device-cloud testing remain the compatibility path for those OS versions.
+
+Reproduce the Swift formatting check locally:
+
+```bash
+xcrun swift-format lint --recursive --strict "Go CyclingTests" "Go CyclingUITests"
+```
 
 Reproduce the unit tests locally:
 
