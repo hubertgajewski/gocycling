@@ -118,6 +118,7 @@
 		AA0000162026061700000001 /* BikeRideSortingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000132026061700000001 /* BikeRideSortingTests.swift */; };
 		AA0000172026061700000001 /* RecordsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000142026061700000001 /* RecordsTests.swift */; };
 		AA0000182026061700000001 /* CyclingRecordsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000112026061700000001 /* CyclingRecordsTests.swift */; };
+		AA0000212026061700000001 /* BikeRidePersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000222026061700000001 /* BikeRidePersistenceTests.swift */; };
 		9D816A152640A4F000DED7F8 /* Default@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D816A132640A4F000DED7F8 /* Default@3x.png */; };
 		9D816A162640A4F000DED7F8 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D816A142640A4F000DED7F8 /* Default@2x.png */; };
 		9D816A1E2641BAD000DED7F8 /* ResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D816A1D2641BAD000DED7F8 /* ResetView.swift */; };
@@ -306,6 +307,7 @@
 		AA0000122026061700000001 /* PersistedStoreSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistedStoreSnapshot.swift; sourceTree = "<group>"; };
 		AA0000132026061700000001 /* BikeRideSortingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeRideSortingTests.swift; sourceTree = "<group>"; };
 		AA0000142026061700000001 /* RecordsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsTests.swift; sourceTree = "<group>"; };
+		AA0000222026061700000001 /* BikeRidePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeRidePersistenceTests.swift; sourceTree = "<group>"; };
 		9D816A132640A4F000DED7F8 /* Default@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@3x.png"; sourceTree = "<group>"; };
 		9D816A142640A4F000DED7F8 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		9D816A1D2641BAD000DED7F8 /* ResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetView.swift; sourceTree = "<group>"; };
@@ -738,6 +740,7 @@
 		AA0000202026061700000001 /* Core Data */ = {
 			isa = PBXGroup;
 			children = (
+				AA0000222026061700000001 /* BikeRidePersistenceTests.swift */,
 				AA0000132026061700000001 /* BikeRideSortingTests.swift */,
 				AA0000142026061700000001 /* RecordsTests.swift */,
 			);
@@ -1102,6 +1105,7 @@
 				AA0000072026061700000001 /* RecordsFormattingTests.swift in Sources */,
 				AA0000152026061700000001 /* PersistedStoreSnapshot.swift in Sources */,
 				AA0000162026061700000001 /* BikeRideSortingTests.swift in Sources */,
+				AA0000212026061700000001 /* BikeRidePersistenceTests.swift in Sources */,
 				AA0000172026061700000001 /* RecordsTests.swift in Sources */,
 				AA0000182026061700000001 /* CyclingRecordsTests.swift in Sources */,
 			);
