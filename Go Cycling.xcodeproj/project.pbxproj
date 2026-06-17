@@ -112,6 +112,8 @@
 		9D816A0F263FBD0600DED7F8 /* CyclingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D816A0E263FBD0600DED7F8 /* CyclingStatus.swift */; };
 		AA0000032026061600000001 /* UITesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022026061600000001 /* UITesting.swift */; };
 		AA0000042026061600000001 /* UITesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022026061600000001 /* UITesting.swift */; };
+		AA0000062026061700000001 /* MetricsFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000082026061700000001 /* MetricsFormattingTests.swift */; };
+		AA0000072026061700000001 /* RecordsFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000092026061700000001 /* RecordsFormattingTests.swift */; };
 		9D816A152640A4F000DED7F8 /* Default@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D816A132640A4F000DED7F8 /* Default@3x.png */; };
 		9D816A162640A4F000DED7F8 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D816A142640A4F000DED7F8 /* Default@2x.png */; };
 		9D816A1E2641BAD000DED7F8 /* ResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D816A1D2641BAD000DED7F8 /* ResetView.swift */; };
@@ -295,6 +297,8 @@
 		9D8169F9263FA4CE00DED7F8 /* IconNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconNames.swift; sourceTree = "<group>"; };
 		9D816A0E263FBD0600DED7F8 /* CyclingStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CyclingStatus.swift; sourceTree = "<group>"; };
 		AA0000022026061600000001 /* UITesting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITesting.swift; sourceTree = "<group>"; };
+		AA0000082026061700000001 /* MetricsFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsFormattingTests.swift; sourceTree = "<group>"; };
+		AA0000092026061700000001 /* RecordsFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsFormattingTests.swift; sourceTree = "<group>"; };
 		9D816A132640A4F000DED7F8 /* Default@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@3x.png"; sourceTree = "<group>"; };
 		9D816A142640A4F000DED7F8 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		9D816A1D2641BAD000DED7F8 /* ResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetView.swift; sourceTree = "<group>"; };
@@ -699,10 +703,20 @@
 		9DAB832825FECAD400F5C42E /* Go CyclingTests */ = {
 			isa = PBXGroup;
 			children = (
+				AA0000102026061700000001 /* Model */,
 				9DAB832925FECAD400F5C42E /* GoCyclingTests.swift */,
 				9DAB832B25FECAD400F5C42E /* Info.plist */,
 			);
 			path = "Go CyclingTests";
+			sourceTree = "<group>";
+		};
+		AA0000102026061700000001 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000082026061700000001 /* MetricsFormattingTests.swift */,
+				AA0000092026061700000001 /* RecordsFormattingTests.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		9DAB833325FECAD400F5C42E /* Go CyclingUITests */ = {
@@ -1060,6 +1074,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				9DAB832A25FECAD400F5C42E /* GoCyclingTests.swift in Sources */,
+				AA0000062026061700000001 /* MetricsFormattingTests.swift in Sources */,
+				AA0000072026061700000001 /* RecordsFormattingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
