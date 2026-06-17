@@ -94,6 +94,7 @@ struct CyclingRecordsTests {
       UserDefaults.standard.array(forKey: "unlockedIcons") as? [Bool]
         == [true, true, true, true, true, true]
     )
+    // TODO(#24): Replace this runtime iCloud guard with deterministic unavailable-store coverage.
     if assertICloud {
       #expect(
         NSUbiquitousKeyValueStore.default.array(forKey: "unlockedIcons") as? [Bool]
@@ -136,6 +137,7 @@ struct CyclingRecordsTests {
     #expect(UserDefaults.standard.double(forKey: "fastestAverageSpeed") == 5)
     #expect(
       UserDefaults.standard.object(forKey: "fastestAverageSpeedDate") as? Date == oldSpeedDate)
+    // TODO(#24): Replace this runtime iCloud guard with deterministic unavailable-store coverage.
     if assertICloud {
       #expect(NSUbiquitousKeyValueStore.default.double(forKey: "fastestAverageSpeed") == 5)
       #expect(
@@ -178,6 +180,7 @@ struct CyclingRecordsTests {
     #expect(UserDefaults.standard.integer(forKey: "totalCyclingRoutes") == 0)
     #expect(UserDefaults.standard.array(forKey: "unlockedIcons") as? [Bool] == unlockedIcons)
 
+    // TODO(#24): Replace this runtime iCloud guard with deterministic unavailable-store coverage.
     if assertICloud {
       #expect(NSUbiquitousKeyValueStore.default.double(forKey: "totalCyclingTime") == 0)
       #expect(NSUbiquitousKeyValueStore.default.double(forKey: "totalCyclingDistance") == 0)
@@ -265,6 +268,7 @@ private func expectPersistedRecords(
     UserDefaults.standard.object(forKey: "longestCyclingTimeDate") as? Date == longestTimeDate)
   #expect(UserDefaults.standard.integer(forKey: "totalCyclingRoutes") == totalRoutes)
 
+  // TODO(#24): Replace this runtime iCloud guard with deterministic unavailable-store coverage.
   if assertICloud {
     #expect(NSUbiquitousKeyValueStore.default.double(forKey: "totalCyclingTime") == totalTime)
     #expect(
