@@ -5,8 +5,12 @@
 
 import Foundation
 
+// Process-wide: UserDefaults and NSUbiquitousKeyValueStore are shared singletons.
 private let persistedStoreSnapshotLock = NSRecursiveLock()
 
+/// Serializes snapshot lifetimes across the test target. Swift Testing runs suites
+/// in parallel; without this, one test could mutate shared defaults while another
+/// is between `init` and `restore()`, causing flaky restores.
 private final class PersistedStoreSnapshotLockToken {
   private var isUnlocked = false
 
