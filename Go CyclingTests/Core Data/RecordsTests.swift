@@ -15,8 +15,8 @@ import Testing
 struct RecordsTests {
 
   @Test("calculates default records from saved rides")
-  func calculatesDefaultRecordsFromBikeRides() {
-    let snapshot = PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+  func calculatesDefaultRecordsFromBikeRides() async {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
     let context = PersistenceController(inMemory: true).container.viewContext
@@ -62,8 +62,8 @@ struct RecordsTests {
   }
 
   @Test("ignores invalid fastest average speed candidates")
-  func ignoresInvalidFastestAverageSpeedCandidates() {
-    let snapshot = PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+  func ignoresInvalidFastestAverageSpeedCandidates() async {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
     let context = PersistenceController(inMemory: true).container.viewContext
@@ -89,8 +89,8 @@ struct RecordsTests {
   }
 
   @Test("calculates broken records from a completed ride")
-  func calculatesBrokenRecordsFromCompletedRide() {
-    let snapshot = PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+  func calculatesBrokenRecordsFromCompletedRide() async {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
     let context = PersistenceController(inMemory: true).container.viewContext
@@ -133,8 +133,8 @@ struct RecordsTests {
   }
 
   @Test("preserves existing records when a ride does not break them")
-  func preservesExistingRecordsWhenRideDoesNotBreakThem() {
-    let snapshot = PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+  func preservesExistingRecordsWhenRideDoesNotBreakThem() async {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
     let context = PersistenceController(inMemory: true).container.viewContext
@@ -175,8 +175,8 @@ struct RecordsTests {
   }
 
   @Test("ignores missing speeds for fastest average speed")
-  func ignoresMissingSpeedsForFastestAverageSpeed() {
-    let snapshot = PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+  func ignoresMissingSpeedsForFastestAverageSpeed() async {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
     let context = PersistenceController(inMemory: true).container.viewContext
@@ -208,8 +208,8 @@ struct RecordsTests {
   }
 
   @Test("unlocks icons from individual and total distance thresholds")
-  func unlocksIconsFromDistanceThresholds() {
-    let snapshot = PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+  func unlocksIconsFromDistanceThresholds() async {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
     let context = PersistenceController(inMemory: true).container.viewContext

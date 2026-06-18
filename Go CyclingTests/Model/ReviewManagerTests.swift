@@ -12,8 +12,8 @@ import Testing
 struct ReviewManagerTests {
 
   @Test("increments review-worthy count and caps at three")
-  func incrementsReviewWorthyCountAndCapsAtThree() {
-    let snapshot = PersistedStoreSnapshot(keys: reviewManagerStoreKeys)
+  func incrementsReviewWorthyCountAndCapsAtThree() async {
+    let snapshot = await PersistedStoreSnapshot(keys: reviewManagerStoreKeys)
     defer { snapshot.restore() }
 
     let defaults = UserDefaults.standard
@@ -33,8 +33,8 @@ struct ReviewManagerTests {
   }
 
   @Test("sets completed route state idempotently")
-  func setsCompletedRouteStateIdempotently() {
-    let snapshot = PersistedStoreSnapshot(keys: reviewManagerStoreKeys)
+  func setsCompletedRouteStateIdempotently() async {
+    let snapshot = await PersistedStoreSnapshot(keys: reviewManagerStoreKeys)
     defer { snapshot.restore() }
 
     let defaults = UserDefaults.standard

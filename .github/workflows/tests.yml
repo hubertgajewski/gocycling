@@ -42,6 +42,32 @@ jobs:
       - name: Lint test target Swift formatting
         run: xcrun swift-format lint --recursive --strict "Go CyclingTests" "Go CyclingUITests"
 
+  swift-unit-tests:
+    if: github.repository == 'hubertgajewski/gocycling' && vars.CI_RUN_UNIT_TESTS != 'false'
+    name: SwiftPM unit tests (complements Xcode)
+    runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'macos-26' || vars.RUNNER || 'macos-26' }}
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          persist-credentials: false
+
+      - name: Select Xcode
+        if: env.ACT != 'true' && runner.environment == 'github-hosted'
+        run: |
+          if [[ "$(sw_vers -productVersion)" == 14.* ]]; then
+            sudo xcode-select -s /Applications/Xcode_16.2.app
+          else
+            sudo xcode-select -s /Applications/Xcode.app
+          fi
+
+      - name: Show Swift toolchain
+        run: swift --version
+
+      - name: Run SwiftPM unit tests
+        run: swift test
+
   unit-tests:
     if: github.repository == 'hubertgajewski/gocycling' && vars.CI_RUN_UNIT_TESTS != 'false'
     name: Unit tests (iPhone 17)

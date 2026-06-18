@@ -5,7 +5,8 @@
 
 import CoreLocation
 
-// Maps Core Location authorization status to cycle-tab location settings alert copy.
+// Kept outside LocationViewModel so the alert copy policy is covered without
+// constructing CLLocationManager or touching live authorization state.
 enum LocationSettingsAlertPolicy {
     static func alertMessage(for status: CLAuthorizationStatus) -> String {
         let messageIfAllowedWhileInUse =

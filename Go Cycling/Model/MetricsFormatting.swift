@@ -57,6 +57,8 @@ class MetricsFormatting {
         return timeString
     }
 
+    // CycleView uses this shared formatter so live timer padding stays covered
+    // by model-level unit tests instead of depending on SwiftUI view creation.
     static func formatElapsedTimer(time: TimeInterval) -> String {
         let components = timeComponents(time: time)
         return String(format: "%02i:%02i:%02i", components.hours, components.minutes, components.seconds)
