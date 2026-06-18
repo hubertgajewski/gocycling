@@ -14,6 +14,7 @@ let package = Package(
     .target(
       name: "Go_Cycling",
       path: "Go Cycling/Model",
+      // Keep Xcode-only model files explicit so this focused package slice stays warning-free.
       exclude: [
         "AutoPauseState.swift",
         "Category.swift",
@@ -38,6 +39,7 @@ let package = Package(
       name: "Go_CyclingTests",
       dependencies: ["Go_Cycling"],
       path: "Go CyclingTests/Model",
+      // Keep Xcode-only model tests explicit so this focused package slice stays warning-free.
       exclude: [
         "CyclingRecordsTests.swift",
         "PreferencesConversionTests.swift",
