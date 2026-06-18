@@ -28,7 +28,7 @@ struct BikeRideDateRangeTests {
 
     let persistence = makeInMemoryChartPersistence()
     let context = persistence.container.viewContext
-    let ridesByWindow = [
+    _ = [
       makeChartRide(
         in: context, distance: 100, time: 60, start: daysFromToday(-1), name: "week"),
       makeChartRide(
@@ -72,6 +72,5 @@ struct BikeRideDateRangeTests {
     )
     #expect(fetchedNames[5] == ["prior-thirty-weeks"])
     #expect(fetchedNames.flatMap { $0 }.contains("outside") == false)
-    #expect(ridesByWindow.count == 7)
   }
 }

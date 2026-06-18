@@ -9,6 +9,7 @@ import Foundation
 @testable import Go_Cycling
 
 let chartViewModelStoreKeys = [
+  iCloudSyncPreferenceKey,
   ReviewManager.reviewCountKey,
   ReviewManager.completedRouteKey,
   ReviewManager.reviewRequestVersionKey,

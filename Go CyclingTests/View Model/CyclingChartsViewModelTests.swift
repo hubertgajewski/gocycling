@@ -118,6 +118,8 @@ struct CyclingChartsViewModelTests {
     #expect(viewModel.pastData[4] == [0, 0, 0, 120, 60])
     #expect(viewModel.pastData[7] == [0, 0, 0, 1, 1])
     #expect(viewModel.pastDataNormalized[1] == [0, 0, 0, 1.0, 0.5])
+    #expect(viewModel.pastDataNormalized[4] == [0, 0, 0, 1.0, 0.5])
+    #expect(viewModel.pastDataNormalized[7] == [0, 0, 0, 1.0, 1.0])
   }
 
   @Test("buckets past-thirty-week ride data into five-week buckets")
@@ -153,6 +155,8 @@ struct CyclingChartsViewModelTests {
     #expect(viewModel.pastData[5] == [0, 0, 0, 0, 180, 60])
     #expect(viewModel.pastData[8] == [0, 0, 0, 0, 1, 1])
     #expect(viewModel.pastDataNormalized[2] == [0, 0, 0, 0, 1.0, 1.0 / 3.0])
+    #expect(viewModel.pastDataNormalized[5] == [0, 0, 0, 0, 1.0, 1.0 / 3.0])
+    #expect(viewModel.pastDataNormalized[8] == [0, 0, 0, 0, 1.0, 1.0])
   }
 
   @Test("leaves chart arrays zeroed when ride data is empty")
