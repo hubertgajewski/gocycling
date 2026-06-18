@@ -6,7 +6,16 @@
 import Foundation
 import Testing
 
+@testable import Go_Cycling
+
 let iCloudSyncPreferenceKey = "iCloudOn"
+
+let viewModelStoreKeys = [
+  iCloudSyncPreferenceKey,
+  ReviewManager.reviewCountKey,
+  ReviewManager.reviewRequestVersionKey,
+  ReviewManager.completedRouteKey,
+]
 
 let cyclingRecordStoreKeys = [
   "didSetupRecords",

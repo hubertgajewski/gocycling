@@ -8,13 +8,6 @@ import Foundation
 
 @testable import Go_Cycling
 
-let chartViewModelStoreKeys = [
-  iCloudSyncPreferenceKey,
-  ReviewManager.reviewCountKey,
-  ReviewManager.completedRouteKey,
-  ReviewManager.reviewRequestVersionKey,
-]
-
 func chartCalendar() -> Calendar {
   var calendar = Calendar.current
   calendar.timeZone = NSTimeZone.local
@@ -27,8 +20,15 @@ func daysFromToday(_ offset: Int, calendar: Calendar = chartCalendar()) -> Date 
   return calendar.date(byAdding: .hour, value: 12, to: day)!
 }
 
+func startOfDayFromToday(_ offset: Int, calendar: Calendar = chartCalendar()) -> Date {
+  let today = calendar.startOfDay(for: Date())
+  return calendar.date(byAdding: .day, value: offset, to: today)!
+}
+
 func makeInMemoryChartPersistence() -> PersistenceController {
   UserDefaults.standard.set(false, forKey: iCloudSyncPreferenceKey)
+  // Callers must keep the returned controller alive for the test; BikeRide objects
+  // read through its viewContext fault if the store is deallocated.
   return PersistenceController(inMemory: true)
 }
 

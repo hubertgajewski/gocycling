@@ -73,4 +73,94 @@ struct BikeRideDateRangeTests {
     #expect(fetchedNames[5] == ["prior-thirty-weeks"])
     #expect(fetchedNames.flatMap { $0 }.contains("outside") == false)
   }
+
+  @Test("includes and excludes rides on statistics window boundaries")
+  func includesAndExcludesRidesOnStatisticsWindowBoundaries() async throws {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+    defer { snapshot.restore() }
+
+    let persistence = makeInMemoryChartPersistence()
+    let context = persistence.container.viewContext
+    _ = [
+      makeChartRide(
+        in: context,
+        distance: 100,
+        time: 60,
+        start: daysFromToday(-6),
+        name: "seven-day-youngest"
+      ),
+      makeChartRide(
+        in: context,
+        distance: 200,
+        time: 120,
+        start: daysFromToday(-7),
+        name: "seven-day-oldest-out"
+      ),
+      makeChartRide(
+        in: context,
+        distance: 300,
+        time: 180,
+        start: startOfDayFromToday(-7),
+        name: "prior-week-upper-edge"
+      ),
+      makeChartRide(
+        in: context,
+        distance: 400,
+        time: 240,
+        start: daysFromToday(-34),
+        name: "five-week-youngest"
+      ),
+      makeChartRide(
+        in: context,
+        distance: 500,
+        time: 300,
+        start: startOfDayFromToday(-35),
+        name: "prior-five-week-upper-edge"
+      ),
+      makeChartRide(
+        in: context,
+        distance: 600,
+        time: 360,
+        start: daysFromToday(-209),
+        name: "thirty-week-youngest"
+      ),
+      makeChartRide(
+        in: context,
+        distance: 700,
+        time: 420,
+        start: startOfDayFromToday(-210),
+        name: "prior-thirty-week-upper-edge"
+      ),
+    ]
+    try context.save()
+
+    let requests = BikeRide.fetchRequestsWithDateRanges()
+    let fetchedNames = try requests.map { request -> [String] in
+      let rides = try context.fetch(try #require(request))
+      return rides.map(\.cyclingRouteName).sorted()
+    }
+
+    #expect(fetchedNames[0] == ["seven-day-youngest"])
+    #expect(fetchedNames[1] == ["prior-week-upper-edge"])
+    #expect(
+      fetchedNames[2] == [
+        "five-week-youngest",
+        "prior-week-upper-edge",
+        "seven-day-oldest-out",
+        "seven-day-youngest",
+      ]
+    )
+    #expect(fetchedNames[3] == ["prior-five-week-upper-edge"])
+    #expect(
+      fetchedNames[4] == [
+        "five-week-youngest",
+        "prior-five-week-upper-edge",
+        "prior-week-upper-edge",
+        "seven-day-oldest-out",
+        "seven-day-youngest",
+        "thirty-week-youngest",
+      ]
+    )
+    #expect(fetchedNames[5] == ["prior-thirty-week-upper-edge"])
+  }
 }

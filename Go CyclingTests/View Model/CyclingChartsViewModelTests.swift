@@ -14,7 +14,7 @@ struct CyclingChartsViewModelTests {
 
   @Test("buckets past-week ride data and normalizes values")
   func bucketsPastWeekData() async {
-    let snapshot = await PersistedStoreSnapshot(keys: chartViewModelStoreKeys)
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
     defer { snapshot.restore() }
 
     let persistence = makeInMemoryChartPersistence()
@@ -38,7 +38,7 @@ struct CyclingChartsViewModelTests {
 
   @Test("normalizes past-week buckets against the maximum value")
   func normalizesPastWeekBucketsAgainstMaximumValue() async {
-    let snapshot = await PersistedStoreSnapshot(keys: chartViewModelStoreKeys)
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
     defer { snapshot.restore() }
 
     let persistence = makeInMemoryChartPersistence()
@@ -67,7 +67,7 @@ struct CyclingChartsViewModelTests {
 
   @Test("ignores rides outside the past-week window")
   func ignoresRidesOutsidePastWeekWindow() async {
-    let snapshot = await PersistedStoreSnapshot(keys: chartViewModelStoreKeys)
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
     defer { snapshot.restore() }
 
     let persistence = makeInMemoryChartPersistence()
@@ -82,12 +82,66 @@ struct CyclingChartsViewModelTests {
     viewModel.setPastWeekFormattedData()
 
     #expect(viewModel.pastData[0].allSatisfy { $0 == 0 })
+    #expect(viewModel.pastData[3].allSatisfy { $0 == 0 })
+    #expect(viewModel.pastData[6].allSatisfy { $0 == 0 })
     #expect(viewModel.pastDataNormalized[0].allSatisfy { $0 == 0 })
+    #expect(viewModel.pastDataNormalized[3].allSatisfy { $0 == 0 })
+    #expect(viewModel.pastDataNormalized[6].allSatisfy { $0 == 0 })
+  }
+
+  @Test("sums multiple rides in the same past-week bucket")
+  func sumsMultipleRidesInSamePastWeekBucket() async {
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
+    defer { snapshot.restore() }
+
+    let persistence = makeInMemoryChartPersistence()
+    let context = persistence.container.viewContext
+    let first = makeChartRide(
+      in: context,
+      distance: 500,
+      time: 300,
+      start: daysFromToday(-1)
+    )
+    let second = makeChartRide(
+      in: context,
+      distance: 700,
+      time: 400,
+      start: daysFromToday(-1)
+    )
+    let viewModel = CyclingChartsViewModel()
+    viewModel.pastWeekData = [first, second]
+    viewModel.setPastWeekFormattedData()
+
+    #expect(viewModel.pastData[0][5] == 1_200)
+    #expect(viewModel.pastData[3][5] == 700)
+    #expect(viewModel.pastData[6][5] == 2)
+  }
+
+  @Test("ignores rides with future start dates")
+  func ignoresRidesWithFutureStartDates() async {
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
+    defer { snapshot.restore() }
+
+    let persistence = makeInMemoryChartPersistence()
+    let futureRide = makeChartRide(
+      in: persistence.container.viewContext,
+      distance: 1_000,
+      time: 600,
+      start: daysFromToday(2)
+    )
+    let viewModel = CyclingChartsViewModel()
+    viewModel.pastWeekData = [futureRide]
+    viewModel.setPastWeekFormattedData()
+
+    for index in [0, 3, 6] {
+      #expect(viewModel.pastData[index].allSatisfy { $0 == 0 })
+      #expect(viewModel.pastDataNormalized[index].allSatisfy { $0 == 0 })
+    }
   }
 
   @Test("buckets past-five-week ride data into weekly buckets")
   func bucketsPastFiveWeekRideData() async {
-    let snapshot = await PersistedStoreSnapshot(keys: chartViewModelStoreKeys)
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
     defer { snapshot.restore() }
 
     let persistence = makeInMemoryChartPersistence()
@@ -124,7 +178,7 @@ struct CyclingChartsViewModelTests {
 
   @Test("buckets past-thirty-week ride data into five-week buckets")
   func bucketsPastThirtyWeekRideData() async {
-    let snapshot = await PersistedStoreSnapshot(keys: chartViewModelStoreKeys)
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
     defer { snapshot.restore() }
 
     let persistence = makeInMemoryChartPersistence()
@@ -161,7 +215,7 @@ struct CyclingChartsViewModelTests {
 
   @Test("leaves chart arrays zeroed when ride data is empty")
   func leavesChartArraysZeroedWhenRideDataIsEmpty() async {
-    let snapshot = await PersistedStoreSnapshot(keys: chartViewModelStoreKeys)
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
     defer { snapshot.restore() }
 
     let viewModel = CyclingChartsViewModel()
@@ -180,7 +234,7 @@ struct CyclingChartsViewModelTests {
 
   @Test("formats chart date ranges for each statistics window")
   func formatsChartDateRanges() async {
-    let snapshot = await PersistedStoreSnapshot(keys: chartViewModelStoreKeys)
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
     defer { snapshot.restore() }
 
     let calendar = chartCalendar()
@@ -211,7 +265,7 @@ struct CyclingChartsViewModelTests {
 
   @Test("formats individual chart bar date ranges")
   func formatsIndividualChartBarDateRanges() async {
-    let snapshot = await PersistedStoreSnapshot(keys: chartViewModelStoreKeys)
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
     defer { snapshot.restore() }
 
     let calendar = chartCalendar()
