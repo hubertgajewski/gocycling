@@ -8,8 +8,8 @@
 import SwiftUI
 import TelemetryDeck
 
-// Launch work normally talks to global defaults/iCloud singletons. These narrow
-// protocols let tests verify the UI-smoke skip paths without touching real stores.
+// Launch work normally reads and writes process-wide defaults/iCloud state.
+// These protocols let tests prove UI-smoke skips that work without touching real stores.
 protocol AppLaunchKeyValueStore {
     func bool(forKey defaultName: String) -> Bool
     func set(_ value: Bool, forKey defaultName: String)
@@ -25,8 +25,8 @@ extension UserDefaults: AppLaunchKeyValueStore {}
 extension UserDefaults: AppLaunchPreferenceStore {}
 
 enum AppLaunchTelemetry {
-    // Kept outside GoCyclingApp.init so UI-smoke launches can skip telemetry
-    // before TelemetryManager reads user preferences or starts network work.
+    // UI smoke must decide to skip telemetry before TelemetryManager reads
+    // preferences or starts network work, so setup is testable outside App.init.
     static func configureIfNeeded(
         arguments: [String] = ProcessInfo.processInfo.arguments,
         appID: Any? = nil,
@@ -55,8 +55,8 @@ enum AppLaunchTelemetry {
 enum AppLaunchMigration {
     static let didLaunchBeforeKey = "didLaunch1.4.0Before"
 
-    // Launch migrations write first-run sentinels and migrate legacy stores; UI
-    // smoke must bypass them so automated launches do not change real app state.
+    // UI smoke must bypass migrations because they write first-run sentinels and
+    // can migrate legacy data in the user's real defaults/iCloud stores.
     static func runIfNeeded(
         arguments: [String] = ProcessInfo.processInfo.arguments,
         userDefaults: AppLaunchKeyValueStore? = nil,
@@ -109,8 +109,8 @@ struct GoCyclingApp: App {
                 .environmentObject(preferences)
                 .onAppear(perform: {
                     #if DEBUG
-                    // Seed History after the isolated store is loaded so UI smoke
-                    // validates a saved route without driving GPS/timer state.
+                    // Seed through the real save path so History smoke verifies
+                    // saved-route UI without relying on live GPS/timer data.
                     if UITesting.shouldSeedRouteSaveFixture() {
                         UITestingRouteSaveFixture.runIfNeeded(
                             persistenceController: persistenceController
@@ -119,6 +119,8 @@ struct GoCyclingApp: App {
                     }
                     #endif
 
+                    // The remaining launch work can mutate real preferences or
+                    // telemetry state, so isolated UI-smoke launches stop here.
                     guard !UITesting.shouldUseIsolatedPersistence() else { return }
 
                     AppLaunchMigration.runIfNeeded(

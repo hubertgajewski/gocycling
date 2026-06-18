@@ -87,8 +87,8 @@ struct PersistenceController {
     ) -> Bool {
         guard UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return false }
 
-        // UI smoke needs a real SQLite store so History can fetch saved rides,
-        // but it must be outside the app's normal CloudKit-backed database.
+        // History smoke needs SQLite because views fetch saved rides from Core
+        // Data, but CloudKit stays off so seeded rides cannot sync to the user.
         description.url = storeURL
         description.cloudKitContainerOptions = nil
         return true
@@ -110,8 +110,8 @@ struct PersistenceController {
     #endif
 
     enum BikeRideStoreError: Error {
-        // Route naming and record updates require a concrete saved BikeRide; if
-        // Core Data cannot materialize it, callers must treat the save as failed.
+        // Without a materialized BikeRide, callers could update records or show
+        // route naming even though there is no concrete saved route to edit.
         case savedRideUnavailable
     }
 

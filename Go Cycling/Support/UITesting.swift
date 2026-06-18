@@ -6,8 +6,8 @@
 import Foundation
 
 enum UITesting {
-    // Keep UI tests black-box: the test target passes raw launch strings instead
-    // of importing app support code.
+    // UI tests stay black-box so they cannot link app-only helper code; raw
+    // launch strings are the stable contract between test target and app.
     static let launchArgument = "-ui-testing"
     static let routeSaveFixtureArgument = "-ui-testing-route-save-fixture"
     static let routeSaveFixtureLaunchArguments = [
@@ -16,8 +16,8 @@ enum UITesting {
     ]
 
     #if DEBUG
-    // A real SQLite URL lets History fetch seeded rides, while the process-id
-    // suffix keeps simultaneous UI-test runs from sharing a store.
+    // History fetches saved rides from Core Data, so UI smoke needs SQLite; the
+    // process-id suffix keeps parallel smoke jobs from deleting each other's data.
     static let isolatedPersistenceStoreURL = FileManager.default.temporaryDirectory
         .appendingPathComponent("GoCycling-\(ProcessInfo.processInfo.processIdentifier)-UITesting.sqlite")
 

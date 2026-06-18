@@ -6,8 +6,8 @@
 import CoreLocation
 import Foundation
 
-// Immutable copy of the completed ride. Map/location state can be stopped or
-// cleared after save without mutating the data being persisted.
+// Ending a ride stops live location side effects before Core Data finishes, so
+// the save path needs an immutable copy that cleanup cannot mutate underneath it.
 struct CompletedRouteSnapshot {
     let locations: [CLLocation?]
     let speeds: [CLLocationSpeed?]
@@ -18,8 +18,8 @@ struct CompletedRouteSnapshot {
 }
 
 protocol BikeRideStoring {
-    /// Implementations should call completion on the main queue. The coordinator
-    /// defensively hops to main before mutating UI-facing records or cleanup state.
+    /// This boundary lets tests force save failures and verify records/cleanup
+    /// stay blocked until a BikeRide is actually saved.
     func storeBikeRide(
         locations: [CLLocation?],
         speeds: [CLLocationSpeed?],
@@ -40,8 +40,8 @@ protocol CyclingRecordsUpdating {
     )
 }
 
-// Serializes the completed-route pipeline so records, cleanup, and route naming
-// only run after Core Data returns the saved ride.
+// The old stop path updated records and cleared samples even after save failure;
+// this pipeline makes every success-only side effect wait for the saved BikeRide.
 struct CompletedRouteSaveCoordinator {
     let persistenceController: BikeRideStoring
     let records: CyclingRecordsUpdating

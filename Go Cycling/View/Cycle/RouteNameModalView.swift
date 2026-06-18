@@ -23,8 +23,8 @@ struct RouteNameModalView: View {
     @ObservedObject var routeNamingViewModel = RouteNamingViewModel()
     
     private var bikeRideToEdit: BikeRide?
-    // Cycle tab passes the saved ride directly so naming cannot attach to
-    // another recently saved route.
+    // Cycle tab passes the Core Data saved ride directly so a delayed naming
+    // sheet cannot rename another recently saved route.
     private var bikeRideToName: BikeRide?
     
     let telemetryManager = TelemetryManager.sharedTelemetryManager
@@ -172,15 +172,16 @@ struct RouteNameModalView: View {
             )
         }
         
-        // This means that we are in the Cycle tab
+        // Prefer the exact Cycle-tab saved ride; the latest-History fallback is
+        // kept only for older presentations that still open without a ride.
         if let ride = self.bikeRideToName {
             updateBikeRideRouteName(ride: ride, routeName: routeName)
             presentationMode.wrappedValue.dismiss()
             self.showEditModal = false
         }
         else if (self.bikeRideToEdit == nil) {
-            // Older Cycle-tab presentations still fall back to the latest ride,
-            // but the guard avoids a crash if History has not loaded a ride yet.
+            // History can still be empty in the legacy path, so fail closed
+            // instead of crashing or guessing a different route.
             guard let ride = self.routeNamingViewModel.allBikeRides.last else {
                 presentationMode.wrappedValue.dismiss()
                 self.showEditModal = false
@@ -208,8 +209,8 @@ struct RouteNameModalView: View {
         self.showEditModal = false
     }
 
-    // Keep all route-name writes on the same path so the direct saved-ride flow
-    // and the existing edit/remove flows cannot drift in which ride fields they copy.
+    // One update path prevents a naming flow from copying a different field set
+    // and corrupting route samples while only the category should change.
     private func updateBikeRideRouteName(ride: BikeRide, routeName: String) {
         persistenceController.updateBikeRideRouteName(
             existingBikeRide: ride,
