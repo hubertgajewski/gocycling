@@ -1,5 +1,5 @@
 //
-//  LocationViewModelTests.swift
+//  LocationSettingsAlertPolicyTests.swift
 //  Go CyclingTests
 //
 
@@ -9,20 +9,19 @@ import Testing
 
 @testable import Go_Cycling
 
-@Suite("LocationViewModel")
-@MainActor
-struct LocationViewModelTests {
+@Suite("LocationSettingsAlertPolicy")
+struct LocationSettingsAlertPolicyTests {
 
   @Test("returns no alert message when location is always authorized")
   func returnsNoAlertMessageWhenLocationIsAlwaysAuthorized() {
     #expect(
-      LocationViewModel.determineLocationSettingsAlertSetup(status: .authorizedAlways) == "")
+      LocationSettingsAlertPolicy.settingsAlertMessage(for: .authorizedAlways) == "")
   }
 
   @Test("returns always-location guidance when authorized while in use")
   func returnsAlwaysLocationGuidanceWhenAuthorizedWhileInUse() {
     #expect(
-      LocationViewModel.determineLocationSettingsAlertSetup(status: .authorizedWhenInUse)
+      LocationSettingsAlertPolicy.settingsAlertMessage(for: .authorizedWhenInUse)
         == alwaysLocationGuidance)
   }
 
@@ -30,7 +29,7 @@ struct LocationViewModelTests {
   func returnsPermissionsRequiredGuidanceForUnavailableAuthorizationStatuses() {
     for status in unavailableLocationAuthorizationStatuses {
       #expect(
-        LocationViewModel.determineLocationSettingsAlertSetup(status: status)
+        LocationSettingsAlertPolicy.settingsAlertMessage(for: status)
           == permissionsGuidance)
     }
   }

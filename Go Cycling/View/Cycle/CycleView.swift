@@ -45,7 +45,8 @@ struct CycleView: View {
                     )
                 }
                 VStack(spacing: 4) {
-                    Text(Self.formatTimeString(accumulatedTime: timer.totalAccumulatedTime))
+                    // Pure formatting lives in CycleElapsedTimeFormatting so unit tests avoid SwiftUI setup.
+                    Text(CycleElapsedTimeFormatting.formatTimeString(accumulatedTime: timer.totalAccumulatedTime))
                         .font(.custom("Avenir", size: 40))
                     if isAutoPaused {
                         HStack(spacing: 6) {
@@ -147,13 +148,6 @@ struct CycleView: View {
             }
         }
         .accessibilityIdentifier("main-tab-cycle")
-    }
-    
-    static func formatTimeString(accumulatedTime: TimeInterval) -> String {
-        let hours = Int(accumulatedTime) / 3600
-        let minutes = Int(accumulatedTime) / 60 % 60
-        let seconds = Int(accumulatedTime) % 60
-        return String(format:"%02i:%02i:%02i", hours, minutes, seconds)
     }
     
     func startCycling() {
