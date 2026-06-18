@@ -28,6 +28,7 @@ struct TimerViewModelTests {
   @Test("start transitions to running state")
   func startTransitionsToRunning() {
     let timer = TimerViewModel()
+    defer { timer.stop() }
 
     timer.start()
 
@@ -67,7 +68,7 @@ struct TimerViewModelTests {
     waitShortInterval()
     timer.pause()
 
-    #expect(timer.totalAccumulatedTime >= pausedTime)
+    #expect(timer.totalAccumulatedTime > pausedTime)
   }
 
   @Test("stop returns to stopped state and clears accumulated time")
@@ -133,6 +134,8 @@ struct TimerViewModelTests {
   @Test("calling start while running does not change state")
   func callingStartWhileRunningDoesNotChangeState() async {
     let timer = TimerViewModel()
+    defer { timer.stop() }
+
     timer.start()
     #expect(timer.isRunning)
 
