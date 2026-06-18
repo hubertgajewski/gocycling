@@ -14,8 +14,8 @@ import Testing
 struct ActivityAwardsViewModelTests {
 
   @Test("updates progress values and strings for locked awards")
-  func updatesProgressValuesAndStringsForLockedAwards() {
-    let snapshots = makeAwardsSnapshots()
+  func updatesProgressValuesAndStringsForLockedAwards() async {
+    let snapshots = await makeAwardsSnapshots()
     defer { snapshots.restore() }
 
     let records = CyclingRecords.shared
@@ -42,8 +42,8 @@ struct ActivityAwardsViewModelTests {
   }
 
   @Test("clamps over-threshold locked awards")
-  func clampsOverThresholdLockedAwards() {
-    let snapshots = makeAwardsSnapshots()
+  func clampsOverThresholdLockedAwards() async {
+    let snapshots = await makeAwardsSnapshots()
     defer { snapshots.restore() }
 
     let records = CyclingRecords.shared
@@ -60,8 +60,8 @@ struct ActivityAwardsViewModelTests {
   }
 
   @Test("presents unlocked awards and alerts once")
-  func presentsUnlockedAwardsAndAlertsOnce() {
-    let snapshots = makeAwardsSnapshots()
+  func presentsUnlockedAwardsAndAlertsOnce() async {
+    let snapshots = await makeAwardsSnapshots()
     defer { snapshots.restore() }
 
     let records = CyclingRecords.shared
@@ -87,8 +87,8 @@ struct ActivityAwardsViewModelTests {
   }
 
   @Test("does not repeat alerts for already-alerted awards")
-  func doesNotRepeatAlertsForAlreadyAlertedAwards() {
-    let snapshots = makeAwardsSnapshots()
+  func doesNotRepeatAlertsForAlreadyAlertedAwards() async {
+    let snapshots = await makeAwardsSnapshots()
     defer { snapshots.restore() }
 
     for key in awardAlertKeys {
@@ -107,8 +107,8 @@ struct ActivityAwardsViewModelTests {
   }
 
   @Test("returns medal order and localized award names")
-  func returnsMedalOrderAndAwardNames() {
-    let snapshots = makeAwardsSnapshots()
+  func returnsMedalOrderAndAwardNames() async {
+    let snapshots = await makeAwardsSnapshots()
     defer { snapshots.restore() }
 
     let viewModel = ActivityAwardsViewModel(
@@ -146,6 +146,7 @@ private let awardsStoreKeys =
     ReviewManager.completedRouteKey,
   ]
 
+@MainActor
 private struct AwardsSnapshots {
   let stores: PersistedStoreSnapshot
   let records: CyclingRecordsStateSnapshot
@@ -156,6 +157,7 @@ private struct AwardsSnapshots {
   }
 }
 
+@MainActor
 private struct CyclingRecordsStateSnapshot {
   private let records: CyclingRecords
   private let totalCyclingTime: Double
@@ -197,9 +199,10 @@ private struct CyclingRecordsStateSnapshot {
   }
 }
 
-private func makeAwardsSnapshots() -> AwardsSnapshots {
+@MainActor
+private func makeAwardsSnapshots() async -> AwardsSnapshots {
   let snapshots = AwardsSnapshots(
-    stores: PersistedStoreSnapshot(keys: awardsStoreKeys),
+    stores: await PersistedStoreSnapshot(keys: awardsStoreKeys),
     records: CyclingRecordsStateSnapshot(records: CyclingRecords.shared)
   )
   UserDefaults.standard.set(false, forKey: ReviewManager.completedRouteKey)

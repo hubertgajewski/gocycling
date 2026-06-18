@@ -16,8 +16,8 @@ import UIKit
 struct PreferencesConversionTests {
 
   @Test("converts stored preference values to display enums")
-  func convertsStoredPreferenceValuesToEnums() {
-    let snapshot = PersistedStoreSnapshot(keys: preferenceStoreKeys)
+  func convertsStoredPreferenceValuesToEnums() async {
+    let snapshot = await PersistedStoreSnapshot(keys: preferenceStoreKeys)
     defer { snapshot.restore() }
     seedPreferenceDefaults()
 
@@ -34,8 +34,8 @@ struct PreferencesConversionTests {
   }
 
   @Test("falls back for invalid stored preference values")
-  func fallsBackForInvalidStoredPreferenceValues() {
-    let snapshot = PersistedStoreSnapshot(keys: preferenceStoreKeys)
+  func fallsBackForInvalidStoredPreferenceValues() async {
+    let snapshot = await PersistedStoreSnapshot(keys: preferenceStoreKeys)
     defer { snapshot.restore() }
     seedPreferenceDefaults()
 
@@ -50,8 +50,8 @@ struct PreferencesConversionTests {
   }
 
   @Test("reads stored sort and selected route preferences")
-  func readsStoredSortAndSelectedRoutePreferences() {
-    let snapshot = PersistedStoreSnapshot(keys: preferenceStoreKeys)
+  func readsStoredSortAndSelectedRoutePreferences() async {
+    let snapshot = await PersistedStoreSnapshot(keys: preferenceStoreKeys)
     defer { snapshot.restore() }
     seedPreferenceDefaults()
 
@@ -65,8 +65,8 @@ struct PreferencesConversionTests {
   }
 
   @Test("converts legacy user preferences values")
-  func convertsLegacyUserPreferencesValues() {
-    let snapshot = PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+  func convertsLegacyUserPreferencesValues() async {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
     let context = PersistenceController(inMemory: true).container.viewContext

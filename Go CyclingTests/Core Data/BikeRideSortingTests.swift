@@ -15,8 +15,8 @@ import Testing
 struct BikeRideSortingTests {
 
   @Test("sorts rides by distance, date, and time")
-  func sortsRidesByDistanceDateAndTime() throws {
-    let snapshot = PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+  func sortsRidesByDistanceDateAndTime() async throws {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
     let context = PersistenceController(inMemory: true).container.viewContext
@@ -65,8 +65,8 @@ struct BikeRideSortingTests {
   }
 
   @Test("keeps empty and single-item lists stable")
-  func keepsEdgeCaseListsStable() {
-    let snapshot = PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+  func keepsEdgeCaseListsStable() async {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
     let empty: [BikeRide] = []
