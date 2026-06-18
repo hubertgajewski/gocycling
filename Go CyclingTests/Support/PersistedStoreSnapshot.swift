@@ -22,8 +22,14 @@ let cyclingRecordStoreKeys = [
   "totalCyclingRoutes",
 ]
 
+// Process-wide: UserDefaults and NSUbiquitousKeyValueStore are shared singletons.
+// Swift Testing can run suites concurrently, so each snapshot owns these stores
+// from capture through restore.
 private let persistedStoreSnapshotGate = PersistedStoreSnapshotGate()
 
+/// Serializes snapshot lifetimes without blocking a thread or actor. Waiting
+/// tests suspend instead of calling a blocking lock, which keeps @MainActor
+/// async tests runnable while another snapshot holder reaches `restore()`.
 private final class PersistedStoreSnapshotGate: @unchecked Sendable {
   private let lock = NSLock()
   private var isAvailable = true
