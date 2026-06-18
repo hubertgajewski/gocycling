@@ -14,8 +14,9 @@ struct CyclingRecordsTests {
 
   @Test("updates cycling records and persists local and iCloud values")
   @MainActor
-  func updatesCyclingRecordsAndPersistedStores() {
-    let snapshot = PersistedStoreSnapshot(keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+  func updatesCyclingRecordsAndPersistedStores() async {
+    let snapshot = await PersistedStoreSnapshot(
+      keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
     let assertICloud = ubiquitousStorePersistsValues()
 
@@ -68,8 +69,9 @@ struct CyclingRecordsTests {
 
   @Test("keeps existing personal records when a ride does not beat them")
   @MainActor
-  func keepsExistingPersonalRecordsWhenRideDoesNotBeatThem() {
-    let snapshot = PersistedStoreSnapshot(keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+  func keepsExistingPersonalRecordsWhenRideDoesNotBeatThem() async {
+    let snapshot = await PersistedStoreSnapshot(
+      keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
     let assertICloud = ubiquitousStorePersistsValues()
 
@@ -123,8 +125,9 @@ struct CyclingRecordsTests {
 
   @Test("updates unlocked icons from individual and total distance thresholds")
   @MainActor
-  func updatesUnlockedIconsFromDistanceThresholds() {
-    let snapshot = PersistedStoreSnapshot(keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+  func updatesUnlockedIconsFromDistanceThresholds() async {
+    let snapshot = await PersistedStoreSnapshot(
+      keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
     let assertICloud = ubiquitousStorePersistsValues()
 
@@ -160,8 +163,9 @@ struct CyclingRecordsTests {
 
   @Test("unlocks cumulative awards when a completed ride crosses the total threshold")
   @MainActor
-  func unlocksCumulativeAwardsWhenRideCrossesTotalThreshold() {
-    let snapshot = PersistedStoreSnapshot(keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+  func unlocksCumulativeAwardsWhenRideCrossesTotalThreshold() async {
+    let snapshot = await PersistedStoreSnapshot(
+      keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
     let assertICloud = ubiquitousStorePersistsValues()
 
@@ -207,8 +211,9 @@ struct CyclingRecordsTests {
 
   @Test("ignores missing speeds when updating fastest average speed")
   @MainActor
-  func ignoresMissingSpeedsWhenUpdatingFastestAverageSpeed() {
-    let snapshot = PersistedStoreSnapshot(keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+  func ignoresMissingSpeedsWhenUpdatingFastestAverageSpeed() async {
+    let snapshot = await PersistedStoreSnapshot(
+      keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
     let assertICloud = ubiquitousStorePersistsValues()
 
@@ -250,8 +255,9 @@ struct CyclingRecordsTests {
 
   @Test("ignores sub one kilometer rides when updating fastest average speed")
   @MainActor
-  func ignoresSubOneKilometerRidesWhenUpdatingFastestAverageSpeed() {
-    let snapshot = PersistedStoreSnapshot(keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+  func ignoresSubOneKilometerRidesWhenUpdatingFastestAverageSpeed() async {
+    let snapshot = await PersistedStoreSnapshot(
+      keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
     let assertICloud = ubiquitousStorePersistsValues()
 
@@ -287,8 +293,9 @@ struct CyclingRecordsTests {
 
   @Test("ignores averages faster than the sampled maximum speed")
   @MainActor
-  func ignoresAveragesFasterThanSampledMaximumSpeed() {
-    let snapshot = PersistedStoreSnapshot(keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+  func ignoresAveragesFasterThanSampledMaximumSpeed() async {
+    let snapshot = await PersistedStoreSnapshot(
+      keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
     let assertICloud = ubiquitousStorePersistsValues()
 
@@ -324,8 +331,9 @@ struct CyclingRecordsTests {
 
   @Test("ignores slower valid rides when updating fastest average speed")
   @MainActor
-  func ignoresSlowerValidRidesWhenUpdatingFastestAverageSpeed() {
-    let snapshot = PersistedStoreSnapshot(keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+  func ignoresSlowerValidRidesWhenUpdatingFastestAverageSpeed() async {
+    let snapshot = await PersistedStoreSnapshot(
+      keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
     let assertICloud = ubiquitousStorePersistsValues()
 
@@ -361,8 +369,9 @@ struct CyclingRecordsTests {
 
   @Test("resets statistics while preserving unlocked icons")
   @MainActor
-  func resetsStatisticsWhilePreservingUnlockedIcons() {
-    let snapshot = PersistedStoreSnapshot(keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+  func resetsStatisticsWhilePreservingUnlockedIcons() async {
+    let snapshot = await PersistedStoreSnapshot(
+      keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
     let assertICloud = ubiquitousStorePersistsValues()
 
@@ -458,6 +467,7 @@ private func setRecordValue(_ value: Any?, forKey key: String) {
   }
 }
 
+@MainActor
 private func expectFastestAverageSpeedUnchanged(
   records: CyclingRecords,
   fastestAverageSpeed: Double,

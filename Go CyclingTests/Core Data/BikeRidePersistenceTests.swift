@@ -16,7 +16,7 @@ struct BikeRidePersistenceTests {
 
   @Test("stores ride data in an in-memory store")
   func storesRideData() async throws {
-    let snapshot = PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
     let persistence = makeInMemoryPersistenceController()
@@ -54,8 +54,8 @@ struct BikeRidePersistenceTests {
   }
 
   @Test("renames matching categories and leaves other rides unchanged")
-  func renamesMatchingCategoriesAndLeavesOtherRidesUnchanged() throws {
-    let snapshot = PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+  func renamesMatchingCategoriesAndLeavesOtherRidesUnchanged() async throws {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
     let persistence = makeInMemoryPersistenceController()
@@ -78,8 +78,8 @@ struct BikeRidePersistenceTests {
   }
 
   @Test("does not rename categories when inputs do not pair cleanly")
-  func doesNotRenameCategoriesWhenInputsDoNotPairCleanly() throws {
-    let snapshot = PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+  func doesNotRenameCategoriesWhenInputsDoNotPairCleanly() async throws {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
     let persistence = makeInMemoryPersistenceController()
@@ -101,8 +101,8 @@ struct BikeRidePersistenceTests {
   }
 
   @Test("removes only matching category rides")
-  func removesOnlyMatchingCategoryRides() throws {
-    let snapshot = PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+  func removesOnlyMatchingCategoryRides() async throws {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
     let persistence = makeInMemoryPersistenceController()
@@ -120,8 +120,8 @@ struct BikeRidePersistenceTests {
   }
 
   @Test("deletes all saved rides")
-  func deletesAllSavedRides() throws {
-    let snapshot = PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+  func deletesAllSavedRides() async throws {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
     let persistence = makeInMemoryPersistenceController()

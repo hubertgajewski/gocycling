@@ -25,23 +25,52 @@ let cyclingRecordStoreKeys = [
 private let persistedStoreSnapshotGate = PersistedStoreSnapshotGate()
 
 private final class PersistedStoreSnapshotGate: @unchecked Sendable {
-  private let semaphore = DispatchSemaphore(value: 1)
+  private let lock = NSLock()
+  private var isAvailable = true
+  private var waiters = [CheckedContinuation<Void, Never>]()
 
-  func acquire() {
-    semaphore.wait()
+  func acquirePermit() async -> PersistedStoreSnapshotPermit {
+    await acquire()
+    return PersistedStoreSnapshotPermit(gate: self)
+  }
+
+  private func acquire() async {
+    await withCheckedContinuation { continuation in
+      lock.lock()
+      if isAvailable {
+        isAvailable = false
+        lock.unlock()
+        continuation.resume()
+      } else {
+        waiters.append(continuation)
+        lock.unlock()
+      }
+    }
   }
 
   func release() {
-    semaphore.signal()
+    let waiter: CheckedContinuation<Void, Never>?
+
+    lock.lock()
+    if waiters.isEmpty {
+      isAvailable = true
+      waiter = nil
+    } else {
+      waiter = waiters.removeFirst()
+    }
+    lock.unlock()
+
+    waiter?.resume()
   }
 }
 
 private final class PersistedStoreSnapshotPermit: @unchecked Sendable {
+  private let gate: PersistedStoreSnapshotGate
   private let stateLock = NSLock()
   private var isReleased = false
 
-  init() {
-    persistedStoreSnapshotGate.acquire()
+  init(gate: PersistedStoreSnapshotGate) {
+    self.gate = gate
   }
 
   deinit {
@@ -55,7 +84,7 @@ private final class PersistedStoreSnapshotPermit: @unchecked Sendable {
     stateLock.unlock()
 
     if shouldRelease {
-      persistedStoreSnapshotGate.release()
+      gate.release()
     }
   }
 }
@@ -68,8 +97,8 @@ struct PersistedStoreSnapshot {
   private let iCloudValues: [String: Any]
   private let iCloudKeys: Set<String>
 
-  init(keys: [String]) {
-    self.permit = PersistedStoreSnapshotPermit()
+  init(keys: [String]) async {
+    self.permit = await persistedStoreSnapshotGate.acquirePermit()
     self.keys = keys
 
     var userDefaultsValues = [String: Any]()
@@ -150,72 +179,156 @@ func ubiquitousStorePersistsValues() -> Bool {
 
 @Suite("PersistedStoreSnapshot", .serialized)
 struct PersistedStoreSnapshotTests {
-  @Test("serializes overlapping snapshots")
-  func serializesOverlappingSnapshots() {
-    let key = "GoCyclingTests.persistedStoreSnapshotLock"
-    let userDefaultsValue = UserDefaults.standard.object(forKey: key)
-    let iCloudValue = NSUbiquitousKeyValueStore.default.object(forKey: key)
-    defer { restoreProbeValues(userDefaultsValue: userDefaultsValue, iCloudValue: iCloudValue) }
+  @Test("waiting for a permit leaves the main actor runnable")
+  @MainActor
+  func waitingForPermitLeavesMainActorRunnable() async throws {
+    let gate = PersistedStoreSnapshotGate()
+    let firstPermit = await gate.acquirePermit()
+    let probe = PersistedStoreSnapshotGateProbe()
+    let mainActorProbeRecorded = DispatchSemaphore(value: 0)
 
-    let firstSnapshotReady = DispatchSemaphore(value: 0)
-    let releaseFirstSnapshot = DispatchSemaphore(value: 0)
-    let secondSnapshotAttemptStarted = DispatchSemaphore(value: 0)
-    let secondSnapshotReturned = DispatchSemaphore(value: 0)
-    let completedSnapshots = DispatchSemaphore(value: 0)
-    defer { releaseFirstSnapshot.signal() }
-
-    DispatchQueue.global(qos: .userInitiated).async {
-      let firstSnapshot = PersistedStoreSnapshot(keys: [key])
-      firstSnapshotReady.signal()
-      releaseFirstSnapshot.wait()
-      firstSnapshot.restore()
-      completedSnapshots.signal()
+    let waitingTask = Task { @MainActor in
+      probe.recordAttempt()
+      let secondPermit = await gate.acquirePermit()
+      probe.recordAcquire()
+      secondPermit.release()
     }
 
-    #expect(firstSnapshotReady.wait(timeout: .now() + .seconds(2)) == .success)
-
     DispatchQueue.global(qos: .userInitiated).async {
-      secondSnapshotAttemptStarted.signal()
-      let secondSnapshot = PersistedStoreSnapshot(keys: [key])
-      secondSnapshotReturned.signal()
-      secondSnapshot.restore()
-      completedSnapshots.signal()
+      if probe.waitForAttempt(timeout: .now() + .seconds(2)) {
+        DispatchQueue.main.async {
+          probe.recordMainActorProbe()
+          mainActorProbeRecorded.signal()
+        }
+      }
+
+      let probeResult = mainActorProbeRecorded.wait(timeout: .now() + .seconds(2))
+      probe.recordProbeCompletedBeforeRelease(probeResult == .success)
+      probe.recordRelease()
+      firstPermit.release()
     }
 
-    #expect(secondSnapshotAttemptStarted.wait(timeout: .now() + .seconds(2)) == .success)
-    let secondReturnedBeforeRelease = secondSnapshotReturned.wait(
+    await waitingTask.value
+    let times = probe.snapshot()
+    let mainActorProbeAt = try #require(times.mainActorProbeAt)
+    let releaseAt = try #require(times.releaseAt)
+    #expect(times.probeCompletedBeforeRelease == true)
+    #expect(mainActorProbeAt < releaseAt)
+  }
+
+  @Test("serializes overlapping permits")
+  func serializesOverlappingPermits() async {
+    let gate = PersistedStoreSnapshotGate()
+    let firstPermit = await gate.acquirePermit()
+    defer { firstPermit.release() }
+
+    let secondPermitAttemptStarted = DispatchSemaphore(value: 0)
+    let secondPermitAcquired = DispatchSemaphore(value: 0)
+    let secondPermitReleased = DispatchSemaphore(value: 0)
+
+    Task.detached(priority: .userInitiated) {
+      secondPermitAttemptStarted.signal()
+      let secondPermit = await gate.acquirePermit()
+      secondPermitAcquired.signal()
+      secondPermit.release()
+      secondPermitReleased.signal()
+    }
+
+    #expect(
+      await waitForSemaphore(secondPermitAttemptStarted, timeout: .now() + .seconds(2))
+        == .success)
+    let secondAcquiredBeforeRelease = await waitForSemaphore(
+      secondPermitAcquired,
       timeout: .now() + .milliseconds(200)
     )
-    #expect(secondReturnedBeforeRelease == .timedOut)
+    #expect(secondAcquiredBeforeRelease == .timedOut)
 
-    releaseFirstSnapshot.signal()
-    if secondReturnedBeforeRelease == .timedOut {
-      #expect(secondSnapshotReturned.wait(timeout: .now() + .seconds(2)) == .success)
+    firstPermit.release()
+    if secondAcquiredBeforeRelease == .timedOut {
+      #expect(
+        await waitForSemaphore(secondPermitAcquired, timeout: .now() + .seconds(2))
+          == .success
+      )
     }
-    #expect(completedSnapshots.wait(timeout: .now() + .seconds(2)) == .success)
-    #expect(completedSnapshots.wait(timeout: .now() + .seconds(2)) == .success)
+    #expect(
+      await waitForSemaphore(secondPermitReleased, timeout: .now() + .seconds(2))
+        == .success
+    )
+  }
+}
+
+private func waitForSemaphore(
+  _ semaphore: DispatchSemaphore,
+  timeout: DispatchTime
+) async -> DispatchTimeoutResult {
+  await withCheckedContinuation { continuation in
+    DispatchQueue.global(qos: .userInitiated).async {
+      continuation.resume(returning: semaphore.wait(timeout: timeout))
+    }
+  }
+}
+
+private final class PersistedStoreSnapshotGateProbe: @unchecked Sendable {
+  private let lock = NSLock()
+  private var attemptAt: Date?
+  private var acquireAt: Date?
+  private var mainActorProbeAt: Date?
+  private var releaseAt: Date?
+  private var probeCompletedBeforeRelease: Bool?
+
+  func recordAttempt() {
+    lock.lock()
+    attemptAt = Date()
+    lock.unlock()
   }
 
-  private func restoreProbeValues(userDefaultsValue: Any?, iCloudValue: Any?) {
-    let key = "GoCyclingTests.persistedStoreSnapshotLock"
-    restoreProbeValue(userDefaultsValue, key: key, in: UserDefaults.standard)
-    restoreProbeValue(iCloudValue, key: key, in: NSUbiquitousKeyValueStore.default)
-    NSUbiquitousKeyValueStore.default.synchronize()
+  func recordAcquire() {
+    lock.lock()
+    acquireAt = Date()
+    lock.unlock()
   }
 
-  private func restoreProbeValue(_ value: Any?, key: String, in defaults: UserDefaults) {
-    if let value {
-      defaults.set(value, forKey: key)
-    } else {
-      defaults.removeObject(forKey: key)
-    }
+  func recordMainActorProbe() {
+    lock.lock()
+    mainActorProbeAt = Date()
+    lock.unlock()
   }
 
-  private func restoreProbeValue(_ value: Any?, key: String, in store: NSUbiquitousKeyValueStore) {
-    if let value {
-      store.set(value, forKey: key)
-    } else {
-      store.removeObject(forKey: key)
+  func recordRelease() {
+    lock.lock()
+    releaseAt = Date()
+    lock.unlock()
+  }
+
+  func recordProbeCompletedBeforeRelease(_ value: Bool) {
+    lock.lock()
+    probeCompletedBeforeRelease = value
+    lock.unlock()
+  }
+
+  func waitForAttempt(timeout: DispatchTime) -> Bool {
+    while DispatchTime.now() < timeout {
+      lock.lock()
+      let didAttempt = attemptAt != nil
+      lock.unlock()
+
+      if didAttempt {
+        return true
+      }
+      Thread.sleep(forTimeInterval: 0.001)
     }
+    return false
+  }
+
+  func snapshot() -> (
+    attemptAt: Date?,
+    acquireAt: Date?,
+    mainActorProbeAt: Date?,
+    releaseAt: Date?,
+    probeCompletedBeforeRelease: Bool?
+  ) {
+    lock.lock()
+    defer { lock.unlock() }
+    return (attemptAt, acquireAt, mainActorProbeAt, releaseAt, probeCompletedBeforeRelease)
   }
 }
