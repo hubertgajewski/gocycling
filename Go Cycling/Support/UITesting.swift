@@ -16,8 +16,9 @@ enum UITesting {
     ]
 
     #if DEBUG
-    // History fetches saved rides from Core Data, so UI smoke needs SQLite; the
-    // process-id suffix keeps parallel smoke jobs from deleting each other's data.
+    // UI-smoke tests need SQLite because History fetches saved rides from Core
+    // Data; the process-id suffix keeps parallel smoke jobs from deleting each
+    // other's data.
     static let isolatedPersistenceStoreURL = FileManager.default.temporaryDirectory
         .appendingPathComponent("GoCycling-\(ProcessInfo.processInfo.processIdentifier)-UITesting.sqlite")
 

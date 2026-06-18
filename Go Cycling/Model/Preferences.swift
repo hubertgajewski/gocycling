@@ -60,8 +60,8 @@ class Preferences: ObservableObject {
     // Telemetry opt-out is stored locally only (privacy preference should stay device-local)
     static let telemetryEnabledKey = "telemetryEnabled"
     static private let keyTypes = [0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2] // 0: Bool, 1: Int, 2: String
-    // Shared defaults let UI-smoke launches mirror first-launch state without
-    // writing the normal initialization keys into the user's preferences.
+    // UI-smoke tests need first-launch defaults without writing the normal
+    // initialization keys into the user's preferences.
     static private let defaultUsingMetric = true
     static private let defaultDisplayingMetrics = true
     static private let defaultColourChoice = ColourChoice.blue.rawValue
@@ -81,7 +81,7 @@ class Preferences: ObservableObject {
     
     init(arguments: [String] = ProcessInfo.processInfo.arguments) {
         if UITesting.shouldUseIsolatedPersistence(arguments: arguments) {
-            // UI smoke needs predictable defaults, but writing the normal
+            // UI-smoke tests need predictable defaults, but writing the normal
             // initialization keys would mutate the user's app preferences.
             self.usingMetric = Preferences.defaultUsingMetric
             self.displayingMetrics = Preferences.defaultDisplayingMetrics
@@ -459,8 +459,8 @@ class Preferences: ObservableObject {
     // Used in BikeRideViewModel where the environment object is not available
     static func storedSortingChoice() -> SortChoice {
         guard let stringValue = UserDefaults.standard.string(forKey: Preferences.keys[4]) else {
-            // UI smoke avoids writing normal defaults; callers still need a stable
-            // sort preference when reading outside the environment object.
+            // UI-smoke tests avoid writing normal defaults; callers still need a
+            // stable sort preference when reading outside the environment object.
             return SortChoice.dateDescending
         }
         return SortChoice(rawValue: stringValue) ?? SortChoice.dateDescending
@@ -472,7 +472,7 @@ class Preferences: ObservableObject {
     }
     
     static func storedSelectedRoute() -> String {
-        // UI smoke avoids writing normal defaults, so missing route selection
+        // UI-smoke tests avoid writing normal defaults, so missing route selection
         // should mean "all routes" instead of crashing on a force unwrap.
         return UserDefaults.standard.string(forKey: Preferences.keys[8]) ?? ""
     }

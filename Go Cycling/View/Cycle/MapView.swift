@@ -21,8 +21,8 @@ struct MapView: UIViewRepresentable {
     @Binding var centerMapOnLocation: Bool
     @Binding var cyclingStartTime: Date
     @Binding var timeCycling: TimeInterval
-    // Without the exact saved BikeRide, route naming can rename a different ride
-    // if History ordering changes while the async save finishes.
+    // Route-naming UI tests need the exact saved BikeRide because History ordering
+    // can change while the async save finishes.
     var onRouteSaveSuccess: (BikeRide) -> Void = { _ in }
     
     @Environment(\.managedObjectContext) private var managedObjectContext
@@ -67,8 +67,8 @@ struct MapView: UIViewRepresentable {
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView(frame: .zero)
         mapView.delegate = context.coordinator
-        // UI smoke is not testing permissions here; hiding user location avoids
-        // MKMapView permission UI that can block the tab smoke flow.
+        // UI-smoke tests are not testing permissions here; hiding user location
+        // avoids MKMapView permission UI that can block the tab smoke flow.
         mapView.showsUserLocation = UITesting.shouldShowUserLocation
         mapView.showsCompass = false
         mapView.mapType = preferences.mapTypeChoiceConverted.mkMapType
@@ -101,8 +101,8 @@ struct MapView: UIViewRepresentable {
             if cyclingStatus.isCycling {
                 if (!startedCycling) {
                     startedCycling = true
-                    // SwiftUI redraws the map before new GPS samples arrive, so
-                    // clear the old overlay to avoid showing the previous route.
+                    // Route-save UI tests need the new ride to start from a clean
+                    // map; SwiftUI can redraw before new GPS samples arrive.
                     context.coordinator.currentRouteOverlay = nil
                     context.coordinator.lastRenderedCount = 0
                     view.removeOverlays(view.overlays)
@@ -136,11 +136,11 @@ struct MapView: UIViewRepresentable {
                 // Means we need to store the current route and clear the map
                 if (startedCycling) {
                     startedCycling = false
-                    // Save completion can arrive after another ride starts; this
-                    // token is the guard against clearing or naming the new ride.
+                    // Route-save tests need a stale save completion blocked from
+                    // clearing or naming a new ride that has already started.
                     let completedSessionToken = locationManager.currentCyclingSessionToken
-                    // End-of-ride cleanup stops live state immediately, so the
-                    // save needs an immutable copy before arrays can be cleared.
+                    // Route-save tests need an immutable copy before end-of-ride
+                    // cleanup stops live state and arrays can be cleared.
                     let completedRoute = CompletedRouteSnapshot(
                         locations: locationManager.cyclingLocations,
                         speeds: locationManager.cyclingSpeeds,
@@ -155,16 +155,16 @@ struct MapView: UIViewRepresentable {
                         persistenceController: persistenceController,
                         records: records
                     ).save(completedRoute, cleanupAfterSuccess: {
-                        // A stale completion would remove overlay/samples for the
-                        // next ride, so old sessions are ignored.
+                        // Route-save tests cover stale completions; ignoring old
+                        // sessions prevents removing overlay/samples for the next ride.
                         guard locationManager.isCurrentCyclingSession(completedSessionToken) else { return }
                         context.coordinator.currentRouteOverlay = nil
                         context.coordinator.lastRenderedCount = 0
                         view.removeOverlays(view.overlays)
                         locationManager.clearCompletedRouteData()
                     }, completion: { result in
-                        // A stale completion would present naming for the wrong
-                        // route, so only this completed session may open the sheet.
+                        // Route-naming UI tests cover stale completions; only this
+                        // completed session may open the sheet for its saved route.
                         guard locationManager.isCurrentCyclingSession(completedSessionToken) else { return }
                         if case .success(let savedRide) = result {
                             onRouteSaveSuccess(savedRide)

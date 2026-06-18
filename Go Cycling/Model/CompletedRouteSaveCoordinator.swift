@@ -6,8 +6,8 @@
 import CoreLocation
 import Foundation
 
-// Ending a ride stops live location side effects before Core Data finishes, so
-// the save path needs an immutable copy that cleanup cannot mutate underneath it.
+// Route-save tests need deterministic completed-route data after live cleanup;
+// the save path keeps an immutable copy that cleanup cannot mutate underneath it.
 struct CompletedRouteSnapshot {
     let locations: [CLLocation?]
     let speeds: [CLLocationSpeed?]
@@ -18,8 +18,8 @@ struct CompletedRouteSnapshot {
 }
 
 protocol BikeRideStoring {
-    /// This boundary lets tests force save failures and verify records/cleanup
-    /// stay blocked until a BikeRide is actually saved.
+    /// Unit tests need this boundary to force save failures and verify
+    /// records/cleanup stay blocked until a BikeRide is actually saved.
     func storeBikeRide(
         locations: [CLLocation?],
         speeds: [CLLocationSpeed?],
@@ -40,8 +40,8 @@ protocol CyclingRecordsUpdating {
     )
 }
 
-// The old stop path updated records and cleared samples even after save failure;
-// this pipeline makes every success-only side effect wait for the saved BikeRide.
+// Route-save tests need records and cleanup to wait for persistence; the old stop
+// path updated records and cleared samples even after save failure.
 struct CompletedRouteSaveCoordinator {
     let persistenceController: BikeRideStoring
     let records: CyclingRecordsUpdating
@@ -70,8 +70,9 @@ struct CompletedRouteSaveCoordinator {
         ) { result in
             let finish = {
                 if case .success = result {
-                    // Records and UI cleanup happen only after persistence succeeds;
-                    // otherwise a failed save would still count or discard a ride.
+                    // Route-save tests cover this failure path: records and UI
+                    // cleanup happen only after persistence succeeds so a failed
+                    // save cannot count or discard a ride.
                     records.updateCyclingRecords(
                         speeds: completedRoute.speeds,
                         distance: completedRoute.distance,

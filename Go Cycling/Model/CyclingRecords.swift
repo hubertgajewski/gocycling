@@ -25,8 +25,8 @@ class CyclingRecords: ObservableObject {
     @Published var longestCyclingTimeDate: Date?
     // Total cycling distance is always changed last as the ActivityAwardsViewModel publishes changes when it changes
     @Published var totalCyclingDistance: Double
-    // UI smoke drives record-updating paths; this flag keeps those display updates
-    // from writing into the user's defaults or iCloud record store.
+    // UI-smoke tests drive record-updating paths; this flag keeps those display
+    // updates from writing into the user's defaults or iCloud record store.
     private let persistsRecordUpdates: Bool
     
     static private let initKey = "didSetupRecords"
@@ -34,8 +34,8 @@ class CyclingRecords: ObservableObject {
     static private let keyTypes = [2, 2, 0, 2, 2, 2, 3, 3, 3, 1] // 0: [Bool], 1: Int, 2: Double, 3: Date
     static private let numberOfUnlockableIcons = 6
     static let awardValues: [Double] = [10.0 * 1000, 25.0 * 1000, 50.0 * 1000, 100.0 * 1000, 250.0 * 1000, 500.0 * 1000]
-    // Reuse the same defaults for normal initialization and isolated UI smoke so
-    // the test-only in-memory values cannot drift from first-launch app values.
+    // UI-smoke tests need the same defaults as normal initialization, but kept in
+    // memory so test-only values cannot drift from first-launch app values.
     static private let defaultTotalCyclingTime = 0.0
     static private let defaultTotalCyclingDistance = 0.0
     static private var defaultUnlockedIcons: [Bool] {
@@ -51,8 +51,8 @@ class CyclingRecords: ObservableObject {
         self.persistsRecordUpdates = !isUsingIsolatedPersistence
 
         if isUsingIsolatedPersistence {
-            // UI smoke opens History/Statistics; keep records in memory so those
-            // visits do not alter the user's defaults or iCloud record values.
+            // UI-smoke tests open History/Statistics; keep records in memory so
+            // those visits do not alter the user's defaults or iCloud record values.
             self.totalCyclingTime = CyclingRecords.defaultTotalCyclingTime
             self.totalCyclingRoutes = CyclingRecords.defaultTotalCyclingRoutes
             self.unlockedIcons = CyclingRecords.defaultUnlockedIcons
@@ -213,8 +213,8 @@ class CyclingRecords: ObservableObject {
     }
 
     private func persistClassMembersIfNeeded() {
-        // Isolated UI-test runs can update displayed records without persisting
-        // them to shared UserDefaults or NSUbiquitousKeyValueStore.
+        // UI tests need to update displayed records without persisting them to
+        // shared UserDefaults or NSUbiquitousKeyValueStore.
         guard persistsRecordUpdates else { return }
         self.writeClassMembersToUserDefaults()
         CyclingRecords.syncLocalAndCloud(localToCloud: true)
@@ -268,7 +268,7 @@ class CyclingRecords: ObservableObject {
     
     // Should only ever be called once - used to migrate legacy Records to UserDefaults and NSUbiquitousKeyValueStore or create Records from existing BikeRides
     public func initialRecordsMigration(existingRecords: Records?, existingBikeRides: [BikeRide]) {
-        // Launching UI smoke must not mark legacy migrations as completed in the
+        // UI-smoke tests must not mark legacy migrations as completed in the
         // user's real UserDefaults/iCloud stores.
         guard persistsRecordUpdates else { return }
 
@@ -403,8 +403,8 @@ class CyclingRecords: ObservableObject {
     // Reset stored statistics (except unlocked app icons)
     static public func resetStatistics(arguments: [String] = ProcessInfo.processInfo.arguments) {
         if UITesting.shouldUseIsolatedPersistence(arguments: arguments) {
-            // Settings smoke can exercise reset behavior; keep it in memory so it
-            // cannot wipe the user's actual cycling statistics.
+            // Settings UI-smoke tests can exercise reset behavior; keep it in
+            // memory so they cannot wipe the user's actual cycling statistics.
             CyclingRecords.shared.totalCyclingTime = defaultTotalCyclingTime
             CyclingRecords.shared.totalCyclingDistance = defaultTotalCyclingDistance
             CyclingRecords.shared.longestCyclingDistance = defaultLongestCyclingDistance

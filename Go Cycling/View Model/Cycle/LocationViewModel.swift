@@ -26,8 +26,8 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     private var stalenessTimer: Timer?
     private var lastLocationUpdateTime: Date = Date()
     private var stoppedSpeedDuration: TimeInterval = 0.0
-    // CLLocationManager can deliver callbacks across ride boundaries. Session
-    // state prevents old samples or save completions from affecting the next ride.
+    // Route-save tests need callbacks isolated by session because CLLocationManager
+    // can deliver old samples or save completions after the next ride starts.
     private var isTrackingCyclingSession = false
     private var cyclingSessionToken = 0
     @Published var cyclingAltitude: CLLocationDistance?
@@ -95,8 +95,8 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
         lastLocation = location
-        // Ignore launch-time and post-stop callbacks so saved routes contain only
-        // samples collected while the user was actively cycling.
+        // Route-save tests need saved routes to contain only active-session
+        // samples, so launch-time and post-stop callbacks are ignored.
         guard isTrackingCyclingSession else { return }
         cyclingLocations.append(lastLocation)
         cyclingSpeed = location.speed
@@ -147,7 +147,7 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func startedCycling() {
-        // A previous save may still be finishing, so a new token invalidates its
+        // Route-save tests need a new ride to invalidate any previous async save
         // cleanup/naming before this ride starts collecting samples.
         cyclingSessionToken += 1
         isTrackingCyclingSession = true
@@ -181,8 +181,8 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 
     func isCurrentCyclingSession(_ token: Int) -> Bool {
-        // Async save cleanup uses this check so an old save cannot clear or name
-        // a newer ride that has already started.
+        // Route-save tests use this check to prove an old async save cannot clear
+        // or name a newer ride that has already started.
         cyclingSessionToken == token
     }
     
@@ -205,8 +205,8 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         stoppedSpeedDuration = -5.0
     }
 
-    // Stop live-session side effects immediately, but keep route samples until
-    // persistence succeeds so a failed save does not silently discard the ride.
+    // Route-save tests need live-session side effects stopped immediately while
+    // samples are kept until persistence succeeds, so failed saves are recoverable.
     func endCyclingSession() {
         isTrackingCyclingSession = false
         stalenessTimer?.invalidate()
@@ -227,16 +227,16 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         distanceSinceLastHealthStore = 0.0
     }
 
-    // Keep immediate clearing only for legacy callers; route-save clears samples
-    // after persistence succeeds so a failed save can still be recovered.
+    // Route-save tests keep immediate clearing only for legacy callers; the new
+    // save path clears samples after persistence succeeds so failures are recoverable.
     func clearLocationArray() {
         endCyclingSession()
         clearCompletedRouteData()
     }
 
     func clearCompletedRouteData() {
-        // Called only after a successful async save in the route-save flow, so
-        // the user does not lose unsaved route samples on persistence failure.
+        // Route-save tests call this only after successful async persistence so
+        // the user does not lose unsaved samples when a save fails.
         cyclingLocations.removeAll()
         cyclingDistances.removeAll()
         cyclingSpeeds.removeAll()

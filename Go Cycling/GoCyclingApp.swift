@@ -8,8 +8,8 @@
 import SwiftUI
 import TelemetryDeck
 
-// Launch work normally reads and writes process-wide defaults/iCloud state.
-// These protocols let tests prove UI-smoke skips that work without touching real stores.
+// Unit tests need to exercise launch decisions without running App.init, and the
+// launch work normally reads/writes process-wide defaults and iCloud state.
 protocol AppLaunchKeyValueStore {
     func bool(forKey defaultName: String) -> Bool
     func set(_ value: Bool, forKey defaultName: String)
@@ -25,7 +25,7 @@ extension UserDefaults: AppLaunchKeyValueStore {}
 extension UserDefaults: AppLaunchPreferenceStore {}
 
 enum AppLaunchTelemetry {
-    // UI smoke must decide to skip telemetry before TelemetryManager reads
+    // UI-smoke tests need telemetry skipped before TelemetryManager reads
     // preferences or starts network work, so setup is testable outside App.init.
     static func configureIfNeeded(
         arguments: [String] = ProcessInfo.processInfo.arguments,
@@ -38,8 +38,8 @@ enum AppLaunchTelemetry {
             )
         }
     ) {
-        // UI tests relaunch often on shared devices; skip telemetry setup so they
-        // do not read or mutate the user's launch-time preferences.
+        // UI tests relaunch often on shared devices; skip telemetry setup so test
+        // launches do not read or mutate the user's launch-time preferences.
         guard !UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return }
 
         let appID = appID ?? Bundle.main.object(forInfoDictionaryKey: "GoCyclingAppID")
@@ -55,8 +55,8 @@ enum AppLaunchTelemetry {
 enum AppLaunchMigration {
     static let didLaunchBeforeKey = "didLaunch1.4.0Before"
 
-    // UI smoke must bypass migrations because they write first-run sentinels and
-    // can migrate legacy data in the user's real defaults/iCloud stores.
+    // UI-smoke tests need migrations bypassed because they write first-run
+    // sentinels and can migrate legacy data in the user's real defaults/iCloud stores.
     static func runIfNeeded(
         arguments: [String] = ProcessInfo.processInfo.arguments,
         userDefaults: AppLaunchKeyValueStore? = nil,
@@ -64,7 +64,7 @@ enum AppLaunchMigration {
         migratePreferences: () -> Void,
         migrateRecords: () -> Void
     ) {
-        // UI smoke starts from fixture state; running launch migrations there
+        // UI-smoke tests start from fixture state; running launch migrations there
         // would write real defaults/iCloud keys outside the isolated Core Data store.
         guard !UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return }
 
@@ -109,8 +109,8 @@ struct GoCyclingApp: App {
                 .environmentObject(preferences)
                 .onAppear(perform: {
                     #if DEBUG
-                    // Seed through the real save path so History smoke verifies
-                    // saved-route UI without relying on live GPS/timer data.
+                    // UI-smoke tests need a saved route from the real save path so
+                    // History is verified without relying on live GPS/timer data.
                     if UITesting.shouldSeedRouteSaveFixture() {
                         UITestingRouteSaveFixture.runIfNeeded(
                             persistenceController: persistenceController
@@ -119,8 +119,8 @@ struct GoCyclingApp: App {
                     }
                     #endif
 
-                    // The remaining launch work can mutate real preferences or
-                    // telemetry state, so isolated UI-smoke launches stop here.
+                    // UI-smoke tests need to stop here because the remaining launch
+                    // work can mutate real preferences or telemetry state.
                     guard !UITesting.shouldUseIsolatedPersistence() else { return }
 
                     AppLaunchMigration.runIfNeeded(

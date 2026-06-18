@@ -22,11 +22,11 @@ enum UITestingRouteSaveFixture {
         arguments: [String] = ProcessInfo.processInfo.arguments,
         completion: @escaping (Result<Void, Error>) -> Void = { _ in }
     ) {
-        // One seeded ride exercises History route-save UI while avoiding
-        // GPS/timer nondeterminism that makes smoke tests flaky.
+        // UI-smoke tests need one seeded ride to exercise History route-save UI
+        // while avoiding GPS/timer nondeterminism that makes the smoke flaky.
         guard UITesting.shouldSeedRouteSaveFixture(arguments: arguments) && !hasRun else { return }
-        // The fixture deletes all rides before seeding; verify isolation first so
-        // a misconfigured UI-test launch cannot erase the user's saved routes.
+        // The UI-test fixture deletes all rides before seeding; verify isolation
+        // first so a misconfigured launch cannot erase the user's saved routes.
         guard persistenceController.isUsingPersistentStore(at: UITesting.isolatedPersistenceStoreURL) else {
             completion(.failure(UITestingRouteSaveFixtureError.nonIsolatedStore))
             return
@@ -61,8 +61,8 @@ enum UITestingRouteSaveFixture {
     )
 
     private final class FixtureCyclingRecordsUpdater: CyclingRecordsUpdating {
-        // The fixture only needs a saved BikeRide; updating statistics here would
-        // make History setup depend on record side effects that this smoke does not test.
+        // The UI-smoke test only needs a saved BikeRide; updating statistics here
+        // would make History setup depend on record side effects it does not test.
         func updateCyclingRecords(
             speeds: [CLLocationSpeed?],
             distance: Double,

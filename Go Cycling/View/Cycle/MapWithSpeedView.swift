@@ -14,8 +14,8 @@ struct MapWithSpeedView: View {
 
     @Binding var cyclingStartTime: Date
     @Binding var timeCycling: TimeInterval
-    // Forward the exact saved ride because fetching "latest" after an async save
-    // can choose the wrong route when multiple saves finish close together.
+    // Route-naming UI tests need the exact saved ride forwarded because fetching
+    // "latest" can choose the wrong route when saves finish close together.
     var onRouteSaveSuccess: (BikeRide) -> Void = { _ in }
 
     @StateObject var locationManager = LocationViewModel.locationManager

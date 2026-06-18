@@ -112,8 +112,8 @@ struct BikeRideListView: View {
                 })
             }
         }
-        // Older iPadOS NavigationView defaults to split view, which can open
-        // History on a blank detail pane instead of the saved-route list.
+        // iPad UI-smoke tests need the saved-route list visible; older iPadOS
+        // NavigationView defaults to split view and can open a blank detail pane.
         .navigationViewStyle(StackNavigationViewStyle())
         // Move alert outside of navigation view due to a SwiftUI bug
         .alert(isPresented: $showingDeleteAlert) {
