@@ -26,6 +26,8 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     private var stalenessTimer: Timer?
     private var lastLocationUpdateTime: Date = Date()
     private var stoppedSpeedDuration: TimeInterval = 0.0
+    // CLLocationManager can outlive a ride boundary. These fields keep samples
+    // and async save callbacks tied to the ride session that produced them.
     private var isTrackingCyclingSession = false
     private var cyclingSessionToken = 0
     @Published var cyclingAltitude: CLLocationDistance?
@@ -93,8 +95,8 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
         lastLocation = location
-        // CLLocationManager can deliver updates before/after a ride; only active
-        // cycling sessions should contribute samples to the saved route.
+        // Ignore launch-time and post-stop callbacks so saved routes contain only
+        // samples collected while the user was actively cycling.
         guard isTrackingCyclingSession else { return }
         cyclingLocations.append(lastLocation)
         cyclingSpeed = location.speed
@@ -145,8 +147,8 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func startedCycling() {
-        // Async save callbacks use this token to avoid cleaning up or naming a
-        // newer ride if the user starts another session before the save finishes.
+        // Starting a ride advances the token, invalidating save callbacks from
+        // any older ride that finishes after this session begins.
         cyclingSessionToken += 1
         isTrackingCyclingSession = true
         // Setup background location checking if authorized
@@ -179,6 +181,8 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 
     func isCurrentCyclingSession(_ token: Int) -> Bool {
+        // Async save cleanup uses this check so an old save cannot clear or name
+        // a newer ride that has already started.
         cyclingSessionToken == token
     }
     
@@ -201,8 +205,8 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         stoppedSpeedDuration = -5.0
     }
 
-    // Ends session side effects without discarding route samples. On save failure
-    // the route data stays available while timers, heading, and HealthKit writes stop.
+    // Stop live-session side effects immediately, but keep route samples until
+    // persistence succeeds so a failed save does not silently discard the ride.
     func endCyclingSession() {
         isTrackingCyclingSession = false
         stalenessTimer?.invalidate()
@@ -223,14 +227,15 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         distanceSinceLastHealthStore = 0.0
     }
 
-    // Happens at the end of the cycling route
+    // Legacy callers still expect this to remove route data immediately.
     func clearLocationArray() {
         endCyclingSession()
         clearCompletedRouteData()
     }
 
     func clearCompletedRouteData() {
-        
+        // Called only after a successful async save in the route-save flow, so
+        // the user does not lose unsaved route samples on persistence failure.
         cyclingLocations.removeAll()
         cyclingDistances.removeAll()
         cyclingSpeeds.removeAll()

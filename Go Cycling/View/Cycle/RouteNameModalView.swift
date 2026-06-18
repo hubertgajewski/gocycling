@@ -179,6 +179,8 @@ struct RouteNameModalView: View {
             self.showEditModal = false
         }
         else if (self.bikeRideToEdit == nil) {
+            // Older Cycle-tab presentations still fall back to the latest ride,
+            // but the guard avoids a crash if History has not loaded a ride yet.
             guard let ride = self.routeNamingViewModel.allBikeRides.last else {
                 presentationMode.wrappedValue.dismiss()
                 self.showEditModal = false
@@ -206,6 +208,8 @@ struct RouteNameModalView: View {
         self.showEditModal = false
     }
 
+    // Keep all route-name writes on the same path so the direct saved-ride flow
+    // and the existing edit/remove flows cannot drift in which ride fields they copy.
     private func updateBikeRideRouteName(ride: BikeRide, routeName: String) {
         persistenceController.updateBikeRideRouteName(
             existingBikeRide: ride,

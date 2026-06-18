@@ -16,6 +16,8 @@ enum UITesting {
     ]
 
     #if DEBUG
+    // A real SQLite URL lets History fetch seeded rides, while the process-id
+    // suffix keeps simultaneous UI-test runs from sharing a store.
     static let isolatedPersistenceStoreURL = FileManager.default.temporaryDirectory
         .appendingPathComponent("GoCycling-\(ProcessInfo.processInfo.processIdentifier)-UITesting.sqlite")
 

@@ -160,7 +160,6 @@ struct BikeRidePersistenceTests {
       let configured = PersistenceController.configureStoreForUITestingIfNeeded(
         description,
         arguments: UITesting.routeSaveFixtureLaunchArguments,
-        defaults: defaults,
         storeURL: isolatedURL
       )
 

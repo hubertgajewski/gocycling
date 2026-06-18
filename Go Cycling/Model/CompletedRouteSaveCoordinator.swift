@@ -6,6 +6,8 @@
 import CoreLocation
 import Foundation
 
+// Immutable copy of the completed ride. Map/location state can be stopped or
+// cleared after save without mutating the data being persisted.
 struct CompletedRouteSnapshot {
     let locations: [CLLocation?]
     let speeds: [CLLocationSpeed?]
@@ -68,6 +70,8 @@ struct CompletedRouteSaveCoordinator {
         ) { result in
             let finish = {
                 if case .success = result {
+                    // Records and UI cleanup happen only after persistence succeeds;
+                    // otherwise a failed save would still count or discard a ride.
                     records.updateCyclingRecords(
                         speeds: completedRoute.speeds,
                         distance: completedRoute.distance,

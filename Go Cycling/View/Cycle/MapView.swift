@@ -21,6 +21,8 @@ struct MapView: UIViewRepresentable {
     @Binding var centerMapOnLocation: Bool
     @Binding var cyclingStartTime: Date
     @Binding var timeCycling: TimeInterval
+    // CycleView needs the exact saved BikeRide so route naming cannot race a
+    // History fetch for "latest ride" while the save finishes asynchronously.
     var onRouteSaveSuccess: (BikeRide) -> Void = { _ in }
     
     @Environment(\.managedObjectContext) private var managedObjectContext
@@ -99,6 +101,8 @@ struct MapView: UIViewRepresentable {
             if cyclingStatus.isCycling {
                 if (!startedCycling) {
                     startedCycling = true
+                    // A new ride starts with an empty route; clear any overlay left
+                    // from the previous session before new GPS samples arrive.
                     context.coordinator.currentRouteOverlay = nil
                     context.coordinator.lastRenderedCount = 0
                     view.removeOverlays(view.overlays)
@@ -132,6 +136,8 @@ struct MapView: UIViewRepresentable {
                 // Means we need to store the current route and clear the map
                 if (startedCycling) {
                     startedCycling = false
+                    // Capture the session token before saving so stale completions
+                    // cannot clean up or name a newer ride.
                     let completedSessionToken = locationManager.currentCyclingSessionToken
                     // Snapshot before the async save; successful cleanup can then
                     // clear live state without losing the route being persisted.
@@ -149,12 +155,15 @@ struct MapView: UIViewRepresentable {
                         persistenceController: persistenceController,
                         records: records
                     ).save(completedRoute, cleanupAfterSuccess: {
+                        // If the user already started another ride, this completion
+                        // belongs to the old ride and must not touch current state.
                         guard locationManager.isCurrentCyclingSession(completedSessionToken) else { return }
                         context.coordinator.currentRouteOverlay = nil
                         context.coordinator.lastRenderedCount = 0
                         view.removeOverlays(view.overlays)
                         locationManager.clearCompletedRouteData()
                     }, completion: { result in
+                        // Route naming is UI state for the completed session only.
                         guard locationManager.isCurrentCyclingSession(completedSessionToken) else { return }
                         if case .success(let savedRide) = result {
                             onRouteSaveSuccess(savedRide)

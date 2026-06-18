@@ -17,6 +17,8 @@ struct CycleView: View {
     @State private var cyclingStartTime = Date()
     @State private var timeCycling = 0.0
     @State private var showingRouteNamingPopover = false
+    // Keep the exact saved ride from the async save so the naming sheet does not
+    // have to guess via the current History ordering.
     @State private var savedRouteForNaming: BikeRide?
     @State private var isAutoPaused: Bool = false
     
@@ -156,6 +158,8 @@ struct CycleView: View {
     func startCycling() {
         // Send an alert about location settings if it is necessary
         locationManager.setLocationAlertStatus()
+        // A fresh session should not reuse a prior saved ride if the old naming
+        // sheet was dismissed or a late callback arrives.
         savedRouteForNaming = nil
         cyclingStatus.startedCycling()
         // Call synchronously before any SwiftUI re-renders so the pre-ride
@@ -203,8 +207,8 @@ struct CycleView: View {
     }
 
     func routeSaved(_ bikeRide: BikeRide) {
-        // Show naming only after Core Data returns the saved ride, avoiding a
-        // race with fetching "the latest" ride from History state.
+        // Show naming only after Core Data returns this saved ride; presenting
+        // earlier can rename the wrong route when saves finish out of order.
         guard preferences.namedRoutes else { return }
         savedRouteForNaming = bikeRide
         showingRouteNamingPopover = true

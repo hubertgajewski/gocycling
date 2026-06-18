@@ -25,6 +25,8 @@ enum UITestingRouteSaveFixture {
         // Seed exactly one saved ride in the isolated store so History smoke
         // verifies route-save output without GPS/timer nondeterminism.
         guard UITesting.shouldSeedRouteSaveFixture(arguments: arguments) && !hasRun else { return }
+        // The fixture deletes all rides before seeding; verify isolation first so
+        // a misconfigured UI-test launch cannot erase the user's saved routes.
         guard persistenceController.isUsingPersistentStore(at: UITesting.isolatedPersistenceStoreURL) else {
             completion(.failure(UITestingRouteSaveFixtureError.nonIsolatedStore))
             return

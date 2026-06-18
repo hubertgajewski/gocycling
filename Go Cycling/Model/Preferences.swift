@@ -56,10 +56,12 @@ class Preferences: ObservableObject {
     // Icon index is a special case since it should only be stored locally
     static private let iconIndexKey = "iconIndex"
     // iCloud sync setting is also only stored locally
-    static let iCloudOnKey = "iCloudOn"
+    static private let iCloudOnKey = "iCloudOn"
     // Telemetry opt-out is stored locally only (privacy preference should stay device-local)
     static let telemetryEnabledKey = "telemetryEnabled"
     static private let keyTypes = [0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2] // 0: Bool, 1: Int, 2: String
+    // Shared defaults let UI-smoke launches mirror first-launch state without
+    // writing the normal initialization keys into the user's preferences.
     static private let defaultUsingMetric = true
     static private let defaultDisplayingMetrics = true
     static private let defaultColourChoice = ColourChoice.blue.rawValue

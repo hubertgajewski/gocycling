@@ -32,12 +32,14 @@ struct PersistenceController {
         
         if inMemory {
             description.url = URL(fileURLWithPath: "/dev/null")
+            // In-memory tests must not attach CloudKit; Core Data rejects CloudKit
+            // mirroring for stores that are not backed by a normal SQLite URL.
             description.cloudKitContainerOptions = nil
         }
         else {
             #if DEBUG
-            // UI smoke seeds routes into a DEBUG-only local store so tests never touch
-            // the user's CloudKit-backed ride database.
+            // The UI-smoke launch argument redirects persistence before the store
+            // loads, so seeded rides cannot be written into the user's CloudKit store.
             let configuredForUITesting = PersistenceController.configureStoreForUITestingIfNeeded(
                 description,
                 arguments: arguments
@@ -81,17 +83,20 @@ struct PersistenceController {
     static func configureStoreForUITestingIfNeeded(
         _ description: NSPersistentStoreDescription,
         arguments: [String] = ProcessInfo.processInfo.arguments,
-        defaults: UserDefaults = .standard,
         storeURL: URL = UITesting.isolatedPersistenceStoreURL
     ) -> Bool {
         guard UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return false }
 
+        // UI smoke needs a real SQLite store so History can fetch saved rides,
+        // but it must be outside the app's normal CloudKit-backed database.
         description.url = storeURL
         description.cloudKitContainerOptions = nil
         return true
     }
 
     func isUsingPersistentStore(at expectedURL: URL) -> Bool {
+        // The fixture deletes/reseeds rides; fail closed unless the loaded store
+        // is the isolated UI-test store, never the user's production ride store.
         let expectedURL = Self.normalizedStoreURL(expectedURL)
         return container.persistentStoreCoordinator.persistentStores.contains { store in
             guard let storeURL = store.url else { return false }
@@ -105,6 +110,8 @@ struct PersistenceController {
     #endif
 
     enum BikeRideStoreError: Error {
+        // Route naming and record updates require a concrete saved BikeRide; if
+        // Core Data cannot materialize it, callers must treat the save as failed.
         case savedRideUnavailable
     }
 
@@ -157,8 +164,8 @@ struct PersistenceController {
 
             do {
                 try context.save()
-                // Return the saved object so route naming targets this ride instead
-                // of racing a "latest ride" fetch.
+                // Return the saved object in the view context so route naming targets
+                // this ride instead of racing a "latest ride" fetch.
                 let objectID = newBikeRide.objectID
                 print("Bike ride saved")
                 DispatchQueue.main.async {
