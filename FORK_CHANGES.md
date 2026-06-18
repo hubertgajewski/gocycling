@@ -122,7 +122,7 @@ Current fork-specific differences include:
 - Focused Swift Testing unit coverage for cycling record sorting, aggregation, unlocked-icon, and reset-statistics behavior, plus UI smoke coverage for the main Cycle, History, Statistics, and Settings tabs.
 - UI testing support through the `-ui-testing` launch argument to avoid location authorization prompts during automated tests.
 - A shared `Go Cycling` Xcode scheme for command-line and CI testing.
-- A focused SwiftPM package slice for package-compatible formatting logic, linked from the existing Xcode-owned source and test files so `swift test` complements the Xcode test action.
+- A focused SwiftPM package slice for package-compatible formatting logic, declared over the existing Xcode-owned source and test directories so `swift test` complements the Xcode test action.
 - GitHub Actions coverage for Swift formatting, SwiftPM unit tests, Xcode unit tests, unit-test code coverage summaries, and UI smoke tests.
 - CI retries for failed XCTest and XCUITest cases via `-retry-tests-on-failure`.
 - Hosted simulator coverage across selected GitHub-hosted macOS runner lines.
