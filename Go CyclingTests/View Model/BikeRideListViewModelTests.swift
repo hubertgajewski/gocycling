@@ -161,13 +161,6 @@ struct BikeRideListViewModelTests {
   }
 }
 
-private let viewModelStoreKeys = [
-  iCloudSyncPreferenceKey,
-  ReviewManager.reviewCountKey,
-  ReviewManager.reviewRequestVersionKey,
-  ReviewManager.completedRouteKey,
-]
-
 private func makeListViewModel(
   rides: [BikeRide],
   categories: [RideCategory] = [RideCategory(name: "All", number: 0)],
