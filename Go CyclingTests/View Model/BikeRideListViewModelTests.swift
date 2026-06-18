@@ -16,8 +16,8 @@ private typealias RideCategory = Go_Cycling.Category
 struct BikeRideListViewModelTests {
 
   @Test("updates rides and state for each sort selection")
-  func updatesRidesAndStateForEachSortSelection() {
-    let snapshot = PersistedStoreSnapshot(keys: viewModelStoreKeys)
+  func updatesRidesAndStateForEachSortSelection() async {
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
     defer { snapshot.restore() }
 
     let context = PersistenceController(inMemory: true).container.viewContext
@@ -77,8 +77,8 @@ struct BikeRideListViewModelTests {
   }
 
   @Test("returns display title and sort descriptor for current sort")
-  func returnsDisplayTitleAndSortDescriptorForCurrentSort() {
-    let snapshot = PersistedStoreSnapshot(keys: viewModelStoreKeys)
+  func returnsDisplayTitleAndSortDescriptorForCurrentSort() async {
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
     defer { snapshot.restore() }
 
     let viewModel = makeListViewModel(rides: [])
@@ -102,8 +102,8 @@ struct BikeRideListViewModelTests {
   }
 
   @Test("manages selected route names and category availability")
-  func managesSelectedRouteNamesAndCategoryAvailability() {
-    let snapshot = PersistedStoreSnapshot(keys: viewModelStoreKeys)
+  func managesSelectedRouteNamesAndCategoryAvailability() async {
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
     defer { snapshot.restore() }
 
     let categories = [
@@ -147,8 +147,8 @@ struct BikeRideListViewModelTests {
   }
 
   @Test("clears invalid selected route during initialization")
-  func clearsInvalidSelectedRouteDuringInitialization() {
-    let snapshot = PersistedStoreSnapshot(keys: viewModelStoreKeys)
+  func clearsInvalidSelectedRouteDuringInitialization() async {
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
     defer { snapshot.restore() }
 
     let viewModel = makeListViewModel(

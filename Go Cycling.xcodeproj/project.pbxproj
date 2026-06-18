@@ -122,9 +122,12 @@
 		AA0000222026061700000001 /* BikeRideListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000252026061700000001 /* BikeRideListViewModelTests.swift */; };
 		AA0000232026061700000001 /* ActivityAwardsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000262026061700000001 /* ActivityAwardsViewModelTests.swift */; };
 		AA0000282026061700000001 /* BikeRidePersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000292026061700000001 /* BikeRidePersistenceTests.swift */; };
-		AA0000302026061700000001 /* CompletedRouteSaveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000332026061700000001 /* CompletedRouteSaveTests.swift */; };
-		AA0000312026061700000001 /* CompletedRouteSaveCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000342026061700000001 /* CompletedRouteSaveCoordinator.swift */; };
-		AA0000322026061700000001 /* UITestingRouteSaveFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000352026061700000001 /* UITestingRouteSaveFixture.swift */; };
+		AA0000302026061700000001 /* ReviewManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000332026061700000001 /* ReviewManagerTests.swift */; };
+		AA0000322026061700000001 /* LocationSettingsAlertPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000352026061700000001 /* LocationSettingsAlertPolicyTests.swift */; };
+		AA0000432026061800000001 /* LocationSettingsAlertPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000422026061800000001 /* LocationSettingsAlertPolicy.swift */; };
+		AA0000442026061800000001 /* CompletedRouteSaveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000472026061800000001 /* CompletedRouteSaveTests.swift */; };
+		AA0000452026061800000001 /* CompletedRouteSaveCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000482026061800000001 /* CompletedRouteSaveCoordinator.swift */; };
+		AA0000462026061800000001 /* UITestingRouteSaveFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000492026061800000001 /* UITestingRouteSaveFixture.swift */; };
 		9D816A152640A4F000DED7F8 /* Default@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D816A132640A4F000DED7F8 /* Default@3x.png */; };
 		9D816A162640A4F000DED7F8 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D816A142640A4F000DED7F8 /* Default@2x.png */; };
 		9D816A1E2641BAD000DED7F8 /* ResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D816A1D2641BAD000DED7F8 /* ResetView.swift */; };
@@ -317,9 +320,12 @@
 		AA0000252026061700000001 /* BikeRideListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeRideListViewModelTests.swift; sourceTree = "<group>"; };
 		AA0000262026061700000001 /* ActivityAwardsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityAwardsViewModelTests.swift; sourceTree = "<group>"; };
 		AA0000292026061700000001 /* BikeRidePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeRidePersistenceTests.swift; sourceTree = "<group>"; };
-		AA0000332026061700000001 /* CompletedRouteSaveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedRouteSaveTests.swift; sourceTree = "<group>"; };
-		AA0000342026061700000001 /* CompletedRouteSaveCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedRouteSaveCoordinator.swift; sourceTree = "<group>"; };
-		AA0000352026061700000001 /* UITestingRouteSaveFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestingRouteSaveFixture.swift; sourceTree = "<group>"; };
+		AA0000332026061700000001 /* ReviewManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewManagerTests.swift; sourceTree = "<group>"; };
+		AA0000352026061700000001 /* LocationSettingsAlertPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSettingsAlertPolicyTests.swift; sourceTree = "<group>"; };
+		AA0000422026061800000001 /* LocationSettingsAlertPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSettingsAlertPolicy.swift; sourceTree = "<group>"; };
+		AA0000472026061800000001 /* CompletedRouteSaveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedRouteSaveTests.swift; sourceTree = "<group>"; };
+		AA0000482026061800000001 /* CompletedRouteSaveCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedRouteSaveCoordinator.swift; sourceTree = "<group>"; };
+		AA0000492026061800000001 /* UITestingRouteSaveFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestingRouteSaveFixture.swift; sourceTree = "<group>"; };
 		9D816A132640A4F000DED7F8 /* Default@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@3x.png"; sourceTree = "<group>"; };
 		9D816A142640A4F000DED7F8 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		9D816A1D2641BAD000DED7F8 /* ResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetView.swift; sourceTree = "<group>"; };
@@ -551,13 +557,14 @@
 				9D6E5373262CE773008FD7C1 /* ColourChoice.swift */,
 				2AA126438CB9497BB6E22458 /* MapTypeChoice.swift */,
 				9D62F4DF2634F7CC00E28991 /* MetricsFormatting.swift */,
+				AA0000422026061800000001 /* LocationSettingsAlertPolicy.swift */,
 				9DCD21EC263638F200506FA5 /* UnitsChoice.swift */,
 				9D8169BB263E0C5200DED7F8 /* SortChoice.swift */,
 				AA0000012026051300000002 /* AutoPauseState.swift */,
 				9D8169F9263FA4CE00DED7F8 /* IconNames.swift */,
 				9D816A0E263FBD0600DED7F8 /* CyclingStatus.swift */,
 				9D2F48FD265097F000094575 /* Category.swift */,
-				AA0000342026061700000001 /* CompletedRouteSaveCoordinator.swift */,
+				AA0000482026061800000001 /* CompletedRouteSaveCoordinator.swift */,
 				9DF9304626DCABA400D4EEC5 /* RecordsFormatting.swift */,
 				9DF9305226DE06A600D4EEC5 /* Medal.swift */,
 				9DC758382807A74900BB2953 /* Preferences.swift */,
@@ -572,7 +579,7 @@
 			isa = PBXGroup;
 			children = (
 				AA0000022026061600000001 /* UITesting.swift */,
-				AA0000352026061700000001 /* UITestingRouteSaveFixture.swift */,
+				AA0000492026061800000001 /* UITestingRouteSaveFixture.swift */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -741,6 +748,8 @@
 				AA0000082026061700000001 /* MetricsFormattingTests.swift */,
 				AA0000242026061700000001 /* PreferencesConversionTests.swift */,
 				AA0000092026061700000001 /* RecordsFormattingTests.swift */,
+				AA0000332026061700000001 /* ReviewManagerTests.swift */,
+				AA0000352026061700000001 /* LocationSettingsAlertPolicyTests.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -767,7 +776,7 @@
 			children = (
 				AA0000292026061700000001 /* BikeRidePersistenceTests.swift */,
 				AA0000132026061700000001 /* BikeRideSortingTests.swift */,
-				AA0000332026061700000001 /* CompletedRouteSaveTests.swift */,
+				AA0000472026061800000001 /* CompletedRouteSaveTests.swift */,
 				AA0000142026061700000001 /* RecordsTests.swift */,
 			);
 			path = "Core Data";
@@ -1065,7 +1074,7 @@
 				9D601E5B26E085B700844CD1 /* CyclingChartsViewModel.swift in Sources */,
 				9DAB831A25FECAD300F5C42E /* CycleView.swift in Sources */,
 				9DAB837C25FEDEF100F5C42E /* TimerViewModel.swift in Sources */,
-				AA0000312026061700000001 /* CompletedRouteSaveCoordinator.swift in Sources */,
+				AA0000452026061800000001 /* CompletedRouteSaveCoordinator.swift in Sources */,
 				9DEAD6CB2632589500392D88 /* BikeRideStorage.swift in Sources */,
 				9DC758392807A74900BB2953 /* Preferences.swift in Sources */,
 				9DF9305326DE06A600D4EEC5 /* Medal.swift in Sources */,
@@ -1073,9 +1082,10 @@
 				AA0000012026051300000001 /* AutoPauseState.swift in Sources */,
 				9DF9304326DCAAD300D4EEC5 /* CyclingRecordsView.swift in Sources */,
 				9D62F4E02634F7CC00E28991 /* MetricsFormatting.swift in Sources */,
+				AA0000432026061800000001 /* LocationSettingsAlertPolicy.swift in Sources */,
 				9DAB837025FED0A300F5C42E /* HistoryView.swift in Sources */,
 				9DAB835E25FECCB000F5C42E /* MainView.swift in Sources */,
-				AA0000322026061700000001 /* UITestingRouteSaveFixture.swift in Sources */,
+				AA0000462026061800000001 /* UITestingRouteSaveFixture.swift in Sources */,
 				9DEAD6BE262FBFF900392D88 /* MapSystemImageButton.swift in Sources */,
 				9D1ED54D2643CF5A005A97ED /* UIAppearViewController.swift in Sources */,
 				9D816A0F263FBD0600DED7F8 /* CyclingStatus.swift in Sources */,
@@ -1139,7 +1149,9 @@
 				AA0000212026061700000001 /* PreferencesConversionTests.swift in Sources */,
 				AA0000222026061700000001 /* BikeRideListViewModelTests.swift in Sources */,
 				AA0000232026061700000001 /* ActivityAwardsViewModelTests.swift in Sources */,
-				AA0000302026061700000001 /* CompletedRouteSaveTests.swift in Sources */,
+				AA0000302026061700000001 /* ReviewManagerTests.swift in Sources */,
+				AA0000322026061700000001 /* LocationSettingsAlertPolicyTests.swift in Sources */,
+				AA0000442026061800000001 /* CompletedRouteSaveTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
