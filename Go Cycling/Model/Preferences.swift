@@ -79,6 +79,8 @@ class Preferences: ObservableObject {
     
     init(arguments: [String] = ProcessInfo.processInfo.arguments) {
         if UITesting.shouldUseIsolatedPersistence(arguments: arguments) {
+            // UI smoke needs predictable defaults, but writing the normal
+            // initialization keys would mutate the user's app preferences.
             self.usingMetric = Preferences.defaultUsingMetric
             self.displayingMetrics = Preferences.defaultDisplayingMetrics
             self.colourChoice = Preferences.defaultColourChoice
@@ -455,6 +457,8 @@ class Preferences: ObservableObject {
     // Used in BikeRideViewModel where the environment object is not available
     static func storedSortingChoice() -> SortChoice {
         guard let stringValue = UserDefaults.standard.string(forKey: Preferences.keys[4]) else {
+            // UI smoke avoids writing normal defaults; callers still need a stable
+            // sort preference when reading outside the environment object.
             return SortChoice.dateDescending
         }
         return SortChoice(rawValue: stringValue) ?? SortChoice.dateDescending
@@ -466,6 +470,8 @@ class Preferences: ObservableObject {
     }
     
     static func storedSelectedRoute() -> String {
+        // UI smoke avoids writing normal defaults, so missing route selection
+        // should mean "all routes" instead of crashing on a force unwrap.
         return UserDefaults.standard.string(forKey: Preferences.keys[8]) ?? ""
     }
 }

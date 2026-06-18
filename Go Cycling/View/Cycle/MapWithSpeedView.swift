@@ -14,6 +14,8 @@ struct MapWithSpeedView: View {
 
     @Binding var cyclingStartTime: Date
     @Binding var timeCycling: TimeInterval
+    // Bubble the exact saved ride up to CycleView so route naming does not
+    // depend on fetching whichever ride is latest after an async save.
     var onRouteSaveSuccess: (BikeRide) -> Void = { _ in }
 
     @StateObject var locationManager = LocationViewModel.locationManager

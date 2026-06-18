@@ -65,6 +65,8 @@ struct MapView: UIViewRepresentable {
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView(frame: .zero)
         mapView.delegate = context.coordinator
+        // Hiding user location in UI smoke prevents MKMapView from surfacing
+        // location permission UI while still letting the tab render.
         mapView.showsUserLocation = UITesting.shouldShowUserLocation
         mapView.showsCompass = false
         mapView.mapType = preferences.mapTypeChoiceConverted.mkMapType
@@ -131,6 +133,8 @@ struct MapView: UIViewRepresentable {
                 if (startedCycling) {
                     startedCycling = false
                     let completedSessionToken = locationManager.currentCyclingSessionToken
+                    // Snapshot before the async save; successful cleanup can then
+                    // clear live state without losing the route being persisted.
                     let completedRoute = CompletedRouteSnapshot(
                         locations: locationManager.cyclingLocations,
                         speeds: locationManager.cyclingSpeeds,

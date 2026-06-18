@@ -6,6 +6,8 @@
 import Foundation
 
 enum UITesting {
+    // Keep UI tests black-box: the test target passes raw launch strings instead
+    // of importing app support code.
     static let launchArgument = "-ui-testing"
     static let routeSaveFixtureArgument = "-ui-testing-route-save-fixture"
     static let routeSaveFixtureLaunchArguments = [

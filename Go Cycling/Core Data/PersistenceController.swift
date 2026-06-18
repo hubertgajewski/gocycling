@@ -36,6 +36,8 @@ struct PersistenceController {
         }
         else {
             #if DEBUG
+            // UI smoke seeds routes into a DEBUG-only local store so tests never touch
+            // the user's CloudKit-backed ride database.
             let configuredForUITesting = PersistenceController.configureStoreForUITestingIfNeeded(
                 description,
                 arguments: arguments
@@ -155,6 +157,8 @@ struct PersistenceController {
 
             do {
                 try context.save()
+                // Return the saved object so route naming targets this ride instead
+                // of racing a "latest ride" fetch.
                 let objectID = newBikeRide.objectID
                 print("Bike ride saved")
                 DispatchQueue.main.async {

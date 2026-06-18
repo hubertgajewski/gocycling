@@ -34,6 +34,8 @@ enum AppLaunchTelemetry {
             )
         }
     ) {
+        // UI tests relaunch often on shared devices; skip telemetry setup so they
+        // do not read or mutate the user's launch-time preferences.
         guard !UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return }
 
         let appID = appID ?? Bundle.main.object(forInfoDictionaryKey: "GoCyclingAppID")
@@ -56,6 +58,8 @@ enum AppLaunchMigration {
         migratePreferences: () -> Void,
         migrateRecords: () -> Void
     ) {
+        // UI smoke starts from fixture state; running launch migrations there
+        // would write real defaults/iCloud keys outside the isolated Core Data store.
         guard !UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return }
 
         let userDefaults = userDefaults ?? UserDefaults.standard
@@ -99,6 +103,8 @@ struct GoCyclingApp: App {
                 .environmentObject(preferences)
                 .onAppear(perform: {
                     #if DEBUG
+                    // Seed History after the isolated store is loaded so UI smoke
+                    // validates a saved route without driving GPS/timer state.
                     if UITesting.shouldSeedRouteSaveFixture() {
                         UITestingRouteSaveFixture.runIfNeeded(
                             persistenceController: persistenceController

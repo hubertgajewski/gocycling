@@ -93,6 +93,8 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
         lastLocation = location
+        // CLLocationManager can deliver updates before/after a ride; only active
+        // cycling sessions should contribute samples to the saved route.
         guard isTrackingCyclingSession else { return }
         cyclingLocations.append(lastLocation)
         cyclingSpeed = location.speed
@@ -143,6 +145,8 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func startedCycling() {
+        // Async save callbacks use this token to avoid cleaning up or naming a
+        // newer ride if the user starts another session before the save finishes.
         cyclingSessionToken += 1
         isTrackingCyclingSession = true
         // Setup background location checking if authorized

@@ -203,6 +203,8 @@ struct CycleView: View {
     }
 
     func routeSaved(_ bikeRide: BikeRide) {
+        // Show naming only after Core Data returns the saved ride, avoiding a
+        // race with fetching "the latest" ride from History state.
         guard preferences.namedRoutes else { return }
         savedRouteForNaming = bikeRide
         showingRouteNamingPopover = true

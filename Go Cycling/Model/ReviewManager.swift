@@ -20,6 +20,8 @@ class ReviewManager {
     static let productURLString = "https://apps.apple.com/app/id1565861313"
 
     static func incrementReviewWorthyCount(arguments: [String] = ProcessInfo.processInfo.arguments) {
+        // UI smoke visits app flows that normally count as review-worthy actions;
+        // skip those writes so tests do not change the user's review prompt cadence.
         guard !UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return }
 
         let defaults = UserDefaults.standard
@@ -34,6 +36,8 @@ class ReviewManager {
     }
     
     static func completedRoute(arguments: [String] = ProcessInfo.processInfo.arguments) {
+        // UI smoke seeds completed rides for History, but that should not mark
+        // the real app as review-ready on the user's device.
         guard !UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return }
 
         let defaults = UserDefaults.standard
@@ -46,6 +50,7 @@ class ReviewManager {
     }
     
     static func requestReviewIfAppropriate(arguments: [String] = ProcessInfo.processInfo.arguments) {
+        // Automated UI launches should never display or record app-review prompts.
         guard !UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return }
 
         let defaults = UserDefaults.standard

@@ -23,6 +23,8 @@ struct RouteNameModalView: View {
     @ObservedObject var routeNamingViewModel = RouteNamingViewModel()
     
     private var bikeRideToEdit: BikeRide?
+    // Cycle tab passes the saved ride directly so naming cannot attach to
+    // another recently saved route.
     private var bikeRideToName: BikeRide?
     
     let telemetryManager = TelemetryManager.sharedTelemetryManager

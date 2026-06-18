@@ -38,6 +38,8 @@ protocol CyclingRecordsUpdating {
     )
 }
 
+// Serializes the completed-route pipeline so records, cleanup, and route naming
+// only run after Core Data returns the saved ride.
 struct CompletedRouteSaveCoordinator {
     let persistenceController: BikeRideStoring
     let records: CyclingRecordsUpdating

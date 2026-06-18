@@ -71,7 +71,7 @@ jobs:
 
   unit-tests:
     if: github.repository == 'hubertgajewski/gocycling' && vars.CI_RUN_UNIT_TESTS != 'false'
-    name: Unit tests (iPhone Air)
+    name: Unit tests (iPhone 17)
     runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'macos-26' || vars.RUNNER || 'macos-26' }}
     timeout-minutes: 12
     steps:
@@ -99,7 +99,7 @@ jobs:
         id: destination
         run: |
           chmod +x .github/scripts/ios-simulator-destination.sh
-          echo "value=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone Air')" >> "$GITHUB_OUTPUT"
+          echo "value=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17')" >> "$GITHUB_OUTPUT"
 
       - name: Run unit tests
         run: |
@@ -180,9 +180,9 @@ jobs:
           - id: ios26-iphone
             os: macos-26
             runtime: iOS 26
-            device_label: iPhone Air
+            device_label: iPhone 17
             family: iPhone
-            device: "iPhone Air"
+            device: "iPhone 17"
           - id: ios26-ipad
             os: macos-26
             runtime: iOS 26

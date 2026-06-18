@@ -47,6 +47,8 @@ class CyclingRecords: ObservableObject {
         self.persistsRecordUpdates = !isUsingIsolatedPersistence
 
         if isUsingIsolatedPersistence {
+            // UI smoke opens History/Statistics; keep records in memory so those
+            // visits do not alter the user's defaults or iCloud record values.
             self.totalCyclingTime = CyclingRecords.defaultTotalCyclingTime
             self.totalCyclingRoutes = CyclingRecords.defaultTotalCyclingRoutes
             self.unlockedIcons = CyclingRecords.defaultUnlockedIcons
@@ -207,6 +209,8 @@ class CyclingRecords: ObservableObject {
     }
 
     private func persistClassMembersIfNeeded() {
+        // Isolated UI-test runs can update displayed records without persisting
+        // them to shared UserDefaults or NSUbiquitousKeyValueStore.
         guard persistsRecordUpdates else { return }
         self.writeClassMembersToUserDefaults()
         CyclingRecords.syncLocalAndCloud(localToCloud: true)

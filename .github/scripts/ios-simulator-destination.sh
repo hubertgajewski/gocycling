@@ -48,11 +48,6 @@ def match_name(device: dict[str, object], candidate: str) -> bool:
     return name == candidate or name.startswith(candidate)
 
 
-def is_disallowed_fallback(device: dict[str, object]) -> bool:
-    name = str(device.get("name", ""))
-    return preferred == "iPhone Air" and name.startswith("iPhone 17")
-
-
 if preferred:
     for device in devices:
         if device.get("name") == preferred:
@@ -64,7 +59,6 @@ preferred_fallbacks: dict[str, list[str]] = {
         "iPhone SE",
         "iPhone 16e",
     ],
-    "iPhone Air": ["iPhone Air", "iPhone 16", "iPhone 15"],
     "iPhone 17": ["iPhone 17", "iPhone 16", "iPhone 15"],
     "iPhone 17 Pro Max": [
         "iPhone 17 Pro Max",
@@ -98,26 +92,25 @@ preferred_fallbacks: dict[str, list[str]] = {
 
 for candidate in preferred_fallbacks.get(preferred, []):
     for device in devices:
-        if not is_disallowed_fallback(device) and match_name(device, candidate):
+        if match_name(device, candidate):
             emit(device)
 
 if preferred:
     for device in devices:
-        if not is_disallowed_fallback(device) and match_name(device, preferred.split(" (")[0]):
+        if match_name(device, preferred.split(" (")[0]):
             emit(device)
 
 fallback_names = {
-    "iPhone": ["iPhone Air", "iPhone 16", "iPhone 15", "iPhone SE"],
+    "iPhone": ["iPhone 17", "iPhone 16", "iPhone 15", "iPhone SE"],
     "iPad": ["iPad Pro 11-inch (M5)", "iPad Pro 11-inch", "iPad mini"],
 }
 for candidate in fallback_names.get(family, []):
     for device in devices:
-        if not is_disallowed_fallback(device) and match_name(device, candidate):
+        if match_name(device, candidate):
             emit(device)
 
-for device in devices:
-    if not is_disallowed_fallback(device):
-        emit(device)
+if devices:
+    emit(devices[0])
 
 print(f"No available {family} simulator found", file=sys.stderr)
 raise SystemExit(1)
