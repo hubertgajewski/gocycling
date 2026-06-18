@@ -29,6 +29,14 @@ struct MetricsFormattingTests {
     #expect(MetricsFormatting.formatTime(time: 3661) == "1h 1m 1s")
   }
 
+  @Test("formats live elapsed timer")
+  func formatsLiveElapsedTimer() {
+    #expect(MetricsFormatting.formatElapsedTimer(time: 0) == "00:00:00")
+    #expect(MetricsFormatting.formatElapsedTimer(time: 65) == "00:01:05")
+    #expect(MetricsFormatting.formatElapsedTimer(time: 3_661) == "01:01:01")
+    #expect(MetricsFormatting.formatElapsedTimer(time: 90_305) == "25:05:05")
+  }
+
   @Test("formats average speed from route distance and time")
   func formatsAverageSpeed() {
     let speeds: [CLLocationSpeed] = [5, 6, 7]

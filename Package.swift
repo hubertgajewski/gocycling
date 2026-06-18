@@ -22,6 +22,7 @@ let package = Package(
         "CyclingRecords.swift",
         "CyclingStatus.swift",
         "IconNames.swift",
+        "LocationSettingsAlertPolicy.swift",
         "MapTypeChoice.swift",
         "Medal.swift",
         "Preferences.swift",
@@ -42,7 +43,9 @@ let package = Package(
       // Keep Xcode-only model tests explicit so this focused package slice stays warning-free.
       exclude: [
         "CyclingRecordsTests.swift",
+        "LocationSettingsAlertPolicyTests.swift",
         "PreferencesConversionTests.swift",
+        "ReviewManagerTests.swift",
       ],
       sources: [
         "MetricsFormattingTests.swift",

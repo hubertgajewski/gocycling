@@ -125,36 +125,11 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
     }
     
-    // Used to determine whether to display a message to the user to update their location settings
-    func determineLocationSettingsAlertSetup(status: CLAuthorizationStatus) -> String {
-        let messageIfAllowedWhileInUse =
-        """
-        Go Cycling requires your location to be set to "Always" to function while the app is not on the screen.
-        
-        Please visit your app settings and verify that location access is allowed.
-        
-        If you plan to leave your device screen on while cycling then your current location access will work.
-        """
-        
-        let messageIfNotAllowed =
-        """
-        Go Cycling requires location permissions to track your cycling routes.
-        
-        Please visit your app settings and verify that location access is allowed.
-        
-        All of your location data will be stored solely on your device and will never be shared with anyone.
-        """
-        
-        switch status {
-            case .authorizedAlways: return ""
-            case .authorizedWhenInUse: return messageIfAllowedWhileInUse
-            default: return messageIfNotAllowed
-        }
-    }
-    
     // Used to keep the alert message up to date as the authorization status changes
     func setLocationAlertMessage() {
-        locationSettingsAlertMessage = determineLocationSettingsAlertSetup(status: locationStatus ?? .notDetermined)
+        locationSettingsAlertMessage = LocationSettingsAlertPolicy.alertMessage(
+            for: locationStatus ?? .notDetermined
+        )
     }
     
     // Used to decide whether to show a location settings alert when the user starts a session
