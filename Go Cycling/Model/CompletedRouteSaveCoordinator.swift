@@ -16,6 +16,8 @@ struct CompletedRouteSnapshot {
 }
 
 protocol BikeRideStoring {
+    /// Implementations should call completion on the main queue. The coordinator
+    /// defensively hops to main before mutating UI-facing records or cleanup state.
     func storeBikeRide(
         locations: [CLLocation?],
         speeds: [CLLocationSpeed?],
@@ -23,7 +25,7 @@ protocol BikeRideStoring {
         elevations: [CLLocationDistance?],
         startTime: Date,
         time: Double,
-        completion: @escaping () -> Void
+        completion: @escaping (Result<BikeRide, Error>) -> Void
     )
 }
 
@@ -40,10 +42,19 @@ struct CompletedRouteSaveCoordinator {
     let persistenceController: BikeRideStoring
     let records: CyclingRecordsUpdating
 
+    init(
+        persistenceController: BikeRideStoring = PersistenceController.shared,
+        records: CyclingRecordsUpdating = CyclingRecords.shared
+    ) {
+        self.persistenceController = persistenceController
+        self.records = records
+    }
+
     func save(
         _ completedRoute: CompletedRouteSnapshot,
-        cleanup: @escaping () -> Void = {},
-        completion: @escaping () -> Void = {}
+        cleanupAfterSuccess: @escaping () -> Void = {},
+        alwaysCleanup: @escaping () -> Void = {},
+        completion: @escaping (Result<BikeRide, Error>) -> Void = { _ in }
     ) {
         persistenceController.storeBikeRide(
             locations: completedRoute.locations,
@@ -52,15 +63,25 @@ struct CompletedRouteSaveCoordinator {
             elevations: completedRoute.elevations,
             startTime: completedRoute.startTime,
             time: completedRoute.time
-        ) {
-            records.updateCyclingRecords(
-                speeds: completedRoute.speeds,
-                distance: completedRoute.distance,
-                startTime: completedRoute.startTime,
-                time: completedRoute.time
-            )
-            cleanup()
-            completion()
+        ) { result in
+            let finish = {
+                if case .success = result {
+                    records.updateCyclingRecords(
+                        speeds: completedRoute.speeds,
+                        distance: completedRoute.distance,
+                        startTime: completedRoute.startTime,
+                        time: completedRoute.time
+                    )
+                    cleanupAfterSuccess()
+                }
+                alwaysCleanup()
+                completion(result)
+            }
+            if Thread.isMainThread {
+                finish()
+            } else {
+                DispatchQueue.main.async(execute: finish)
+            }
         }
     }
 }

@@ -6,26 +6,42 @@
 import CoreLocation
 import Foundation
 
+#if DEBUG
+enum UITestingRouteSaveFixtureError: Error, Equatable {
+    case nonIsolatedStore
+}
+#endif
+
 enum UITestingRouteSaveFixture {
     #if DEBUG
     private static var hasRun = false
 
     static func runIfNeeded(
         persistenceController: PersistenceController,
-        records: CyclingRecords,
-        preferences: Preferences
+        records: CyclingRecordsUpdating? = nil,
+        arguments: [String] = ProcessInfo.processInfo.arguments,
+        completion: @escaping (Result<Void, Error>) -> Void = { _ in }
     ) {
-        guard UITesting.shouldRunRouteSaveFixture && !hasRun else { return }
+        guard UITesting.shouldSeedRouteSaveFixture(arguments: arguments) && !hasRun else { return }
+        guard persistenceController.isUsingPersistentStore(at: UITesting.isolatedPersistenceStoreURL) else {
+            completion(.failure(UITestingRouteSaveFixtureError.nonIsolatedStore))
+            return
+        }
         hasRun = true
 
-        preferences.updateStringPreference(preference: .selectedRoute, value: "")
         persistenceController.deleteAllBikeRides()
-        CyclingRecords.resetStatistics()
+        let recordsUpdater = records ?? FixtureCyclingRecordsUpdater()
 
         CompletedRouteSaveCoordinator(
             persistenceController: persistenceController,
-            records: records
-        ).save(Self.completedRoute)
+            records: recordsUpdater
+        ).save(Self.completedRoute, completion: { result in
+            completion(result.map { _ in () })
+        })
+    }
+
+    static func resetForTesting() {
+        hasRun = false
     }
 
     private static let completedRoute = CompletedRouteSnapshot(
@@ -39,11 +55,21 @@ enum UITestingRouteSaveFixture {
         startTime: Date(timeIntervalSince1970: 1_800),
         time: 300
     )
+
+    private final class FixtureCyclingRecordsUpdater: CyclingRecordsUpdating {
+        func updateCyclingRecords(
+            speeds: [CLLocationSpeed?],
+            distance: Double,
+            startTime: Date,
+            time: Double
+        ) {}
+    }
     #else
     static func runIfNeeded(
         persistenceController: PersistenceController,
-        records: CyclingRecords,
-        preferences: Preferences
+        records: CyclingRecordsUpdating? = nil,
+        arguments: [String] = ProcessInfo.processInfo.arguments,
+        completion: @escaping (Result<Void, Error>) -> Void = { _ in }
     ) {}
     #endif
 }

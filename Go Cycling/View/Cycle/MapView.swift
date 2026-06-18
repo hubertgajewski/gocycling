@@ -21,6 +21,7 @@ struct MapView: UIViewRepresentable {
     @Binding var centerMapOnLocation: Bool
     @Binding var cyclingStartTime: Date
     @Binding var timeCycling: TimeInterval
+    var onRouteSaveSuccess: (BikeRide) -> Void = { _ in }
     
     @Environment(\.managedObjectContext) private var managedObjectContext
     @EnvironmentObject var preferences: Preferences
@@ -96,6 +97,9 @@ struct MapView: UIViewRepresentable {
             if cyclingStatus.isCycling {
                 if (!startedCycling) {
                     startedCycling = true
+                    context.coordinator.currentRouteOverlay = nil
+                    context.coordinator.lastRenderedCount = 0
+                    view.removeOverlays(view.overlays)
                 } else {
                     let locationsCount = locationManager.cyclingLocations.count
                     // Only rebuild the overlay when new locations have arrived
@@ -126,10 +130,7 @@ struct MapView: UIViewRepresentable {
                 // Means we need to store the current route and clear the map
                 if (startedCycling) {
                     startedCycling = false
-                    context.coordinator.currentRouteOverlay = nil
-                    context.coordinator.lastRenderedCount = 0
-                    let overlays = view.overlays
-                    view.removeOverlays(overlays)
+                    let completedSessionToken = locationManager.currentCyclingSessionToken
                     let completedRoute = CompletedRouteSnapshot(
                         locations: locationManager.cyclingLocations,
                         speeds: locationManager.cyclingSpeeds,
@@ -138,12 +139,22 @@ struct MapView: UIViewRepresentable {
                         startTime: cyclingStartTime,
                         time: timeCycling
                     )
+                    locationManager.endCyclingSession()
+                    locationManager.stopTrackingBackgroundLocation()
                     CompletedRouteSaveCoordinator(
                         persistenceController: persistenceController,
                         records: records
-                    ).save(completedRoute, cleanup: {
-                        locationManager.clearLocationArray()
-                        locationManager.stopTrackingBackgroundLocation()
+                    ).save(completedRoute, cleanupAfterSuccess: {
+                        guard locationManager.isCurrentCyclingSession(completedSessionToken) else { return }
+                        context.coordinator.currentRouteOverlay = nil
+                        context.coordinator.lastRenderedCount = 0
+                        view.removeOverlays(view.overlays)
+                        locationManager.clearCompletedRouteData()
+                    }, completion: { result in
+                        guard locationManager.isCurrentCyclingSession(completedSessionToken) else { return }
+                        if case .success(let savedRide) = result {
+                            onRouteSaveSuccess(savedRide)
+                        }
                     })
                 }
             }

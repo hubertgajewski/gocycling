@@ -20,6 +20,7 @@ env:
   DEVELOPMENT_TEAM: ""
   XCODE_PROJECT: Go Cycling.xcodeproj
   XCODE_SCHEME: Go Cycling
+  XCODE_UI_SCHEME: Go Cycling UI Smoke
 
 jobs:
   swift-format:
@@ -70,7 +71,7 @@ jobs:
 
   unit-tests:
     if: github.repository == 'hubertgajewski/gocycling' && vars.CI_RUN_UNIT_TESTS != 'false'
-    name: Unit tests (iPhone 17)
+    name: Unit tests (iPhone Air)
     runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'macos-26' || vars.RUNNER || 'macos-26' }}
     timeout-minutes: 12
     steps:
@@ -98,7 +99,7 @@ jobs:
         id: destination
         run: |
           chmod +x .github/scripts/ios-simulator-destination.sh
-          echo "value=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17')" >> "$GITHUB_OUTPUT"
+          echo "value=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone Air')" >> "$GITHUB_OUTPUT"
 
       - name: Run unit tests
         run: |
@@ -179,9 +180,9 @@ jobs:
           - id: ios26-iphone
             os: macos-26
             runtime: iOS 26
-            device_label: iPhone 17
+            device_label: iPhone Air
             family: iPhone
-            device: "iPhone 17"
+            device: "iPhone Air"
           - id: ios26-ipad
             os: macos-26
             runtime: iOS 26
@@ -216,7 +217,7 @@ jobs:
           rm -rf TestResults/ui-${{ matrix.id }}.xcresult
           xcodebuild \
             -project "$XCODE_PROJECT" \
-            -scheme "$XCODE_SCHEME" \
+            -scheme "$XCODE_UI_SCHEME" \
             -configuration Debug \
             -destination "${{ steps.destination.outputs.value }}" \
             -only-testing:"Go CyclingUITests" \

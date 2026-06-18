@@ -23,14 +23,16 @@ struct RouteNameModalView: View {
     @ObservedObject var routeNamingViewModel = RouteNamingViewModel()
     
     private var bikeRideToEdit: BikeRide?
+    private var bikeRideToName: BikeRide?
     
     let telemetryManager = TelemetryManager.sharedTelemetryManager
     let telemetryTab = TelemetryTab.Cycle
     
-    init(showEditModal: Binding<Bool>, bikeRideToEdit: BikeRide?) {
+    init(showEditModal: Binding<Bool>, bikeRideToEdit: BikeRide?, bikeRideToName: BikeRide? = nil) {
         if (bikeRideToEdit != nil) {
             self.bikeRideToEdit = bikeRideToEdit
         }
+        self.bikeRideToName = bikeRideToName
         self._showEditModal = showEditModal
     }
     
@@ -169,37 +171,27 @@ struct RouteNameModalView: View {
         }
         
         // This means that we are in the Cycle tab
-        if (self.bikeRideToEdit == nil) {
-            // Get most recent bike ride
-            let ride = self.routeNamingViewModel.allBikeRides[self.routeNamingViewModel.allBikeRides.count - 1]
+        if let ride = self.bikeRideToName {
+            updateBikeRideRouteName(ride: ride, routeName: routeName)
+            presentationMode.wrappedValue.dismiss()
+            self.showEditModal = false
+        }
+        else if (self.bikeRideToEdit == nil) {
+            guard let ride = self.routeNamingViewModel.allBikeRides.last else {
+                presentationMode.wrappedValue.dismiss()
+                self.showEditModal = false
+                return
+            }
             // Route name should be Uncategorized at this point
             if (ride.cyclingRouteName == "Uncategorized") {
-                persistenceController.updateBikeRideRouteName(
-                    existingBikeRide: ride,
-                    latitudes: ride.cyclingLatitudes,
-                    longitudes: ride.cyclingLongitudes,
-                    speeds: ride.cyclingSpeeds,
-                    distance: ride.cyclingDistance,
-                    elevations: ride.cyclingElevations,
-                    startTime: ride.cyclingStartTime,
-                    time: ride.cyclingTime,
-                    routeName: routeName)
+                updateBikeRideRouteName(ride: ride, routeName: routeName)
             }
             presentationMode.wrappedValue.dismiss()
             self.showEditModal = false
         }
         else {
             let ride = self.bikeRideToEdit!
-            persistenceController.updateBikeRideRouteName(
-                existingBikeRide: ride,
-                latitudes: ride.cyclingLatitudes,
-                longitudes: ride.cyclingLongitudes,
-                speeds: ride.cyclingSpeeds,
-                distance: ride.cyclingDistance,
-                elevations: ride.cyclingElevations,
-                startTime: ride.cyclingStartTime,
-                time: ride.cyclingTime,
-                routeName: routeName)
+            updateBikeRideRouteName(ride: ride, routeName: routeName)
             presentationMode.wrappedValue.dismiss()
             self.showEditModal = false
         }
@@ -207,6 +199,12 @@ struct RouteNameModalView: View {
     
     func removeCategoryPressed() {
         let ride = self.bikeRideToEdit!
+        updateBikeRideRouteName(ride: ride, routeName: "Uncategorized")
+        presentationMode.wrappedValue.dismiss()
+        self.showEditModal = false
+    }
+
+    private func updateBikeRideRouteName(ride: BikeRide, routeName: String) {
         persistenceController.updateBikeRideRouteName(
             existingBikeRide: ride,
             latitudes: ride.cyclingLatitudes,
@@ -216,9 +214,7 @@ struct RouteNameModalView: View {
             elevations: ride.cyclingElevations,
             startTime: ride.cyclingStartTime,
             time: ride.cyclingTime,
-            routeName: "Uncategorized")
-        presentationMode.wrappedValue.dismiss()
-        self.showEditModal = false
+            routeName: routeName)
     }
 }
 

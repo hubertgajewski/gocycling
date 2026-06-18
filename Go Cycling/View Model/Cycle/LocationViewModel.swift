@@ -26,6 +26,8 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     private var stalenessTimer: Timer?
     private var lastLocationUpdateTime: Date = Date()
     private var stoppedSpeedDuration: TimeInterval = 0.0
+    private var isTrackingCyclingSession = false
+    private var cyclingSessionToken = 0
     @Published var cyclingAltitude: CLLocationDistance?
     @Published var cyclingAltitudes: [CLLocationDistance?] = []
     @Published var cyclingDistances: [CLLocationDistance?] = []
@@ -91,6 +93,7 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
         lastLocation = location
+        guard isTrackingCyclingSession else { return }
         cyclingLocations.append(lastLocation)
         cyclingSpeed = location.speed
         cyclingAltitude = location.altitude
@@ -140,6 +143,8 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func startedCycling() {
+        cyclingSessionToken += 1
+        isTrackingCyclingSession = true
         // Setup background location checking if authorized
         if locationStatus == .authorizedAlways {
             locationManager.pausesLocationUpdatesAutomatically = false
@@ -164,6 +169,14 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
         autoPauseState = .moving
     }
+
+    var currentCyclingSessionToken: Int {
+        cyclingSessionToken
+    }
+
+    func isCurrentCyclingSession(_ token: Int) -> Bool {
+        cyclingSessionToken == token
+    }
     
     private func handleStalenessTick() {
         let elapsed = Date().timeIntervalSince(lastLocationUpdateTime)
@@ -184,8 +197,10 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         stoppedSpeedDuration = -5.0
     }
 
-    // Happens at the end of the cycling route
-    func clearLocationArray() {
+    // Ends session side effects without discarding route samples. On save failure
+    // the route data stays available while timers, heading, and HealthKit writes stop.
+    func endCyclingSession() {
+        isTrackingCyclingSession = false
         stalenessTimer?.invalidate()
         stalenessTimer = nil
         locationManager.stopUpdatingHeading()
@@ -201,6 +216,16 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         
         // Stop writing health data
         writeHealthData = false
+        distanceSinceLastHealthStore = 0.0
+    }
+
+    // Happens at the end of the cycling route
+    func clearLocationArray() {
+        endCyclingSession()
+        clearCompletedRouteData()
+    }
+
+    func clearCompletedRouteData() {
         
         cyclingLocations.removeAll()
         cyclingDistances.removeAll()

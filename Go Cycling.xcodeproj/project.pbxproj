@@ -111,7 +111,6 @@
 		9D8169FA263FA4CE00DED7F8 /* IconNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8169F9263FA4CE00DED7F8 /* IconNames.swift */; };
 		9D816A0F263FBD0600DED7F8 /* CyclingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D816A0E263FBD0600DED7F8 /* CyclingStatus.swift */; };
 		AA0000032026061600000001 /* UITesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022026061600000001 /* UITesting.swift */; };
-		AA0000042026061600000001 /* UITesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022026061600000001 /* UITesting.swift */; };
 		AA0000062026061700000001 /* MetricsFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000082026061700000001 /* MetricsFormattingTests.swift */; };
 		AA0000072026061700000001 /* RecordsFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000092026061700000001 /* RecordsFormattingTests.swift */; };
 		AA0000152026061700000001 /* PersistedStoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000122026061700000001 /* PersistedStoreSnapshot.swift */; };
@@ -150,7 +149,7 @@
 		9DAB831A25FECAD300F5C42E /* CycleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAB831925FECAD300F5C42E /* CycleView.swift */; };
 		9DAB831C25FECAD400F5C42E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9DAB831B25FECAD400F5C42E /* Assets.xcassets */; };
 		9DAB831F25FECAD400F5C42E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9DAB831E25FECAD400F5C42E /* Preview Assets.xcassets */; };
-		9DAB833525FECAD400F5C42E /* GoCyclingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAB833425FECAD400F5C42E /* GoCyclingUITests.swift */; };
+		9DAB833525FECAD400F5C42E /* GoCyclingUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DAB833425FECAD400F5C42E /* GoCyclingUITests.m */; };
 		9DAB835E25FECCB000F5C42E /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAB835D25FECCB000F5C42E /* MainView.swift */; };
 		9DAB837025FED0A300F5C42E /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAB836F25FED0A300F5C42E /* HistoryView.swift */; };
 		9DAB837525FED2F800F5C42E /* TimerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAB837425FED2F800F5C42E /* TimerButton.swift */; };
@@ -353,7 +352,7 @@
 		9DAB832525FECAD400F5C42E /* Go CyclingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Go CyclingTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DAB832B25FECAD400F5C42E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9DAB833025FECAD400F5C42E /* Go CyclingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Go CyclingUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9DAB833425FECAD400F5C42E /* GoCyclingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoCyclingUITests.swift; sourceTree = "<group>"; };
+		9DAB833425FECAD400F5C42E /* GoCyclingUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GoCyclingUITests.m; sourceTree = "<group>"; };
 		9DAB833625FECAD400F5C42E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9DAB835D25FECCB000F5C42E /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		9DAB836F25FED0A300F5C42E /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
@@ -785,7 +784,7 @@
 		9DAB833325FECAD400F5C42E /* Go CyclingUITests */ = {
 			isa = PBXGroup;
 			children = (
-				9DAB833425FECAD400F5C42E /* GoCyclingUITests.swift */,
+				9DAB833425FECAD400F5C42E /* GoCyclingUITests.m */,
 				9DAB833625FECAD400F5C42E /* Info.plist */,
 			);
 			path = "Go CyclingUITests";
@@ -1159,8 +1158,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9DAB833525FECAD400F5C42E /* GoCyclingUITests.swift in Sources */,
-				AA0000042026061600000001 /* UITesting.swift in Sources */,
+				9DAB833525FECAD400F5C42E /* GoCyclingUITests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

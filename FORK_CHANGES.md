@@ -50,7 +50,7 @@ The hosted UI smoke matrix currently requests these simulators:
 
 - `macos-14` - iPhone SE (3rd generation), iPad mini (6th generation)
 - `macos-15` - iPhone 16, iPad (10th generation)
-- `macos-26` - iPhone 17, iPad Pro 11-inch (M5)
+- `macos-26` - iPhone Air, iPad Pro 11-inch (M5)
 
 CI copies `TelemetryDeck.xcconfig.example` to `TelemetryDeck.xcconfig` when the gitignored file is absent, so no TelemetryDeck account is required. Simulator builds pass `DEVELOPMENT_TEAM=` so no committed development team is needed.
 CI also passes `-retry-tests-on-failure`, which retries failed tests using Xcode's default maximum of 3 iterations.
@@ -77,7 +77,7 @@ Reproduce the unit tests locally:
 cp -n TelemetryDeck.xcconfig.example TelemetryDeck.xcconfig
 mkdir -p TestResults
 rm -rf TestResults/unit.xcresult
-DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17')
+DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone Air')
 xcodebuild \
   -project "Go Cycling.xcodeproj" \
   -scheme "Go Cycling" \
@@ -105,7 +105,7 @@ Reproduce a UI smoke run, substituting the device name as needed:
 DEST=$(.github/scripts/ios-simulator-destination.sh iPad 'iPad Pro 11-inch (M5)')
 xcodebuild \
   -project "Go Cycling.xcodeproj" \
-  -scheme "Go Cycling" \
+  -scheme "Go Cycling UI Smoke" \
   -configuration Debug \
   -destination "$DEST" \
   -only-testing:"Go CyclingUITests" \

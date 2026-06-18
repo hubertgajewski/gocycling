@@ -8,6 +8,67 @@
 import SwiftUI
 import TelemetryDeck
 
+protocol AppLaunchKeyValueStore {
+    func bool(forKey defaultName: String) -> Bool
+    func set(_ value: Bool, forKey defaultName: String)
+}
+
+protocol AppLaunchPreferenceStore {
+    func object(forKey defaultName: String) -> Any?
+    func bool(forKey defaultName: String) -> Bool
+}
+
+extension NSUbiquitousKeyValueStore: AppLaunchKeyValueStore {}
+extension UserDefaults: AppLaunchKeyValueStore {}
+extension UserDefaults: AppLaunchPreferenceStore {}
+
+enum AppLaunchTelemetry {
+    static func configureIfNeeded(
+        arguments: [String] = ProcessInfo.processInfo.arguments,
+        appID: Any? = nil,
+        userDefaults: AppLaunchPreferenceStore? = nil,
+        setup: (String, Bool) -> Void = { appID, telemetryEnabled in
+            TelemetryManager.setup(
+                TelemetryManager.TelemetryManagerConfig(appID: appID),
+                enabled: telemetryEnabled
+            )
+        }
+    ) {
+        guard !UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return }
+
+        let appID = appID ?? Bundle.main.object(forInfoDictionaryKey: "GoCyclingAppID")
+        guard let appID = appID as? String else { return }
+        let userDefaults = userDefaults ?? UserDefaults.standard
+        let telemetryEnabled = userDefaults.object(forKey: Preferences.telemetryEnabledKey) != nil
+            ? userDefaults.bool(forKey: Preferences.telemetryEnabledKey)
+            : true
+        setup(appID, telemetryEnabled)
+    }
+}
+
+enum AppLaunchMigration {
+    static let didLaunchBeforeKey = "didLaunch1.4.0Before"
+
+    static func runIfNeeded(
+        arguments: [String] = ProcessInfo.processInfo.arguments,
+        userDefaults: AppLaunchKeyValueStore? = nil,
+        ubiquitousStore: AppLaunchKeyValueStore? = nil,
+        migratePreferences: () -> Void,
+        migrateRecords: () -> Void
+    ) {
+        guard !UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return }
+
+        let userDefaults = userDefaults ?? UserDefaults.standard
+        let ubiquitousStore = ubiquitousStore ?? NSUbiquitousKeyValueStore.default
+        if !ubiquitousStore.bool(forKey: didLaunchBeforeKey) || !userDefaults.bool(forKey: didLaunchBeforeKey) {
+            ubiquitousStore.set(true, forKey: didLaunchBeforeKey)
+            userDefaults.set(true, forKey: didLaunchBeforeKey)
+            migratePreferences()
+            migrateRecords()
+        }
+    }
+}
+
 @main
 struct GoCyclingApp: App {
     
@@ -20,18 +81,7 @@ struct GoCyclingApp: App {
     @StateObject var records = CyclingRecords.shared
     
     init() {
-        // Initialize TelemetryDeck
-        // Attempt to find App ID
-        if let appID = Bundle.main.object(forInfoDictionaryKey: "GoCyclingAppID") {
-            // Read telemetry preference before singleton init — missing key defaults to true (opted in)
-            let telemetryEnabled = UserDefaults.standard.object(forKey: Preferences.telemetryEnabledKey) != nil
-                ? UserDefaults.standard.bool(forKey: Preferences.telemetryEnabledKey)
-                : true
-            TelemetryManager.setup(
-                TelemetryManager.TelemetryManagerConfig(appID: appID as! String),
-                enabled: telemetryEnabled
-            )
-        }
+        AppLaunchTelemetry.configureIfNeeded()
         
         // Retrieve stored data to be used by all views - create state objects for environment objects
         let managedObjectContext = persistenceController.container.viewContext
@@ -48,27 +98,29 @@ struct GoCyclingApp: App {
                 .environmentObject(cyclingStatus)
                 .environmentObject(preferences)
                 .onAppear(perform: {
-                    
-                    // For first launch with UserPreferences set
-                    if (!NSUbiquitousKeyValueStore.default.bool(forKey: "didLaunch1.4.0Before") || !UserDefaults.standard.bool(forKey: "didLaunch1.4.0Before")) {
-                        NSUbiquitousKeyValueStore.default.set(true, forKey: "didLaunch1.4.0Before")
-                        UserDefaults.standard.set(true, forKey: "didLaunch1.4.0Before")
-                        // Migrate existing UserPreferences
-                        if let oldPreferences = UserPreferences.savedPreferences() {
-                            preferences.initialUserPreferencesMigration(existingPreferences: oldPreferences)
-                        }
-                        // Migrate existing Records
-                        if let oldRecords = Records.getStoredRecords() {
-                            records.initialRecordsMigration(existingRecords: oldRecords, existingBikeRides: bikeRides.storedBikeRides)
-                        }
+                    #if DEBUG
+                    if UITesting.shouldSeedRouteSaveFixture() {
+                        UITestingRouteSaveFixture.runIfNeeded(
+                            persistenceController: persistenceController
+                        )
+                        return
                     }
-                    
-                    // Check if iCloud is available
-                    if FileManager.default.ubiquityIdentityToken != nil {
-                        if (!NSUbiquitousKeyValueStore.default.bool(forKey: "didLaunch1.4.0Before")) {
-                            NSUbiquitousKeyValueStore.default.set(true, forKey: "didLaunch1.4.0Before")
+                    #endif
+
+                    guard !UITesting.shouldUseIsolatedPersistence() else { return }
+
+                    AppLaunchMigration.runIfNeeded(
+                        migratePreferences: {
+                            if let oldPreferences = UserPreferences.savedPreferences() {
+                                preferences.initialUserPreferencesMigration(existingPreferences: oldPreferences)
+                            }
+                        },
+                        migrateRecords: {
+                            if let oldRecords = Records.getStoredRecords() {
+                                records.initialRecordsMigration(existingRecords: oldRecords, existingBikeRides: bikeRides.storedBikeRides)
+                            }
                         }
-                    }
+                    )
                     
                     // Disable auto lock if that setting is enabled
                     if (preferences.autoLockDisabled) {
@@ -77,12 +129,6 @@ struct GoCyclingApp: App {
 
                     // Gate mid-session telemetry signals based on stored preference
                     TelemetryManager.sharedTelemetryManager.userTelemetryEnabled = preferences.telemetryEnabled
-
-                    UITestingRouteSaveFixture.runIfNeeded(
-                        persistenceController: persistenceController,
-                        records: records,
-                        preferences: preferences
-                    )
                 })
         }
         .onChange(of: scenePhase) { _ in

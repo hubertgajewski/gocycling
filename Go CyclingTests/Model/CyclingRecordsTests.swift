@@ -367,6 +367,64 @@ struct CyclingRecordsTests {
     )
   }
 
+  @Test("UI testing record updates stay in memory")
+  @MainActor
+  func uiTestingRecordUpdatesStayInMemory() async {
+    let snapshot = await PersistedStoreSnapshot(
+      keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+    defer { snapshot.restore() }
+    let assertICloud = ubiquitousStorePersistsValues()
+
+    let persistedSpeedDate = date(2026, 5, 1)
+    let persistedDistanceDate = date(2026, 5, 2)
+    let persistedTimeDate = date(2026, 5, 3)
+    let startTime = date(2026, 6, 18)
+    seedRecordStores(
+      totalTime: 42,
+      totalDistance: 43,
+      unlockedIcons: [true, false, true, false, true, false],
+      longestDistance: 44,
+      longestTime: 45,
+      fastestAverageSpeed: 46,
+      fastestAverageSpeedDate: persistedSpeedDate,
+      longestDistanceDate: persistedDistanceDate,
+      longestTimeDate: persistedTimeDate,
+      totalRoutes: 7
+    )
+    let records = CyclingRecords(arguments: [UITesting.launchArgument])
+
+    records.updateCyclingRecords(
+      speeds: [5],
+      distance: 1_500,
+      startTime: startTime,
+      time: 300
+    )
+
+    #expect(records.totalCyclingDistance == 1_500)
+    #expect(records.totalCyclingTime == 300)
+    #expect(records.totalCyclingRoutes == 1)
+    #expect(records.longestCyclingDistance == 1_500)
+    #expect(records.longestCyclingTime == 300)
+    #expect(records.fastestAverageSpeed == 5)
+    #expect(records.longestCyclingDistanceDate == startTime)
+    #expect(records.longestCyclingTimeDate == startTime)
+    #expect(records.fastestAverageSpeedDate == startTime)
+    #expect(records.unlockedIcons == [false, false, false, false, false, false])
+    expectPersistedRecords(
+      totalTime: 42,
+      totalDistance: 43,
+      unlockedIcons: [true, false, true, false, true, false],
+      longestDistance: 44,
+      longestTime: 45,
+      fastestAverageSpeed: 46,
+      fastestAverageSpeedDate: persistedSpeedDate,
+      longestDistanceDate: persistedDistanceDate,
+      longestTimeDate: persistedTimeDate,
+      totalRoutes: 7,
+      assertICloud: assertICloud
+    )
+  }
+
   @Test("resets statistics while preserving unlocked icons")
   @MainActor
   func resetsStatisticsWhilePreservingUnlockedIcons() async {

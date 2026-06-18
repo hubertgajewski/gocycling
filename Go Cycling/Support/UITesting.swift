@@ -8,14 +8,25 @@ import Foundation
 enum UITesting {
     static let launchArgument = "-ui-testing"
     static let routeSaveFixtureArgument = "-ui-testing-route-save-fixture"
+    static let routeSaveFixtureLaunchArguments = [
+        launchArgument,
+        routeSaveFixtureArgument,
+    ]
 
     #if DEBUG
+    static let isolatedPersistenceStoreURL = FileManager.default.temporaryDirectory
+        .appendingPathComponent("GoCycling-\(ProcessInfo.processInfo.processIdentifier)-UITesting.sqlite")
+
     static var isEnabled: Bool {
         ProcessInfo.processInfo.arguments.contains(launchArgument)
     }
 
-    static var shouldRunRouteSaveFixture: Bool {
-        isEnabled && ProcessInfo.processInfo.arguments.contains(routeSaveFixtureArgument)
+    static func shouldUseIsolatedPersistence(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        arguments.contains(launchArgument)
+    }
+
+    static func shouldSeedRouteSaveFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        shouldUseIsolatedPersistence(arguments: arguments) && arguments.contains(routeSaveFixtureArgument)
     }
 
     static var shouldRequestLocationAuthorization: Bool {
@@ -26,9 +37,17 @@ enum UITesting {
         !isEnabled
     }
     #else
+    static let isolatedPersistenceStoreURL = URL(fileURLWithPath: "/dev/null")
+
     static var isEnabled: Bool { false }
 
-    static var shouldRunRouteSaveFixture: Bool { false }
+    static func shouldUseIsolatedPersistence(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        false
+    }
+
+    static func shouldSeedRouteSaveFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        false
+    }
 
     static var shouldRequestLocationAuthorization: Bool { true }
 

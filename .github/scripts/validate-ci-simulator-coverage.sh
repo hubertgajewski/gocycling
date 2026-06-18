@@ -25,8 +25,8 @@ if not unit_match:
 else:
     unit_body = unit_match.group("body")
     unit_name = re.search(r"(?m)^\s+name:\s*(?P<value>.+)$", unit_body)
-    if not unit_name or "iPhone 17" not in unit_name.group("value"):
-        failures.append("unit-tests job name must mention the requested iPhone 17 simulator")
+    if not unit_name or "iPhone Air" not in unit_name.group("value"):
+        failures.append("unit-tests job name must mention the requested iPhone Air simulator")
     if "-enableCodeCoverage YES" not in unit_body:
         failures.append("unit-tests must enable Xcode code coverage")
     if "xcrun xccov view --report --json TestResults/unit.xcresult > TestResults/coverage.json" not in unit_body:
@@ -145,6 +145,25 @@ destination="$(
 expected="platform=iOS Simulator,id=IPAD-A16"
 if [[ "$destination" != "$expected" ]]; then
   printf 'Expected plain iPad fallback %q, got %q\n' "$expected" "$destination" >&2
+  exit 1
+fi
+
+cat > "$tmpdir/iphone17-only.json" <<'JSON'
+{
+  "devices": {
+    "com.apple.CoreSimulator.SimRuntime.iOS-26-5": [
+      {
+        "isAvailable": true,
+        "name": "iPhone 17",
+        "udid": "IPHONE-17"
+      }
+    ]
+  }
+}
+JSON
+
+if SIMCTL_FIXTURE="$tmpdir/iphone17-only.json" PATH="$tmpdir:$PATH" bash "$resolver" iPhone "iPhone Air" > "$tmpdir/iphone-air.out" 2> "$tmpdir/iphone-air.err"; then
+  printf 'Expected iPhone Air resolver to reject iPhone 17 fallback, got %q\n' "$(cat "$tmpdir/iphone-air.out")" >&2
   exit 1
 fi
 

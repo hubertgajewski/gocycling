@@ -15,7 +15,7 @@ struct PersistenceController {
 
     let container: NSPersistentCloudKitContainer
 
-    init(inMemory: Bool = false) {
+    init(inMemory: Bool = false, arguments: [String] = ProcessInfo.processInfo.arguments) {
         container = NSPersistentCloudKitContainer(name: "GoCycling")
         
         guard let description = container.persistentStoreDescriptions.first else {
@@ -32,10 +32,22 @@ struct PersistenceController {
         
         if inMemory {
             description.url = URL(fileURLWithPath: "/dev/null")
+            description.cloudKitContainerOptions = nil
         }
-        
-        if(!Preferences.iCloudAvailable()){
-              description.cloudKitContainerOptions = nil
+        else {
+            #if DEBUG
+            let configuredForUITesting = PersistenceController.configureStoreForUITestingIfNeeded(
+                description,
+                arguments: arguments
+            )
+            if !configuredForUITesting && !Preferences.iCloudAvailable() {
+                description.cloudKitContainerOptions = nil
+            }
+            #else
+            if !Preferences.iCloudAvailable() {
+                description.cloudKitContainerOptions = nil
+            }
+            #endif
         }
 
         container.loadPersistentStores { description, error in
@@ -62,7 +74,39 @@ struct PersistenceController {
     }
     
     // MARK: Bike ride methods
-    func storeBikeRide(locations: [CLLocation?], speeds: [CLLocationSpeed?], distance: Double, elevations: [CLLocationDistance?], startTime: Date, time: Double, completion: @escaping () -> Void) {
+    #if DEBUG
+    @discardableResult
+    static func configureStoreForUITestingIfNeeded(
+        _ description: NSPersistentStoreDescription,
+        arguments: [String] = ProcessInfo.processInfo.arguments,
+        defaults: UserDefaults = .standard,
+        storeURL: URL = UITesting.isolatedPersistenceStoreURL
+    ) -> Bool {
+        guard UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return false }
+
+        description.url = storeURL
+        description.cloudKitContainerOptions = nil
+        return true
+    }
+
+    func isUsingPersistentStore(at expectedURL: URL) -> Bool {
+        let expectedURL = Self.normalizedStoreURL(expectedURL)
+        return container.persistentStoreCoordinator.persistentStores.contains { store in
+            guard let storeURL = store.url else { return false }
+            return Self.normalizedStoreURL(storeURL) == expectedURL
+        }
+    }
+
+    private static func normalizedStoreURL(_ url: URL) -> URL {
+        url.standardizedFileURL.resolvingSymlinksInPath()
+    }
+    #endif
+
+    enum BikeRideStoreError: Error {
+        case savedRideUnavailable
+    }
+
+    func storeBikeRide(locations: [CLLocation?], speeds: [CLLocationSpeed?], distance: Double, elevations: [CLLocationDistance?], startTime: Date, time: Double, completion: @escaping (Result<BikeRide, Error>) -> Void) {
         // Copy value-type arrays before handing off to the background task
         let locationsCopy = locations
         let speedsCopy = speeds
@@ -111,13 +155,25 @@ struct PersistenceController {
 
             do {
                 try context.save()
+                let objectID = newBikeRide.objectID
                 print("Bike ride saved")
+                DispatchQueue.main.async {
+                    do {
+                        let savedRide = try container.viewContext.existingObject(with: objectID)
+                        if let savedBikeRide = savedRide as? BikeRide {
+                            completion(.success(savedBikeRide))
+                        } else {
+                            completion(.failure(BikeRideStoreError.savedRideUnavailable))
+                        }
+                    } catch {
+                        completion(.failure(error))
+                    }
+                }
             } catch {
                 print(error.localizedDescription)
-            }
-
-            DispatchQueue.main.async {
-                completion()
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
         }
     }

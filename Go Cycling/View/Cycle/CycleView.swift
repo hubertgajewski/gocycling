@@ -17,6 +17,7 @@ struct CycleView: View {
     @State private var cyclingStartTime = Date()
     @State private var timeCycling = 0.0
     @State private var showingRouteNamingPopover = false
+    @State private var savedRouteForNaming: BikeRide?
     @State private var isAutoPaused: Bool = false
     
     @StateObject var locationManager = LocationViewModel.locationManager
@@ -29,7 +30,11 @@ struct CycleView: View {
     var body: some View {
         GeometryReader { (geometry) in
             VStack {
-                MapWithSpeedView(cyclingStartTime: $cyclingStartTime, timeCycling: $timeCycling)
+                MapWithSpeedView(
+                    cyclingStartTime: $cyclingStartTime,
+                    timeCycling: $timeCycling,
+                    onRouteSaveSuccess: routeSaved
+                )
                 .layoutPriority(1)
                 // Alert about visiting settings if location access is not allowed
                 .alert(isPresented: $locationManager.showLocationSettingsAlert) {
@@ -105,11 +110,6 @@ struct CycleView: View {
                             self.timer.stop()
                             cyclingStatus.stoppedCycling()
                             
-                            // Present route naming popover if necessary
-                            if (preferences.namedRoutes) {
-                                self.showingRouteNamingPopover = true
-                            }
-                        
                             telemetryManager.sendCyclingSignal(
                                 tab: telemetryTab,
                                 action: TelemetryCyclingAction.ConfirmStop
@@ -121,7 +121,11 @@ struct CycleView: View {
                 Spacer()
             }
             .sheet(isPresented: $showingRouteNamingPopover) {
-                RouteNameModalView(showEditModal: $showingRouteNamingPopover, bikeRideToEdit: nil)
+                RouteNameModalView(
+                    showEditModal: $showingRouteNamingPopover,
+                    bikeRideToEdit: nil,
+                    bikeRideToName: savedRouteForNaming
+                )
             }
             .onChange(of: locationManager.autoPauseState) { state in
                 guard preferences.autoPauseEnabled else { return }
@@ -152,6 +156,7 @@ struct CycleView: View {
     func startCycling() {
         // Send an alert about location settings if it is necessary
         locationManager.setLocationAlertStatus()
+        savedRouteForNaming = nil
         cyclingStatus.startedCycling()
         // Call synchronously before any SwiftUI re-renders so the pre-ride
         // location/distance data is already cleared when MapView first draws the route
@@ -195,6 +200,12 @@ struct CycleView: View {
             tab: telemetryTab,
             action: TelemetryCyclingAction.Stop
         )
+    }
+
+    func routeSaved(_ bikeRide: BikeRide) {
+        guard preferences.namedRoutes else { return }
+        savedRouteForNaming = bikeRide
+        showingRouteNamingPopover = true
     }
 }
 
