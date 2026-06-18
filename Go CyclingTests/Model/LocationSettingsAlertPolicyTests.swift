@@ -4,7 +4,6 @@
 //
 
 import CoreLocation
-import Foundation
 import Testing
 
 @testable import Go_Cycling
@@ -15,13 +14,13 @@ struct LocationSettingsAlertPolicyTests {
   @Test("returns no alert message when location is always authorized")
   func returnsNoAlertMessageWhenLocationIsAlwaysAuthorized() {
     #expect(
-      LocationSettingsAlertPolicy.settingsAlertMessage(for: .authorizedAlways) == "")
+      LocationSettingsAlertPolicy.alertMessage(for: .authorizedAlways) == "")
   }
 
   @Test("returns always-location guidance when authorized while in use")
   func returnsAlwaysLocationGuidanceWhenAuthorizedWhileInUse() {
     #expect(
-      LocationSettingsAlertPolicy.settingsAlertMessage(for: .authorizedWhenInUse)
+      LocationSettingsAlertPolicy.alertMessage(for: .authorizedWhenInUse)
         == alwaysLocationGuidance)
   }
 
@@ -29,7 +28,7 @@ struct LocationSettingsAlertPolicyTests {
   func returnsPermissionsRequiredGuidanceForUnavailableAuthorizationStatuses() {
     for status in unavailableLocationAuthorizationStatuses {
       #expect(
-        LocationSettingsAlertPolicy.settingsAlertMessage(for: status)
+        LocationSettingsAlertPolicy.alertMessage(for: status)
           == permissionsGuidance)
     }
   }

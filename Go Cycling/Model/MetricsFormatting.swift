@@ -15,7 +15,7 @@ class MetricsFormatting {
         dateFormatter.dateFormat = "MMMM dd, yyyy"
         return(dateFormatter.string(from: date))
     }
-    
+
     static func formatStartTime(date: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.amSymbol = "AM"
@@ -23,7 +23,7 @@ class MetricsFormatting {
         dateFormatter.dateFormat = "h:mm a"
         return(dateFormatter.string(from: date))
     }
-    
+
     static func formatDistance(distance: CLLocationDistance, usingMetric: Bool) -> String {
         let distanceKilometres = round(100 * distance/1000)/100
         let distanceMiles = round(100 * (0.621371 * distance/1000))/100
@@ -31,23 +31,35 @@ class MetricsFormatting {
         let distanceString = "\(usingMetric ? distanceKilometres : distanceMiles) " + distanceUnits
         return distanceString
     }
+
+    private static func timeComponents(time: TimeInterval) -> (hours: Int, minutes: Int, seconds: Int) {
+        let wholeSeconds = Int(time)
+        return (
+            hours: wholeSeconds / 3600,
+            minutes: wholeSeconds / 60 % 60,
+            seconds: wholeSeconds % 60
+        )
+    }
     
     static func formatTime(time: TimeInterval) -> String {
         var timeString = ""
-        let hours = Int(time) / 3600
-        let minutes = Int(time) / 60 % 60
-        let seconds = Int(time) % 60
-        
-        if (hours > 0) {
-            timeString = "\(hours)h"
+        let components = timeComponents(time: time)
+
+        if (components.hours > 0) {
+            timeString = "\(components.hours)h"
         }
-        if (minutes > 0) {
-            timeString = timeString + " \(minutes)m"
+        if (components.minutes > 0) {
+            timeString = timeString + " \(components.minutes)m"
         }
-        if (seconds > 0 || timeString == "") {
-            timeString = timeString + " \(seconds)s"
+        if (components.seconds > 0 || timeString == "") {
+            timeString = timeString + " \(components.seconds)s"
         }
         return timeString
+    }
+
+    static func formatElapsedTimer(time: TimeInterval) -> String {
+        let components = timeComponents(time: time)
+        return String(format: "%02i:%02i:%02i", components.hours, components.minutes, components.seconds)
     }
     
     static func formatAverageSpeed(speeds: [CLLocationSpeed], distance: CLLocationDistance, time: TimeInterval, usingMetric: Bool) -> String {

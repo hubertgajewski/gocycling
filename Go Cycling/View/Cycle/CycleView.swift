@@ -45,8 +45,7 @@ struct CycleView: View {
                     )
                 }
                 VStack(spacing: 4) {
-                    // Pure formatting lives in CycleElapsedTimeFormatting so unit tests avoid SwiftUI setup.
-                    Text(CycleElapsedTimeFormatting.formatTimeString(accumulatedTime: timer.totalAccumulatedTime))
+                    Text(MetricsFormatting.formatElapsedTimer(time: timer.totalAccumulatedTime))
                         .font(.custom("Avenir", size: 40))
                     if isAutoPaused {
                         HStack(spacing: 6) {

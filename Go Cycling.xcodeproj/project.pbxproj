@@ -123,9 +123,7 @@
 		AA0000232026061700000001 /* ActivityAwardsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000262026061700000001 /* ActivityAwardsViewModelTests.swift */; };
 		AA0000282026061700000001 /* BikeRidePersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000292026061700000001 /* BikeRidePersistenceTests.swift */; };
 		AA0000302026061700000001 /* ReviewManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000332026061700000001 /* ReviewManagerTests.swift */; };
-		AA0000312026061700000001 /* CycleElapsedTimeFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000342026061700000001 /* CycleElapsedTimeFormattingTests.swift */; };
 		AA0000322026061700000001 /* LocationSettingsAlertPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000352026061700000001 /* LocationSettingsAlertPolicyTests.swift */; };
-		AA0000412026061800000001 /* CycleElapsedTimeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000402026061800000001 /* CycleElapsedTimeFormatting.swift */; };
 		AA0000432026061800000001 /* LocationSettingsAlertPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000422026061800000001 /* LocationSettingsAlertPolicy.swift */; };
 		9D816A152640A4F000DED7F8 /* Default@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D816A132640A4F000DED7F8 /* Default@3x.png */; };
 		9D816A162640A4F000DED7F8 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D816A142640A4F000DED7F8 /* Default@2x.png */; };
@@ -320,9 +318,7 @@
 		AA0000262026061700000001 /* ActivityAwardsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityAwardsViewModelTests.swift; sourceTree = "<group>"; };
 		AA0000292026061700000001 /* BikeRidePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeRidePersistenceTests.swift; sourceTree = "<group>"; };
 		AA0000332026061700000001 /* ReviewManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewManagerTests.swift; sourceTree = "<group>"; };
-		AA0000342026061700000001 /* CycleElapsedTimeFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleElapsedTimeFormattingTests.swift; sourceTree = "<group>"; };
 		AA0000352026061700000001 /* LocationSettingsAlertPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSettingsAlertPolicyTests.swift; sourceTree = "<group>"; };
-		AA0000402026061800000001 /* CycleElapsedTimeFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleElapsedTimeFormatting.swift; sourceTree = "<group>"; };
 		AA0000422026061800000001 /* LocationSettingsAlertPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSettingsAlertPolicy.swift; sourceTree = "<group>"; };
 		9D816A132640A4F000DED7F8 /* Default@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@3x.png"; sourceTree = "<group>"; };
 		9D816A142640A4F000DED7F8 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
@@ -555,7 +551,6 @@
 				9D6E5373262CE773008FD7C1 /* ColourChoice.swift */,
 				2AA126438CB9497BB6E22458 /* MapTypeChoice.swift */,
 				9D62F4DF2634F7CC00E28991 /* MetricsFormatting.swift */,
-				AA0000402026061800000001 /* CycleElapsedTimeFormatting.swift */,
 				AA0000422026061800000001 /* LocationSettingsAlertPolicy.swift */,
 				9DCD21EC263638F200506FA5 /* UnitsChoice.swift */,
 				9D8169BB263E0C5200DED7F8 /* SortChoice.swift */,
@@ -746,7 +741,6 @@
 				AA0000242026061700000001 /* PreferencesConversionTests.swift */,
 				AA0000092026061700000001 /* RecordsFormattingTests.swift */,
 				AA0000332026061700000001 /* ReviewManagerTests.swift */,
-				AA0000342026061700000001 /* CycleElapsedTimeFormattingTests.swift */,
 				AA0000352026061700000001 /* LocationSettingsAlertPolicyTests.swift */,
 			);
 			path = Model;
@@ -1078,7 +1072,6 @@
 				AA0000012026051300000001 /* AutoPauseState.swift in Sources */,
 				9DF9304326DCAAD300D4EEC5 /* CyclingRecordsView.swift in Sources */,
 				9D62F4E02634F7CC00E28991 /* MetricsFormatting.swift in Sources */,
-				AA0000412026061800000001 /* CycleElapsedTimeFormatting.swift in Sources */,
 				AA0000432026061800000001 /* LocationSettingsAlertPolicy.swift in Sources */,
 				9DAB837025FED0A300F5C42E /* HistoryView.swift in Sources */,
 				9DAB835E25FECCB000F5C42E /* MainView.swift in Sources */,
@@ -1146,7 +1139,6 @@
 				AA0000222026061700000001 /* BikeRideListViewModelTests.swift in Sources */,
 				AA0000232026061700000001 /* ActivityAwardsViewModelTests.swift in Sources */,
 				AA0000302026061700000001 /* ReviewManagerTests.swift in Sources */,
-				AA0000312026061700000001 /* CycleElapsedTimeFormattingTests.swift in Sources */,
 				AA0000322026061700000001 /* LocationSettingsAlertPolicyTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

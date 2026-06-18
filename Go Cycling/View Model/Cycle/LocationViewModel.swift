@@ -127,8 +127,7 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     // Used to keep the alert message up to date as the authorization status changes
     func setLocationAlertMessage() {
-        // Pure policy lives in LocationSettingsAlertPolicy so unit tests avoid CLLocationManager setup.
-        locationSettingsAlertMessage = LocationSettingsAlertPolicy.settingsAlertMessage(
+        locationSettingsAlertMessage = LocationSettingsAlertPolicy.alertMessage(
             for: locationStatus ?? .notDetermined
         )
     }

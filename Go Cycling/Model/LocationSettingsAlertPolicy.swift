@@ -4,11 +4,10 @@
 //
 
 import CoreLocation
-import Foundation
 
 // Maps Core Location authorization status to cycle-tab location settings alert copy.
-class LocationSettingsAlertPolicy {
-    static func settingsAlertMessage(for status: CLAuthorizationStatus) -> String {
+enum LocationSettingsAlertPolicy {
+    static func alertMessage(for status: CLAuthorizationStatus) -> String {
         let messageIfAllowedWhileInUse =
         """
         Go Cycling requires your location to be set to "Always" to function while the app is not on the screen.
