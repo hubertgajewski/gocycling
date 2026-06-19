@@ -1,0 +1,62 @@
+//
+//  MainTabBarScreen.swift
+//  Go CyclingUITests
+//
+
+import XCTest
+
+final class MainTabBarScreen {
+  private let app: XCUIApplication
+
+  init(app: XCUIApplication) {
+    self.app = app
+  }
+
+  /// iPhone uses a bottom `TabBar`; iPad uses nested floating tab item buttons.
+  func waitForMainChrome(timeout: TimeInterval = Wait.Timeout.appChrome) -> Bool {
+    if Wait.exists(app.tabBars.firstMatch, timeout: Wait.Timeout.short) {
+      return true
+    }
+
+    return Wait.exists(tabButton(.cycle), timeout: timeout)
+  }
+
+  @discardableResult
+  func select(
+    _ tab: MainTab,
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) -> MainTabBarScreen {
+    let button = tabButton(tab)
+    Wait.assertExists(button, timeout: Wait.Timeout.short, file: file, line: line)
+    button.tap()
+    return self
+  }
+
+  func assertContentVisible(
+    _ tab: MainTab,
+    timeout: TimeInterval = Wait.Timeout.standard,
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    Wait.assertExists(tabContent(tab), timeout: timeout, file: file, line: line)
+  }
+
+  private func tabButton(_ tab: MainTab) -> XCUIElement {
+    let tabBarByLabel = app.tabBars.buttons[tab.englishLabel]
+    if tabBarByLabel.exists {
+      return tabBarByLabel.firstMatch
+    }
+
+    let tabBarByIdentifier = app.tabBars.buttons[tab.imageIdentifier]
+    if tabBarByIdentifier.exists {
+      return tabBarByIdentifier.firstMatch
+    }
+
+    return app.buttons.matching(identifier: tab.imageIdentifier).firstMatch
+  }
+
+  private func tabContent(_ tab: MainTab) -> XCUIElement {
+    app.descendants(matching: .any).matching(identifier: tab.contentIdentifier).firstMatch
+  }
+}
