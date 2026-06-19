@@ -242,6 +242,28 @@ struct BikeRideListViewModelTests {
     #expect(viewModel.allBikeRides.count == 2)
     #expect(viewModel.routeNames == ["Training"])
   }
+
+  @Test("route naming edit fails closed when selected context lacks category")
+  func routeNamingEditFailsClosedWhenSelectedContextLacksCategory() {
+    #expect(
+      RouteNameModalView.selectedExistingRouteIndex(
+        editingRouteName: "Training",
+        routeNames: ["Training", "Errands"]
+      ) == 0
+    )
+    #expect(
+      RouteNameModalView.selectedExistingRouteIndex(
+        editingRouteName: "Missing",
+        routeNames: ["Training"]
+      ) == nil
+    )
+    #expect(
+      RouteNameModalView.selectedExistingRouteIndex(
+        editingRouteName: "Uncategorized",
+        routeNames: ["Training"]
+      ) == 0
+    )
+  }
 }
 
 private func makeListViewModel(

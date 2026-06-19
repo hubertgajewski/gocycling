@@ -144,15 +144,36 @@ struct RouteNameModalView: View {
         .onAppear {
             routeNamingViewModel.useBikeRideContext(managedObjectContext)
             if (bikeRideToEdit != nil && bikeRideToEdit?.cyclingRouteName != "Uncategorized") {
-                self.selectedNameIndex =
-                    routeNamingViewModel.routeNames.firstIndex(
-                        of: bikeRideToEdit!.cyclingRouteName
-                    ) ?? 0
+                guard let selectedIndex = Self.selectedExistingRouteIndex(
+                    editingRouteName: bikeRideToEdit!.cyclingRouteName,
+                    routeNames: routeNamingViewModel.routeNames
+                ) else {
+                    // Route-naming UI tests need selected-context drift to fail
+                    // closed; guessing index 0 can rename a route into the wrong
+                    // category.
+                    presentationMode.wrappedValue.dismiss()
+                    self.showEditModal = false
+                    return
+                }
+                self.selectedNameIndex = selectedIndex
             }
             else {
                 self.selectedNameIndex = 0
             }
         }
+    }
+
+    // Unit tests need this selection rule outside the SwiftUI lifecycle so
+    // route-editing can verify that a missing category is rejected instead of
+    // silently mapped to another route name.
+    static func selectedExistingRouteIndex(
+        editingRouteName: String,
+        routeNames: [String]
+    ) -> Int? {
+        if editingRouteName != "Uncategorized" {
+            return routeNames.firstIndex(of: editingRouteName)
+        }
+        return 0
     }
     
     func savePressed() {
