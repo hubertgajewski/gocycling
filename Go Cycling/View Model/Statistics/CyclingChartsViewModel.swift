@@ -45,8 +45,8 @@ class CyclingChartsViewModel: ObservableObject {
     }
 
     func useBikeRideContext(_ context: NSManagedObjectContext) {
-        // Bar-chart detail is created before environment-backed storage can be
-        // read; load from the selected context once SwiftUI provides it.
+        // Bar-chart UI tests create detail models before environment storage is
+        // readable; load from the selected context once SwiftUI provides it.
         pastWeekData = BikeRide.bikeRidesInPastWeek(in: context)
         past5WeeksData = BikeRide.bikeRidesInPast5Weeks(in: context)
         past30WeeksData = BikeRide.bikeRidesInPast30Weeks(in: context)

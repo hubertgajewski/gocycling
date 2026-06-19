@@ -214,8 +214,8 @@ struct RouteNameModalView: View {
     // Route-naming tests need one update path so a naming flow cannot copy a
     // different field set while only the category should change.
     private func updateBikeRideRouteName(ride: BikeRide, routeName: String) {
-        // Naming must update the BikeRide in its selected launch context; using
-        // shared persistence here can rename a different store than the UI shows.
+        // Route-naming UI tests need the BikeRide updated in its selected launch
+        // context; shared persistence can rename a different store than the UI shows.
         PersistenceController.updateBikeRideRouteName(
             existingBikeRide: ride,
             routeName: routeName

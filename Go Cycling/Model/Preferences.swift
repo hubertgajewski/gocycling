@@ -377,8 +377,8 @@ class Preferences: ObservableObject {
         self.writeToClassMembers()
     }
     
-    // Isolated launch preferences still update published Settings state; only
-    // this helper writes the backing stores during persistent app launches.
+    // Settings UI tests need isolated preferences to update published state; only
+    // this helper writes backing stores during persistent app launches.
     private func setPersistentPreference(_ value: Bool, forKey key: String) {
         guard persistsPreferenceUpdates else { return }
         UserDefaults.standard.set(value, forKey: key)

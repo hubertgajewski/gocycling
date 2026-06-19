@@ -185,8 +185,8 @@ struct PersistenceController {
         Self.deleteAllBikeRides(in: container.viewContext)
     }
 
-    // Settings receives the launch-selected context from SwiftUI; this overload
-    // lets deletion follow that context instead of always using the shared store.
+    // Settings reset UI tests receive the launch-selected context from SwiftUI;
+    // deletion must follow that context instead of the shared store.
     static func deleteAllBikeRides(in context: NSManagedObjectContext) {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         fetchRequest.entity = NSEntityDescription.entity(forEntityName: "BikeRide", in: context)
@@ -212,8 +212,8 @@ struct PersistenceController {
         )
     }
 
-    // Route naming receives the launch-selected context from SwiftUI; updating
-    // the ride in its own context avoids falling back to PersistenceController.shared.
+    // Route-naming UI tests pass a ride from the launch-selected context; updating
+    // that ride in-place avoids falling back to PersistenceController.shared.
     static func updateBikeRideRouteName(existingBikeRide: BikeRide, routeName: String) {
         guard let context = existingBikeRide.managedObjectContext else { return }
         context.performAndWait {
@@ -353,7 +353,8 @@ private struct BikeRideStorePayload {
         var elevationsValidated: [CLLocationDistance] = []
 
         for location in locations {
-            // Only include coordinates where neither latitude nor longitude is nil.
+            // Route-save tests compare persisted route arrays; append latitude and
+            // longitude together so optional location gaps cannot desynchronize them.
             if let currentLatitude = location?.coordinate.latitude {
                 if let currentLongitude = location?.coordinate.longitude {
                     latitudes.append(currentLatitude)
@@ -420,9 +421,9 @@ struct ManagedObjectContextBikeRideStore: BikeRideStoring {
             startTime: startTime,
             time: time
         )
-        // MapView only receives launch-selected Core Data through the SwiftUI
-        // environment; save on a private context for that selected store and
-        // return the selected view-context object asynchronously so
+        // Route-save UI tests only receive launch-selected Core Data through the
+        // SwiftUI environment; save on a private context for that selected store
+        // and return the selected view-context object asynchronously so
         // MapView.updateUIView never blocks or mutates records inline.
         let complete: (Result<BikeRide, Error>) -> Void = { result in
             DispatchQueue.main.async {

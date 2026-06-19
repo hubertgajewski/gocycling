@@ -13,9 +13,9 @@ extension BikeRide {
     // Testability: route-name, category, sort, and chart date-window helpers are
     // covered by unit tests that seed rides in in-memory Core Data stores. The
     // zero-arg APIs keep production compatibility by using PersistenceController.shared;
-    // selected UI/chart paths call context overloads so isolated launches never
-    // open or write the app singleton store, which fails on CI when the store
-    // config differs.
+    // selected UI/chart paths exercised by UI tests call context overloads so
+    // isolated launches never open or write the app singleton store, which fails
+    // on CI when the store config differs.
     
     static func allBikeRides(in context: NSManagedObjectContext) -> [BikeRide] {
         let fetchRequest: NSFetchRequest<BikeRide> = BikeRide.fetchRequest()
@@ -129,8 +129,8 @@ extension BikeRide {
     }
     
     // Functions to get data for the charts on the statistics tab
-    // Bar-chart detail views load after SwiftUI injects the selected context, so
-    // date-window fetches need context overloads instead of opening shared storage.
+    // Bar-chart UI tests load detail views after SwiftUI injects the selected
+    // context, so date-window fetches need overloads instead of shared storage.
     static func bikeRidesInPastWeek(in context: NSManagedObjectContext) -> [BikeRide] {
         let fetchRequest: NSFetchRequest<BikeRide> = BikeRide.fetchRequestsWithDateRanges()[0] ?? BikeRide.fetchRequest()
         return bikeRides(matching: fetchRequest, in: context)

@@ -94,8 +94,8 @@ struct BarChartView: View {
             resetValues()
         })
         .onAppear {
-            // Detail charts are built before their model can read environment
-            // storage, so populate them from the selected launch context here.
+            // Bar-chart UI tests build detail charts before their model can read
+            // environment storage, so populate from the selected launch context.
             chartViewModel.useBikeRideContext(managedObjectContext)
             self.sendTelemetrySignal(index: index)
         }

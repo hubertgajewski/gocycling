@@ -15,8 +15,8 @@ class ActivityAwardsViewModel: ObservableObject {
     // Awards used to read CyclingRecords.shared directly; holding the source
     // records lets isolated UI-test launches display their selected record state.
     private var sourceRecords: CyclingRecords?
-    // Award-alert flags are stored in UserDefaults for production records, but
-    // isolated launch records can only raise transient UI state.
+    // Award-alert UI tests need production flags left alone; isolated launch
+    // records can only raise transient UI state.
     private var persistAwardAlerts = false
 
     @Published var progressValues: [CGFloat] = [CGFloat].init(repeating: 0.0, count: 6)
@@ -31,8 +31,8 @@ class ActivityAwardsViewModel: ObservableObject {
     
     @Published var records: CyclingRecords? {
         willSet {
-            // Recompute from the selected records object instead of the shared
-            // singleton so injected launch storage drives every awards update.
+            // Awards UI tests inject selected records; recompute from that object
+            // instead of CyclingRecords.shared so launch storage drives updates.
             guard let updatedRecords = newValue ?? sourceRecords else { return }
             // Update published values when records change
             unlockedIcons = updatedRecords.unlockedIcons
@@ -69,8 +69,8 @@ class ActivityAwardsViewModel: ObservableObject {
     
     private var cancellable: AnyCancellable?
 
-    // Tests can inject a publisher, but production binds to the selected records
-    // object so award progress follows launch storage after environment injection.
+    // Unit tests can inject a publisher, but production binds to the selected
+    // records object so UI-test award progress follows launch storage.
     init(records: CyclingRecords? = nil, recordsPublisher: AnyPublisher<Int, Never>? = nil) {
         if let records = records {
             bindRecords(records, recordsPublisher: recordsPublisher)

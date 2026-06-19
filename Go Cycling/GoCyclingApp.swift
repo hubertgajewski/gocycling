@@ -80,8 +80,8 @@ enum AppLaunchMigration {
     }
 }
 
-// Groups launch-time storage decisions so persistence is selected once before
-// storage-backed state objects, views, or migrations can touch Core Data.
+// UI tests need launch-time storage selected once before storage-backed state
+// objects, views, or migrations can touch Core Data.
 struct AppLaunchStorage {
     // Keep the launch arguments with the selected storage so later launch gates
     // use the same UI-test mode that built persistence, preferences, and records.
@@ -91,8 +91,8 @@ struct AppLaunchStorage {
     let preferences: Preferences
     let records: CyclingRecords
 
-    // Migration helpers read through this selected context instead of resolving
-    // PersistenceController.shared again after launch-store selection.
+    // Migration tests and UI-test launches read through this selected context
+    // instead of resolving PersistenceController.shared after storage selection.
     var viewContext: NSManagedObjectContext {
         persistenceController.container.viewContext
     }
@@ -118,8 +118,8 @@ struct AppLaunchStorage {
         records: CyclingRecordsUpdating? = nil,
         completion: @escaping (Result<Void, Error>) -> Void = { _ in }
     ) {
-        // Keep the fixture gate, fixture execution, and records update on the
-        // same selected launch state so seeded rides do not diverge from UI.
+        // UI-smoke tests need the fixture gate, fixture execution, and records
+        // update on the same selected launch state so seeded rides match the UI.
         UITestingRouteSaveFixture.runIfNeeded(
             persistenceController: persistenceController,
             records: records ?? self.records,
@@ -180,8 +180,8 @@ struct AppLaunchStorage {
 @main
 struct GoCyclingApp: App {
 
-    // Retain the selected launch storage so onAppear migrations use the same
-    // context that was injected into the first rendered view hierarchy.
+    // UI tests need onAppear migrations to use the same selected launch storage
+    // that was injected into the first rendered view hierarchy.
     private let launchStorage: AppLaunchStorage
     let persistenceController: PersistenceController
     @Environment(\.scenePhase) var scenePhase
@@ -232,8 +232,8 @@ struct GoCyclingApp: App {
                     // work can mutate real preferences or telemetry state.
                     guard !launchStorage.shouldUseIsolatedPersistence else { return }
 
-                    // Legacy Core Data migration must read from the selected
-                    // launch store before migrated values are copied to defaults.
+                    // Migration tests need legacy Core Data reads to use the
+                    // selected launch store before copying values to defaults.
                     AppLaunchMigration.runIfNeeded(
                         arguments: launchStorage.arguments,
                         migratePreferences: {

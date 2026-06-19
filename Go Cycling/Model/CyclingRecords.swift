@@ -220,8 +220,8 @@ class CyclingRecords: ObservableObject {
         CyclingRecords.syncLocalAndCloud(localToCloud: true)
     }
 
-    // Award-alert defaults must follow the selected records storage mode so
-    // isolated launches can update UI state without writing production flags.
+    // Award-alert UI tests need defaults to follow the selected records storage
+    // mode so isolated launches update UI state without writing production flags.
     var writesPersistentState: Bool {
         persistsRecordUpdates
     }

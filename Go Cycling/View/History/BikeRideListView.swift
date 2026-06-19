@@ -76,8 +76,8 @@ struct BikeRideListView: View {
                     }
                 }
                 .onAppear {
-                    // History view state is created before environment storage is
-                    // available; load here from the selected launch context.
+                    // History UI tests create view state before environment
+                    // storage is available; load from the selected launch context.
                     bikeRideViewModel.useStorage(
                         context: managedObjectContext,
                         preferences: preferences
