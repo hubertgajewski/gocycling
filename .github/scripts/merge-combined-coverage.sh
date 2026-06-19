@@ -45,3 +45,52 @@ xcrun xccov merge \
   "$ui_report" "$ui_archive"
 
 xcrun xccov view --report --json "$output_dir/combined.xccovreport" > "$output_dir/coverage.json"
+
+xcrun xccov view --report --json "$unit_result" > "$output_dir/unit-only-coverage.json"
+
+python3 - "$output_dir/unit-only-coverage.json" "$output_dir/coverage.json" <<'PY'
+import json
+import sys
+
+
+def app_line_coverage(path: str) -> float:
+    with open(path, encoding="utf-8") as handle:
+        report = json.load(handle)
+
+    targets = report.get("targets")
+    if not isinstance(targets, list):
+        raise SystemExit(f"{path} does not contain a targets array")
+
+    target = next(
+        (candidate for candidate in targets if candidate.get("name") == "Go Cycling.app"),
+        None,
+    )
+    if target is None:
+        raise SystemExit(f"Go Cycling.app not found in {path}")
+
+    value = target.get("lineCoverage")
+    if isinstance(value, (int, float)):
+        return float(value)
+
+    covered = target.get("coveredLines")
+    executable = target.get("executableLines")
+    if isinstance(covered, int) and isinstance(executable, int) and executable > 0:
+        return covered / executable
+
+    raise SystemExit(f"Go Cycling.app coverage is missing in {path}")
+
+
+unit_only = app_line_coverage(sys.argv[1])
+combined = app_line_coverage(sys.argv[2])
+
+if combined + 1e-12 < unit_only:
+    raise SystemExit(
+        "merge-combined-coverage error: combined Go Cycling.app coverage "
+        f"{combined:.4%} is lower than unit-only {unit_only:.4%}"
+    )
+
+print(
+    "merge-combined-coverage: combined Go Cycling.app coverage "
+    f"{combined:.4%} >= unit-only {unit_only:.4%}"
+)
+PY

@@ -55,6 +55,11 @@ else:
         failures.append("coverage job must upload combined coverage artifacts")
     if "unit-test-coverage-result" not in coverage_body or "ui-test-coverage-ios26-iphone" not in coverage_body:
         failures.append("coverage job must download unit and ios26-iphone UI coverage artifacts")
+    runs_on = re.search(r"(?m)^\s+runs-on:\s*(?P<value>.+)$", coverage_body)
+    if not runs_on or "vars.RUNNER" not in runs_on.group("value"):
+        failures.append("coverage job runs-on must honor vars.RUNNER")
+    if "unit-only-coverage.json" not in merge_script.read_text():
+        failures.append("merge-combined-coverage must verify combined Go Cycling.app coverage is not lower than unit-only")
 
 match = re.search(r"(?ms)^  ui-tests:\n(?P<body>.*?)(?:\n  [A-Za-z0-9_-]+:\n|\Z)", workflow)
 if not match:
