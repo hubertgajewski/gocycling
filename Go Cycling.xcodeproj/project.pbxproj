@@ -129,6 +129,7 @@
 		AA00004C2026061800000001 /* SingleChartListCellViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000462026061800000001 /* SingleChartListCellViewTests.swift */; };
 		AA00004D2026061800000001 /* CyclingChartsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000472026061800000001 /* CyclingChartsViewModelTests.swift */; };
 		AA00004E2026061800000001 /* BikeRideDateRangeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000482026061800000001 /* BikeRideDateRangeTests.swift */; };
+		AA0000512026061800000001 /* TimerViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000502026061800000001 /* TimerViewModelTests.swift */; };
 		AA0000602026061800000001 /* CompletedRouteSaveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000632026061800000001 /* CompletedRouteSaveTests.swift */; };
 		AA0000612026061800000001 /* CompletedRouteSaveCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000642026061800000001 /* CompletedRouteSaveCoordinator.swift */; };
 		AA0000622026061800000001 /* UITestingRouteSaveFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000652026061800000001 /* UITestingRouteSaveFixture.swift */; };
@@ -331,6 +332,7 @@
 		AA0000462026061800000001 /* SingleChartListCellViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleChartListCellViewTests.swift; sourceTree = "<group>"; };
 		AA0000472026061800000001 /* CyclingChartsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CyclingChartsViewModelTests.swift; sourceTree = "<group>"; };
 		AA0000482026061800000001 /* BikeRideDateRangeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeRideDateRangeTests.swift; sourceTree = "<group>"; };
+		AA0000502026061800000001 /* TimerViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerViewModelTests.swift; sourceTree = "<group>"; };
 		AA0000422026061800000001 /* LocationSettingsAlertPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSettingsAlertPolicy.swift; sourceTree = "<group>"; };
 		AA0000632026061800000001 /* CompletedRouteSaveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedRouteSaveTests.swift; sourceTree = "<group>"; };
 		AA0000642026061800000001 /* CompletedRouteSaveCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedRouteSaveCoordinator.swift; sourceTree = "<group>"; };
@@ -770,8 +772,17 @@
 				AA0000262026061700000001 /* ActivityAwardsViewModelTests.swift */,
 				AA0000252026061700000001 /* BikeRideListViewModelTests.swift */,
 				AA0000472026061800000001 /* CyclingChartsViewModelTests.swift */,
+				AA0000522026061800000001 /* Cycle */,
 			);
 			path = "View Model";
+			sourceTree = "<group>";
+		};
+		AA0000522026061800000001 /* Cycle */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000502026061800000001 /* TimerViewModelTests.swift */,
+			);
+			path = Cycle;
 			sourceTree = "<group>";
 		};
 		AA0000492026061800000001 /* Statistics */ = {
@@ -1178,6 +1189,7 @@
 				AA00004C2026061800000001 /* SingleChartListCellViewTests.swift in Sources */,
 				AA00004D2026061800000001 /* CyclingChartsViewModelTests.swift in Sources */,
 				AA00004E2026061800000001 /* BikeRideDateRangeTests.swift in Sources */,
+				AA0000512026061800000001 /* TimerViewModelTests.swift in Sources */,
 				AA0000602026061800000001 /* CompletedRouteSaveTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
