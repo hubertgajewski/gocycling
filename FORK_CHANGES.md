@@ -43,8 +43,9 @@ GitHub Actions runs on every push to `main` and on pull requests. Jobs run in a 
 
 - **Swift format** - `swift-format` linting for `Go CyclingTests` and `Go CyclingUITests`
 - **SwiftPM unit tests** - `swift test` for the package-compatible formatting unit-test slice
-- **Unit tests** - `Go CyclingTests` on an iPhone simulator, with Xcode code coverage published to the workflow summary
+- **Unit tests** - `Go CyclingTests` on an iPhone simulator, with code coverage collected for later merge
 - **UI smoke tests** - `Go CyclingUITests` on representative iPhone and iPad simulators across the hosted `macos-14`, `macos-15`, and `macos-26` runner lines
+- **Combined code coverage** - merges unit-test coverage with the `ios26-iphone` UI smoke run into one `Go Cycling.app` report
 
 The hosted UI smoke matrix currently requests these simulators:
 
@@ -54,7 +55,7 @@ The hosted UI smoke matrix currently requests these simulators:
 
 CI copies `TelemetryDeck.xcconfig.example` to `TelemetryDeck.xcconfig` when the gitignored file is absent, so no TelemetryDeck account is required. Simulator builds pass `DEVELOPMENT_TEAM=` so no committed development team is needed.
 CI also passes `-retry-tests-on-failure`, which retries failed tests using Xcode's default maximum of 3 iterations.
-Unit-test coverage is generated from `TestResults/unit.xcresult` with `xcrun xccov`, summarized in the GitHub Actions run summary, and uploaded with the unit-test result bundle as a workflow artifact.
+Combined `Go Cycling.app` coverage is generated after unit and UI smoke jobs finish. The `ios26-iphone` matrix entry runs with `-enableCodeCoverage YES`; a follow-up `coverage` job merges that UI result bundle with `TestResults/unit.xcresult` via `xcrun xccov`, summarizes the union in the GitHub Actions run summary, and uploads the combined artifact.
 GitHub-hosted CI does not provide iOS/iPadOS 14, 15, or 16 simulator coverage on those runner lines; the deployment target, availability checks, and optional physical-device, self-hosted-runner, or device-cloud testing remain the compatibility path for those OS versions.
 
 ### Reproduce CI Locally
@@ -95,11 +96,43 @@ Inspect the local unit-test coverage report:
 
 ```bash
 xcrun xccov view --report TestResults/unit.xcresult
-xcrun xccov view --report --json TestResults/unit.xcresult > TestResults/coverage.json
+xcrun xccov view --report --json TestResults/unit.xcresult > TestResults/unit-coverage.json
+python3 .github/scripts/write-xccov-summary.py TestResults/unit-coverage.json --target "Go Cycling.app"
+```
+
+Reproduce a UI smoke run with coverage for merge, substituting the device name as needed:
+
+```bash
+cp -n TelemetryDeck.xcconfig.example TelemetryDeck.xcconfig
+mkdir -p TestResults
+rm -rf TestResults/ui-ios26-iphone.xcresult
+DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17')
+xcodebuild \
+  -project "Go Cycling.xcodeproj" \
+  -scheme "Go Cycling UI Smoke" \
+  -configuration Debug \
+  -destination "$DEST" \
+  -only-testing:"Go CyclingUITests" \
+  -enableCodeCoverage YES \
+  -resultBundlePath TestResults/ui-ios26-iphone.xcresult \
+  -retry-tests-on-failure \
+  DEVELOPMENT_TEAM= \
+  test
+```
+
+Merge unit and UI coverage locally:
+
+```bash
+chmod +x .github/scripts/merge-combined-coverage.sh
+.github/scripts/merge-combined-coverage.sh \
+  TestResults/unit.xcresult \
+  TestResults/ui-ios26-iphone.xcresult \
+  TestResults
+xcrun xccov view --report TestResults/combined.xccovreport
 python3 .github/scripts/write-xccov-summary.py TestResults/coverage.json --target "Go Cycling.app"
 ```
 
-Reproduce a UI smoke run, substituting the device name as needed:
+Reproduce a UI smoke run without coverage, substituting the device name as needed:
 
 ```bash
 DEST=$(.github/scripts/ios-simulator-destination.sh iPad 'iPad Pro 11-inch (M5)')
@@ -119,12 +152,12 @@ xcodebuild \
 Current fork-specific differences include:
 
 - Local build fixes for fork owners: `TelemetryDeck.xcconfig.example`, in-repository default alternate icon paths, generic signing guidance, and explicit `NSUbiquitousKeyValueStore` integer writes.
-- Focused Swift Testing unit coverage for cycling record sorting, aggregation, unlocked-icon, and reset-statistics behavior, plus UI smoke coverage for the main Cycle, History, Statistics, and Settings tabs.
-- UI smoke tests use a lightweight harness under `Go CyclingUITests/Support`, `Go CyclingUITests/Screens`, and `Go CyclingUITests/Tests` for shared launch arguments, waits, accessibility IDs, and main-tab navigation queries.
+- Focused Swift Testing unit coverage for cycling record sorting, aggregation, unlocked-icon, and reset-statistics behavior, plus UI smoke coverage for the main Cycle, History, Statistics, and Settings tabs and the Cycle timer stop-cancel flow.
+- UI smoke tests use a lightweight harness under `Go CyclingUITests/Support`, `Go CyclingUITests/Screens`, and `Go CyclingUITests/Tests` for shared launch arguments, waits, accessibility IDs, main-tab navigation queries, and Cycle control workflows.
 - UI testing support through the `-ui-testing` launch argument to avoid location authorization prompts during automated tests.
 - A shared `Go Cycling` Xcode scheme for command-line and CI testing.
 - A focused SwiftPM package slice for package-compatible formatting logic, declared over the existing Xcode-owned source and test directories so `swift test` complements the Xcode test action.
-- GitHub Actions coverage for Swift formatting, SwiftPM unit tests, Xcode unit tests, unit-test code coverage summaries, and UI smoke tests.
+- GitHub Actions coverage for Swift formatting, SwiftPM unit tests, Xcode unit tests, combined unit-plus-UI `Go Cycling.app` coverage summaries, and UI smoke tests.
 - CI retries for failed XCTest and XCUITest cases via `-retry-tests-on-failure`.
 - Hosted simulator coverage across selected GitHub-hosted macOS runner lines.
 - Test-target `swift-format` enforcement in CI and the committed pre-commit hook.
