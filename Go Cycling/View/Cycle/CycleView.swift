@@ -38,22 +38,17 @@ struct CycleView: View {
                     onRouteSaveSuccess: routeSaved
                 )
                 .layoutPriority(1)
-                // Alert about visiting settings if location access is not allowed
-                .alert(isPresented: $locationManager.showLocationSettingsAlert) {
-                    Alert(title: Text("Location settings may not be correct"),
-                          message: Text(locationManager.locationSettingsAlertMessage),
-                          primaryButton: .default(Text("Open Settings")) {
-                            // Pause the current cycling session
-                            self.timer.pause()
-                            // Open Settings app
-                            UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!, options: [:], completionHandler: nil)
-                          },
-                          secondaryButton: .cancel(Text("Ignore"))
-                    )
-                }
+                .cycleLocationSettingsAlert(
+                    isPresented: $locationManager.showLocationSettingsAlert,
+                    message: locationManager.locationSettingsAlertMessage,
+                    openSettings: openLocationSettings
+                )
                 VStack(spacing: 4) {
+                    // UI tests assert Cycle state through stable identifiers
+                    // instead of localized text, formatting, or SF Symbol names.
                     Text(MetricsFormatting.formatElapsedTimer(time: timer.totalAccumulatedTime))
                         .font(.custom("Avenir", size: 40))
+                        .accessibilityIdentifier(AccessibilityIdentifier.Cycle.timerDisplay)
                     if isAutoPaused {
                         HStack(spacing: 6) {
                             Spacer(minLength: 0)
@@ -77,49 +72,35 @@ struct CycleView: View {
                         Button(action: { self.pauseCycling() }) {
                             TimerButton(label: "Pause", buttonColour: UIColor.systemYellow, systemImageName: "pause.fill", expandsHorizontally: true)
                         }
+                        .accessibilityIdentifier(AccessibilityIdentifier.Cycle.pauseButton)
                         Button(action: { self.confirmStop() }) {
                             TimerButton(label: "Stop", buttonColour: UIColor.systemRed, isSecondary: true, systemImageName: "stop.fill")
                         }
+                        .accessibilityIdentifier(AccessibilityIdentifier.Cycle.stopButton)
                     }
                     if timer.isStopped {
                         Button(action: { self.startCycling() }) {
                             TimerButton(label: "Start", buttonColour: UIColor.systemGreen, systemImageName: "play.fill", expandsHorizontally: true)
                         }
+                        .accessibilityIdentifier(AccessibilityIdentifier.Cycle.startButton)
                     }
                     if timer.isPaused {
                         Button(action: { self.resumeCycling() }) {
                             TimerButton(label: "Resume", buttonColour: UIColor.systemGreen, systemImageName: "play.fill", expandsHorizontally: true)
                         }
+                        .accessibilityIdentifier(AccessibilityIdentifier.Cycle.resumeButton)
                         Button(action: { self.confirmStop() }) {
                             TimerButton(label: "Stop", buttonColour: UIColor.systemRed, isSecondary: true, systemImageName: "stop.fill")
                         }
+                        .accessibilityIdentifier(AccessibilityIdentifier.Cycle.stopButton)
                     }
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 20)
-                // Confirmation alert about ending the current route
-                .alert(isPresented: $showingAlert) {
-                    Alert(title: Text("Are you sure that you want to end the current route?"),
-                          message: Text("Please confirm that you are ready to end the current route."),
-                          primaryButton: .destructive(Text("Stop")) {
-                            // Completing a route is a review worthy event
-                            ReviewManager.incrementReviewWorthyCount()
-                            // Keep track of whether user has completed a route
-                            ReviewManager.completedRoute()
-                        
-                            self.isAutoPaused = false
-                            self.timeCycling = timer.totalAccumulatedTime
-                            self.timer.stop()
-                            cyclingStatus.stoppedCycling()
-                            
-                            telemetryManager.sendCyclingSignal(
-                                tab: telemetryTab,
-                                action: TelemetryCyclingAction.ConfirmStop
-                            )
-                          },
-                          secondaryButton: .cancel()
-                    )
-                }
+                .cycleStopConfirmationAlert(
+                    isPresented: $showingAlert,
+                    confirmStop: stopCyclingAfterConfirmation
+                )
                 Spacer()
             }
             .sheet(isPresented: $showingRouteNamingPopover) {
@@ -152,7 +133,6 @@ struct CycleView: View {
                 }
             }
         }
-        .accessibilityIdentifier("main-tab-cycle")
     }
     
     func startCycling() {
@@ -173,6 +153,15 @@ struct CycleView: View {
             tab: telemetryTab,
             action: TelemetryCyclingAction.Start
         )
+    }
+
+    // Extracted so the iOS 15 alert buttons can carry UI-test identifiers while
+    // sharing the same production action with the iOS 14 Alert fallback.
+    func openLocationSettings() {
+        // Pause the current cycling session
+        self.timer.pause()
+        // Open Settings app
+        UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!, options: [:], completionHandler: nil)
     }
     
     func pauseCycling() {
@@ -206,6 +195,25 @@ struct CycleView: View {
         )
     }
 
+    // Extracted so the identifier-bearing stop-confirmation alert and the
+    // iOS 14 Alert fallback cannot drift in their route-ending behavior.
+    func stopCyclingAfterConfirmation() {
+        // Completing a route is a review worthy event
+        ReviewManager.incrementReviewWorthyCount()
+        // Keep track of whether user has completed a route
+        ReviewManager.completedRoute()
+
+        self.isAutoPaused = false
+        self.timeCycling = timer.totalAccumulatedTime
+        self.timer.stop()
+        cyclingStatus.stoppedCycling()
+
+        telemetryManager.sendCyclingSignal(
+            tab: telemetryTab,
+            action: TelemetryCyclingAction.ConfirmStop
+        )
+    }
+
     func routeSaved(_ bikeRide: BikeRide) {
         // Route-naming UI tests need the sheet shown only after Core Data returns
         // this saved ride; presenting earlier can rename the wrong route.
@@ -219,4 +227,74 @@ struct CycleView_Previews: PreviewProvider {
     static var previews: some View {
         CycleView()
     }
+}
+
+// UI tests need identifiers on alert actions. The iOS 15 alert builder exposes
+// Button views that can carry identifiers; the legacy Alert fallback preserves
+// iOS 14 behavior where those identifiers cannot be attached.
+private extension View {
+    @ViewBuilder
+    func cycleLocationSettingsAlert(
+        isPresented: Binding<Bool>,
+        message: String,
+        openSettings: @escaping () -> Void
+    ) -> some View {
+        if #available(iOS 15.0, *) {
+            alert(CycleAlertCopy.locationSettingsTitle, isPresented: isPresented) {
+                Button(CycleAlertCopy.openSettingsButton, action: openSettings)
+                    .accessibilityIdentifier(AccessibilityIdentifier.Cycle.locationSettingsOpenSettingsButton)
+                Button(CycleAlertCopy.ignoreButton, role: .cancel) { }
+                    .accessibilityIdentifier(AccessibilityIdentifier.Cycle.locationSettingsIgnoreButton)
+            } message: {
+                Text(message)
+            }
+        } else {
+            // Alert about visiting settings if location access is not allowed
+            alert(isPresented: isPresented) {
+                Alert(title: Text(CycleAlertCopy.locationSettingsTitle),
+                      message: Text(message),
+                      primaryButton: .default(Text(CycleAlertCopy.openSettingsButton), action: openSettings),
+                      secondaryButton: .cancel(Text(CycleAlertCopy.ignoreButton))
+                )
+            }
+        }
+    }
+
+    @ViewBuilder
+    func cycleStopConfirmationAlert(
+        isPresented: Binding<Bool>,
+        confirmStop: @escaping () -> Void
+    ) -> some View {
+        if #available(iOS 15.0, *) {
+            alert(CycleAlertCopy.stopConfirmationTitle, isPresented: isPresented) {
+                Button(CycleAlertCopy.stopButton, role: .destructive, action: confirmStop)
+                    .accessibilityIdentifier(AccessibilityIdentifier.Cycle.stopConfirmationStopButton)
+                Button(CycleAlertCopy.cancelButton, role: .cancel) { }
+                    .accessibilityIdentifier(AccessibilityIdentifier.Cycle.stopConfirmationCancelButton)
+            } message: {
+                Text(CycleAlertCopy.stopConfirmationMessage)
+            }
+        } else {
+            // Confirmation alert about ending the current route
+            alert(isPresented: isPresented) {
+                Alert(title: Text(CycleAlertCopy.stopConfirmationTitle),
+                      message: Text(CycleAlertCopy.stopConfirmationMessage),
+                      primaryButton: .destructive(Text(CycleAlertCopy.stopButton), action: confirmStop),
+                      secondaryButton: .cancel(Text(CycleAlertCopy.cancelButton))
+                )
+            }
+        }
+    }
+}
+
+// Shared by the iOS 15 identifier-bearing alerts and the iOS 14 Alert fallback
+// so UI-test support does not create separate user-facing copy paths.
+private enum CycleAlertCopy {
+    static let locationSettingsTitle = "Location settings may not be correct"
+    static let openSettingsButton = "Open Settings"
+    static let ignoreButton = "Ignore"
+    static let stopConfirmationTitle = "Are you sure that you want to end the current route?"
+    static let stopConfirmationMessage = "Please confirm that you are ready to end the current route."
+    static let stopButton = "Stop"
+    static let cancelButton = "Cancel"
 }

@@ -10,6 +10,9 @@ enum UITesting {
     // launch strings are the stable contract between test target and app.
     static let launchArgument = "-ui-testing"
     static let routeSaveFixtureArgument = "-ui-testing-route-save-fixture"
+    // Cycle controls UI tests need deterministic alerts and timer behavior
+    // without applying those fixtures to every UI-testing launch.
+    static let cycleControlsFixtureArgument = "-ui-testing-cycle-controls-fixture"
     static let routeSaveFixtureLaunchArguments = [
         launchArgument,
         routeSaveFixtureArgument,
@@ -34,6 +37,10 @@ enum UITesting {
         shouldUseIsolatedPersistence(arguments: arguments) && arguments.contains(routeSaveFixtureArgument)
     }
 
+    static func shouldUseCycleControlsFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        shouldUseIsolatedPersistence(arguments: arguments) && arguments.contains(cycleControlsFixtureArgument)
+    }
+
     static var shouldRequestLocationAuthorization: Bool {
         !isEnabled
     }
@@ -54,8 +61,30 @@ enum UITesting {
         false
     }
 
+    static func shouldUseCycleControlsFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        false
+    }
+
     static var shouldRequestLocationAuthorization: Bool { true }
 
     static var shouldShowUserLocation: Bool { true }
     #endif
+}
+
+// Black-box UI tests can only find controls through the rendered app process,
+// so app code owns these stable identifiers and the test target mirrors them.
+enum AccessibilityIdentifier {
+    enum Cycle {
+        static let timerDisplay = "cycle-timer-display"
+        static let mapLockButton = "cycle-map-lock-button"
+        static let mapUnlockButton = "cycle-map-unlock-button"
+        static let startButton = "cycle-start-button"
+        static let pauseButton = "cycle-pause-button"
+        static let resumeButton = "cycle-resume-button"
+        static let stopButton = "cycle-stop-button"
+        static let locationSettingsOpenSettingsButton = "cycle-location-settings-open-settings-button"
+        static let locationSettingsIgnoreButton = "cycle-location-settings-ignore-button"
+        static let stopConfirmationStopButton = "cycle-stop-confirmation-stop-button"
+        static let stopConfirmationCancelButton = "cycle-stop-confirmation-cancel-button"
+    }
 }

@@ -32,6 +32,23 @@ struct LocationSettingsAlertPolicyTests {
           == permissionsGuidance)
     }
   }
+
+  @Test("cycle controls fixture requires a dedicated launch argument")
+  func cycleControlsFixtureRequiresDedicatedLaunchArgument() {
+    #expect(
+      !UITesting.shouldUseCycleControlsFixture(arguments: [
+        UITesting.cycleControlsFixtureArgument
+      ]))
+    #expect(
+      !UITesting.shouldUseCycleControlsFixture(arguments: [
+        UITesting.launchArgument
+      ]))
+    #expect(
+      UITesting.shouldUseCycleControlsFixture(arguments: [
+        UITesting.launchArgument,
+        UITesting.cycleControlsFixtureArgument,
+      ]))
+  }
 }
 
 private let unavailableLocationAuthorizationStatuses: [CLAuthorizationStatus] = [
