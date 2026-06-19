@@ -1,6 +1,11 @@
 # Repository variables (Settings → Secrets and variables → Actions → Variables):
 # RUNNER — set to "self-hosted" to route jobs to local Mac runners; unset defaults to macos-26.
 # CI_RUN_UNIT_TESTS, CI_RUN_UI_TESTS — set to "false" to skip; unset or any other value runs the job.
+#
+# Job order (fail-fast): swift-format → swift-unit-tests → unit-tests and ui-tests in parallel.
+# ui-tests requires swift-format success; it accepts a skipped swift-unit-tests job only when
+# CI_RUN_UNIT_TESTS is "false" so UI-only runs remain possible without starting simulator work
+# after a format or SwiftPM failure.
 name: Tests
 
 on:
@@ -44,6 +49,7 @@ jobs:
         run: xcrun swift-format lint --recursive --strict "Go CyclingTests" "Go CyclingUITests"
 
   swift-unit-tests:
+    needs: swift-format
     if: github.repository == 'hubertgajewski/gocycling' && vars.CI_RUN_UNIT_TESTS != 'false'
     name: SwiftPM unit tests (complements Xcode)
     runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'macos-26' || vars.RUNNER || 'macos-26' }}
@@ -70,6 +76,7 @@ jobs:
         run: swift test
 
   unit-tests:
+    needs: swift-unit-tests
     if: github.repository == 'hubertgajewski/gocycling' && vars.CI_RUN_UNIT_TESTS != 'false'
     name: Unit tests (iPhone 17)
     runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'macos-26' || vars.RUNNER || 'macos-26' }}
@@ -143,7 +150,14 @@ jobs:
           if-no-files-found: ignore
 
   ui-tests:
-    if: github.repository == 'hubertgajewski/gocycling' && vars.CI_RUN_UI_TESTS != 'false'
+    needs: [swift-format, swift-unit-tests]
+    if: >-
+      always() &&
+      needs.swift-format.result == 'success' &&
+      (needs.swift-unit-tests.result == 'success' ||
+        (needs.swift-unit-tests.result == 'skipped' && vars.CI_RUN_UNIT_TESTS == 'false')) &&
+      github.repository == 'hubertgajewski/gocycling' &&
+      vars.CI_RUN_UI_TESTS != 'false'
     name: UI smoke (${{ matrix.runtime }} / ${{ matrix.device_label }})
     runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && matrix.os || vars.RUNNER || matrix.os }}
     timeout-minutes: 20
