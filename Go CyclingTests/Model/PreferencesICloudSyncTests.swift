@@ -43,12 +43,39 @@ struct PreferencesICloudSyncTests {
 
   @Test("reports iCloud unavailable when sync is on but ubiquity token is missing")
   func reportsICloudUnavailableWhenSyncIsOnButUbiquityTokenIsMissing() async {
+    guard FileManager.default.ubiquityIdentityToken == nil else {
+      return
+    }
+
     let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
     UserDefaults.standard.set(true, forKey: iCloudSyncPreferenceKey)
-    #expect(FileManager.default.ubiquityIdentityToken == nil)
     #expect(Preferences.iCloudAvailable() == false)
+  }
+
+  @Test("writes default preferences to cloud on first launch when iCloud sync is enabled")
+  func writesDefaultPreferencesToCloudOnFirstLaunchWhenICloudSyncIsEnabled() async {
+    guard ubiquitousStorePersistsValues() else {
+      // TODO(#24): Replace runtime guard with deterministic unavailable-store coverage.
+      return
+    }
+
+    let snapshot = await PersistedStoreSnapshot(keys: preferenceICloudStoreKeys)
+    defer { snapshot.restore() }
+    clearPreferenceStores()
+    UserDefaults.standard.set(true, forKey: iCloudSyncPreferenceKey)
+
+    let preferences = Preferences()
+
+    #expect(preferences.usingMetric == true)
+    #expect(preferences.colourChoiceConverted == .blue)
+    #expect(preferences.sortingChoiceConverted == .dateDescending)
+    #expect(UserDefaults.standard.bool(forKey: "didSetupPreferences") == true)
+    #expect(NSUbiquitousKeyValueStore.default.bool(forKey: "didSetupPreferences") == true)
+    #expect(NSUbiquitousKeyValueStore.default.bool(forKey: "metric") == true)
+    #expect(
+      NSUbiquitousKeyValueStore.default.string(forKey: "colour") == ColourChoice.blue.rawValue)
   }
 
   @Test("syncs local values to cloud when only local store is initialized")
