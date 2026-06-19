@@ -56,7 +56,7 @@ struct PreferencesICloudSyncTests {
 
   @Test("writes default preferences to cloud on first launch when iCloud sync is enabled")
   func writesDefaultPreferencesToCloudOnFirstLaunchWhenICloudSyncIsEnabled() async {
-    guard ubiquitousStorePersistsValues() else {
+    guard iCloudKeyValueSyncAvailableForTests() else {
       // TODO(#24): Replace runtime guard with deterministic unavailable-store coverage.
       return
     }
@@ -80,7 +80,7 @@ struct PreferencesICloudSyncTests {
 
   @Test("syncs local values to cloud when only local store is initialized")
   func syncsLocalValuesToCloudWhenOnlyLocalStoreIsInitialized() async {
-    guard ubiquitousStorePersistsValues() else {
+    guard iCloudKeyValueSyncAvailableForTests() else {
       // TODO(#24): Replace runtime guard with deterministic unavailable-store coverage.
       return
     }
@@ -103,7 +103,7 @@ struct PreferencesICloudSyncTests {
 
   @Test("syncs cloud values into local storage when only cloud store is initialized")
   func syncsCloudValuesIntoLocalStorageWhenOnlyCloudStoreIsInitialized() async {
-    guard ubiquitousStorePersistsValues() else {
+    guard iCloudKeyValueSyncAvailableForTests() else {
       // TODO(#24): Replace runtime guard with deterministic unavailable-store coverage.
       return
     }
@@ -124,7 +124,7 @@ struct PreferencesICloudSyncTests {
 
   @Test("syncs cloud values into local storage when both stores are initialized")
   func syncsCloudValuesIntoLocalStorageWhenBothStoresAreInitialized() async {
-    guard ubiquitousStorePersistsValues() else {
+    guard iCloudKeyValueSyncAvailableForTests() else {
       // TODO(#24): Replace runtime guard with deterministic unavailable-store coverage.
       return
     }
@@ -150,7 +150,7 @@ struct PreferencesICloudSyncTests {
 
   @Test("refreshing iCloud sync on a status-3 store pulls cloud values locally")
   func refreshingICloudSyncOnStatus3StorePullsCloudValuesLocally() async {
-    guard ubiquitousStorePersistsValues() else {
+    guard iCloudKeyValueSyncAvailableForTests() else {
       // TODO(#24): Replace runtime guard with deterministic unavailable-store coverage.
       return
     }
@@ -181,7 +181,7 @@ struct PreferencesICloudSyncTests {
 
   @Test("handles external cloud change notifications")
   func handlesExternalCloudChangeNotifications() async {
-    guard ubiquitousStorePersistsValues() else {
+    guard iCloudKeyValueSyncAvailableForTests() else {
       // TODO(#24): Replace runtime guard with deterministic unavailable-store coverage.
       return
     }

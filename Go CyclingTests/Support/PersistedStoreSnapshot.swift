@@ -192,6 +192,14 @@ func ubiquitousStorePersistsValues() -> Bool {
   return persistsValues
 }
 
+/// Matches the runtime requirements for `Preferences.iCloudAvailable()` after
+/// `iCloudOn` is enabled: the ubiquitous store must persist values and an
+/// iCloud identity token must be present. CI simulators may satisfy the probe
+/// without a signed-in iCloud account.
+func iCloudKeyValueSyncAvailableForTests() -> Bool {
+  ubiquitousStorePersistsValues() && FileManager.default.ubiquityIdentityToken != nil
+}
+
 @Suite("PersistedStoreSnapshot", .serialized)
 struct PersistedStoreSnapshotTests {
   @Test("waiting for a permit leaves the main actor runnable")
