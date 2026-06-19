@@ -59,3 +59,19 @@ enum UITesting {
     static var shouldShowUserLocation: Bool { true }
     #endif
 }
+
+enum AccessibilityIdentifier {
+    enum Cycle {
+        static let timerDisplay = "cycle-timer-display"
+        static let mapLockButton = "cycle-map-lock-button"
+        static let mapUnlockButton = "cycle-map-unlock-button"
+        static let startButton = "cycle-start-button"
+        static let pauseButton = "cycle-pause-button"
+        static let resumeButton = "cycle-resume-button"
+        static let stopButton = "cycle-stop-button"
+        static let locationSettingsOpenSettingsButton = "cycle-location-settings-open-settings-button"
+        static let locationSettingsIgnoreButton = "cycle-location-settings-ignore-button"
+        static let stopConfirmationStopButton = "cycle-stop-confirmation-stop-button"
+        static let stopConfirmationCancelButton = "cycle-stop-confirmation-cancel-button"
+    }
+}

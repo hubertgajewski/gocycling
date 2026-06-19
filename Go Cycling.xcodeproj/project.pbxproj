@@ -136,8 +136,6 @@
 		AA0000752026061900000001 /* TelemetryManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000742026061900000001 /* TelemetryManagerTests.swift */; };
 		AA0000772026061900000001 /* BikeRideExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000762026061900000001 /* BikeRideExtensionsTests.swift */; };
 		AA0000792026061900000001 /* BikeRideStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000782026061900000001 /* BikeRideStorageTests.swift */; };
-		AA00007B2026061900000001 /* RouteNamingViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00007A2026061900000001 /* RouteNamingViewModelTests.swift */; };
-		AA00007D2026061900000001 /* SharedStoreRideFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00007C2026061900000001 /* SharedStoreRideFixture.swift */; };
 		AA0000612026061800000001 /* CompletedRouteSaveCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000642026061800000001 /* CompletedRouteSaveCoordinator.swift */; };
 		AA0000622026061800000001 /* UITestingRouteSaveFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000652026061800000001 /* UITestingRouteSaveFixture.swift */; };
 		9D816A152640A4F000DED7F8 /* Default@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D816A132640A4F000DED7F8 /* Default@3x.png */; };
@@ -347,8 +345,6 @@
 		AA0000742026061900000001 /* TelemetryManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryManagerTests.swift; sourceTree = "<group>"; };
 		AA0000762026061900000001 /* BikeRideExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeRideExtensionsTests.swift; sourceTree = "<group>"; };
 		AA0000782026061900000001 /* BikeRideStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeRideStorageTests.swift; sourceTree = "<group>"; };
-		AA00007A2026061900000001 /* RouteNamingViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteNamingViewModelTests.swift; sourceTree = "<group>"; };
-		AA00007C2026061900000001 /* SharedStoreRideFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedStoreRideFixture.swift; sourceTree = "<group>"; };
 		AA0000642026061800000001 /* CompletedRouteSaveCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedRouteSaveCoordinator.swift; sourceTree = "<group>"; };
 		AA0000652026061800000001 /* UITestingRouteSaveFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestingRouteSaveFixture.swift; sourceTree = "<group>"; };
 		9D816A132640A4F000DED7F8 /* Default@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@3x.png"; sourceTree = "<group>"; };
@@ -798,7 +794,6 @@
 			isa = PBXGroup;
 			children = (
 				AA0000502026061800000001 /* TimerViewModelTests.swift */,
-				AA00007A2026061900000001 /* RouteNamingViewModelTests.swift */,
 			);
 			path = Cycle;
 			sourceTree = "<group>";
@@ -817,7 +812,6 @@
 			isa = PBXGroup;
 			children = (
 				AA0000122026061700000001 /* PersistedStoreSnapshot.swift */,
-				AA00007C2026061900000001 /* SharedStoreRideFixture.swift */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -1217,8 +1211,6 @@
 				AA0000752026061900000001 /* TelemetryManagerTests.swift in Sources */,
 				AA0000772026061900000001 /* BikeRideExtensionsTests.swift in Sources */,
 				AA0000792026061900000001 /* BikeRideStorageTests.swift in Sources */,
-				AA00007B2026061900000001 /* RouteNamingViewModelTests.swift in Sources */,
-				AA00007D2026061900000001 /* SharedStoreRideFixture.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
