@@ -111,7 +111,6 @@
 		9D8169FA263FA4CE00DED7F8 /* IconNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8169F9263FA4CE00DED7F8 /* IconNames.swift */; };
 		9D816A0F263FBD0600DED7F8 /* CyclingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D816A0E263FBD0600DED7F8 /* CyclingStatus.swift */; };
 		AA0000032026061600000001 /* UITesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022026061600000001 /* UITesting.swift */; };
-		AA0000042026061600000001 /* UITesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022026061600000001 /* UITesting.swift */; };
 		AA0000062026061700000001 /* MetricsFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000082026061700000001 /* MetricsFormattingTests.swift */; };
 		AA0000072026061700000001 /* RecordsFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000092026061700000001 /* RecordsFormattingTests.swift */; };
 		AA0000152026061700000001 /* PersistedStoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000122026061700000001 /* PersistedStoreSnapshot.swift */; };
@@ -130,6 +129,9 @@
 		AA00004C2026061800000001 /* SingleChartListCellViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000462026061800000001 /* SingleChartListCellViewTests.swift */; };
 		AA00004D2026061800000001 /* CyclingChartsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000472026061800000001 /* CyclingChartsViewModelTests.swift */; };
 		AA00004E2026061800000001 /* BikeRideDateRangeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000482026061800000001 /* BikeRideDateRangeTests.swift */; };
+		AA0000602026061800000001 /* CompletedRouteSaveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000632026061800000001 /* CompletedRouteSaveTests.swift */; };
+		AA0000612026061800000001 /* CompletedRouteSaveCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000642026061800000001 /* CompletedRouteSaveCoordinator.swift */; };
+		AA0000622026061800000001 /* UITestingRouteSaveFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000652026061800000001 /* UITestingRouteSaveFixture.swift */; };
 		9D816A152640A4F000DED7F8 /* Default@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D816A132640A4F000DED7F8 /* Default@3x.png */; };
 		9D816A162640A4F000DED7F8 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D816A142640A4F000DED7F8 /* Default@2x.png */; };
 		9D816A1E2641BAD000DED7F8 /* ResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D816A1D2641BAD000DED7F8 /* ResetView.swift */; };
@@ -330,6 +332,9 @@
 		AA0000472026061800000001 /* CyclingChartsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CyclingChartsViewModelTests.swift; sourceTree = "<group>"; };
 		AA0000482026061800000001 /* BikeRideDateRangeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeRideDateRangeTests.swift; sourceTree = "<group>"; };
 		AA0000422026061800000001 /* LocationSettingsAlertPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSettingsAlertPolicy.swift; sourceTree = "<group>"; };
+		AA0000632026061800000001 /* CompletedRouteSaveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedRouteSaveTests.swift; sourceTree = "<group>"; };
+		AA0000642026061800000001 /* CompletedRouteSaveCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedRouteSaveCoordinator.swift; sourceTree = "<group>"; };
+		AA0000652026061800000001 /* UITestingRouteSaveFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestingRouteSaveFixture.swift; sourceTree = "<group>"; };
 		9D816A132640A4F000DED7F8 /* Default@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@3x.png"; sourceTree = "<group>"; };
 		9D816A142640A4F000DED7F8 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		9D816A1D2641BAD000DED7F8 /* ResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetView.swift; sourceTree = "<group>"; };
@@ -568,6 +573,7 @@
 				9D8169F9263FA4CE00DED7F8 /* IconNames.swift */,
 				9D816A0E263FBD0600DED7F8 /* CyclingStatus.swift */,
 				9D2F48FD265097F000094575 /* Category.swift */,
+				AA0000642026061800000001 /* CompletedRouteSaveCoordinator.swift */,
 				9DF9304626DCABA400D4EEC5 /* RecordsFormatting.swift */,
 				9DF9305226DE06A600D4EEC5 /* Medal.swift */,
 				9DC758382807A74900BB2953 /* Preferences.swift */,
@@ -582,6 +588,7 @@
 			isa = PBXGroup;
 			children = (
 				AA0000022026061600000001 /* UITesting.swift */,
+				AA0000652026061800000001 /* UITestingRouteSaveFixture.swift */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -791,6 +798,7 @@
 				AA0000482026061800000001 /* BikeRideDateRangeTests.swift */,
 				AA0000292026061700000001 /* BikeRidePersistenceTests.swift */,
 				AA0000132026061700000001 /* BikeRideSortingTests.swift */,
+				AA0000632026061800000001 /* CompletedRouteSaveTests.swift */,
 				AA0000142026061700000001 /* RecordsTests.swift */,
 			);
 			path = "Core Data";
@@ -1088,6 +1096,7 @@
 				9D601E5B26E085B700844CD1 /* CyclingChartsViewModel.swift in Sources */,
 				9DAB831A25FECAD300F5C42E /* CycleView.swift in Sources */,
 				9DAB837C25FEDEF100F5C42E /* TimerViewModel.swift in Sources */,
+				AA0000612026061800000001 /* CompletedRouteSaveCoordinator.swift in Sources */,
 				9DEAD6CB2632589500392D88 /* BikeRideStorage.swift in Sources */,
 				9DC758392807A74900BB2953 /* Preferences.swift in Sources */,
 				9DF9305326DE06A600D4EEC5 /* Medal.swift in Sources */,
@@ -1098,6 +1107,7 @@
 				AA0000432026061800000001 /* LocationSettingsAlertPolicy.swift in Sources */,
 				9DAB837025FED0A300F5C42E /* HistoryView.swift in Sources */,
 				9DAB835E25FECCB000F5C42E /* MainView.swift in Sources */,
+				AA0000622026061800000001 /* UITestingRouteSaveFixture.swift in Sources */,
 				9DEAD6BE262FBFF900392D88 /* MapSystemImageButton.swift in Sources */,
 				9D1ED54D2643CF5A005A97ED /* UIAppearViewController.swift in Sources */,
 				9D816A0F263FBD0600DED7F8 /* CyclingStatus.swift in Sources */,
@@ -1168,6 +1178,7 @@
 				AA00004C2026061800000001 /* SingleChartListCellViewTests.swift in Sources */,
 				AA00004D2026061800000001 /* CyclingChartsViewModelTests.swift in Sources */,
 				AA00004E2026061800000001 /* BikeRideDateRangeTests.swift in Sources */,
+				AA0000602026061800000001 /* CompletedRouteSaveTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1176,7 +1187,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9DAB833525FECAD400F5C42E /* GoCyclingUITests.swift in Sources */,
-				AA0000042026061600000001 /* UITesting.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -105,7 +105,7 @@ Reproduce a UI smoke run, substituting the device name as needed:
 DEST=$(.github/scripts/ios-simulator-destination.sh iPad 'iPad Pro 11-inch (M5)')
 xcodebuild \
   -project "Go Cycling.xcodeproj" \
-  -scheme "Go Cycling" \
+  -scheme "Go Cycling UI Smoke" \
   -configuration Debug \
   -destination "$DEST" \
   -only-testing:"Go CyclingUITests" \

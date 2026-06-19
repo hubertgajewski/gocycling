@@ -25,14 +25,47 @@ class CyclingRecords: ObservableObject {
     @Published var longestCyclingTimeDate: Date?
     // Total cycling distance is always changed last as the ActivityAwardsViewModel publishes changes when it changes
     @Published var totalCyclingDistance: Double
+    // UI-smoke tests drive record-updating paths; this flag keeps those display
+    // updates from writing into the user's defaults or iCloud record store.
+    private let persistsRecordUpdates: Bool
     
     static private let initKey = "didSetupRecords"
     static private let keys = ["totalCyclingTime", "totalCyclingDistance", "unlockedIcons", "longestCyclingDistance", "longestCyclingTime", "fastestAverageSpeed", "fastestAverageSpeedDate", "longestCyclingDistanceDate", "longestCyclingTimeDate", "totalCyclingRoutes"]
     static private let keyTypes = [2, 2, 0, 2, 2, 2, 3, 3, 3, 1] // 0: [Bool], 1: Int, 2: Double, 3: Date
     static private let numberOfUnlockableIcons = 6
     static let awardValues: [Double] = [10.0 * 1000, 25.0 * 1000, 50.0 * 1000, 100.0 * 1000, 250.0 * 1000, 500.0 * 1000]
+    // UI-smoke tests need the same defaults as normal initialization, but kept in
+    // memory so test-only values cannot drift from first-launch app values.
+    static private let defaultTotalCyclingTime = 0.0
+    static private let defaultTotalCyclingDistance = 0.0
+    static private var defaultUnlockedIcons: [Bool] {
+        [Bool].init(repeating: false, count: CyclingRecords.numberOfUnlockableIcons)
+    }
+    static private let defaultLongestCyclingDistance = 0.0
+    static private let defaultLongestCyclingTime = 0.0
+    static private let defaultFastestAverageSpeed = 0.0
+    static private let defaultTotalCyclingRoutes = 0
     
-    init() {
+    init(arguments: [String] = ProcessInfo.processInfo.arguments) {
+        let isUsingIsolatedPersistence = UITesting.shouldUseIsolatedPersistence(arguments: arguments)
+        self.persistsRecordUpdates = !isUsingIsolatedPersistence
+
+        if isUsingIsolatedPersistence {
+            // UI-smoke tests open History/Statistics; keep records in memory so
+            // those visits do not alter the user's defaults or iCloud record values.
+            self.totalCyclingTime = CyclingRecords.defaultTotalCyclingTime
+            self.totalCyclingRoutes = CyclingRecords.defaultTotalCyclingRoutes
+            self.unlockedIcons = CyclingRecords.defaultUnlockedIcons
+            self.longestCyclingDistance = CyclingRecords.defaultLongestCyclingDistance
+            self.longestCyclingTime = CyclingRecords.defaultLongestCyclingTime
+            self.fastestAverageSpeed = CyclingRecords.defaultFastestAverageSpeed
+            self.fastestAverageSpeedDate = nil
+            self.longestCyclingDistanceDate = nil
+            self.longestCyclingTimeDate = nil
+            self.totalCyclingDistance = CyclingRecords.defaultTotalCyclingDistance
+            return
+        }
+
         // First check if iCloud is available
         let iCloudStatus = Preferences.iCloudAvailable()
         
@@ -137,23 +170,23 @@ class CyclingRecords: ObservableObject {
     static private func writeDefaults(iCloud: Bool) {
         // Use NSUbiquitousKeyValueStore for iCloud storage
         if iCloud {
-            NSUbiquitousKeyValueStore.default.set(0.0, forKey: keys[0])
-            NSUbiquitousKeyValueStore.default.set(0.0, forKey: keys[1])
-            NSUbiquitousKeyValueStore.default.set([Bool].init(repeating: false, count: numberOfUnlockableIcons), forKey: keys[2])
-            NSUbiquitousKeyValueStore.default.set(0.0, forKey: keys[3])
-            NSUbiquitousKeyValueStore.default.set(0.0, forKey: keys[4])
-            NSUbiquitousKeyValueStore.default.set(0.0, forKey: keys[5])
-            NSUbiquitousKeyValueStore.default.set(0 as Int, forKey: keys[9])
+            NSUbiquitousKeyValueStore.default.set(defaultTotalCyclingTime, forKey: keys[0])
+            NSUbiquitousKeyValueStore.default.set(defaultTotalCyclingDistance, forKey: keys[1])
+            NSUbiquitousKeyValueStore.default.set(defaultUnlockedIcons, forKey: keys[2])
+            NSUbiquitousKeyValueStore.default.set(defaultLongestCyclingDistance, forKey: keys[3])
+            NSUbiquitousKeyValueStore.default.set(defaultLongestCyclingTime, forKey: keys[4])
+            NSUbiquitousKeyValueStore.default.set(defaultFastestAverageSpeed, forKey: keys[5])
+            NSUbiquitousKeyValueStore.default.set(defaultTotalCyclingRoutes, forKey: keys[9])
         }
         // Use UserDefaults for local storage
         else {
-            UserDefaults.standard.set(0.0, forKey: keys[0])
-            UserDefaults.standard.set(0.0, forKey: keys[1])
-            UserDefaults.standard.set([Bool].init(repeating: false, count: numberOfUnlockableIcons), forKey: keys[2])
-            UserDefaults.standard.set(0.0, forKey: keys[3])
-            UserDefaults.standard.set(0.0, forKey: keys[4])
-            UserDefaults.standard.set(0.0, forKey: keys[5])
-            UserDefaults.standard.set(0, forKey: keys[9])
+            UserDefaults.standard.set(defaultTotalCyclingTime, forKey: keys[0])
+            UserDefaults.standard.set(defaultTotalCyclingDistance, forKey: keys[1])
+            UserDefaults.standard.set(defaultUnlockedIcons, forKey: keys[2])
+            UserDefaults.standard.set(defaultLongestCyclingDistance, forKey: keys[3])
+            UserDefaults.standard.set(defaultLongestCyclingTime, forKey: keys[4])
+            UserDefaults.standard.set(defaultFastestAverageSpeed, forKey: keys[5])
+            UserDefaults.standard.set(defaultTotalCyclingRoutes, forKey: keys[9])
         }
     }
     
@@ -177,6 +210,14 @@ class CyclingRecords: ObservableObject {
         }
         
         UserDefaults.standard.set(self.totalCyclingRoutes, forKey: CyclingRecords.keys[9])
+    }
+
+    private func persistClassMembersIfNeeded() {
+        // UI tests need to update displayed records without persisting them to
+        // shared UserDefaults or NSUbiquitousKeyValueStore.
+        guard persistsRecordUpdates else { return }
+        self.writeClassMembersToUserDefaults()
+        CyclingRecords.syncLocalAndCloud(localToCloud: true)
     }
     
     static private func syncLocalAndCloud(localToCloud: Bool) {
@@ -227,6 +268,10 @@ class CyclingRecords: ObservableObject {
     
     // Should only ever be called once - used to migrate legacy Records to UserDefaults and NSUbiquitousKeyValueStore or create Records from existing BikeRides
     public func initialRecordsMigration(existingRecords: Records?, existingBikeRides: [BikeRide]) {
+        // UI-smoke tests must not mark legacy migrations as completed in the
+        // user's real UserDefaults/iCloud stores.
+        guard persistsRecordUpdates else { return }
+
         if let records = existingRecords {
             UserDefaults.standard.set(records.totalCyclingTime, forKey: CyclingRecords.keys[0])
             UserDefaults.standard.set(records.totalCyclingDistance, forKey: CyclingRecords.keys[1])
@@ -280,7 +325,12 @@ class CyclingRecords: ObservableObject {
     }
     
     // Updates CyclingRecords after a new bike ride has been completed
-    public func updateCyclingRecords(speeds: [CLLocationSpeed?], distance: Double, startTime: Date, time: Double) {
+    public func updateCyclingRecords(
+        speeds: [CLLocationSpeed?],
+        distance: Double,
+        startTime: Date,
+        time: Double
+    ) {
         self.totalCyclingDistance = self.totalCyclingDistance + distance
         self.totalCyclingTime = self.totalCyclingTime + time
         self.longestCyclingDistanceDate = distance > self.longestCyclingDistance ? startTime : self.longestCyclingDistanceDate
@@ -307,11 +357,8 @@ class CyclingRecords: ObservableObject {
         
         self.totalCyclingRoutes = self.totalCyclingRoutes + 1
         
-        // Update UserDefaults
-        self.writeClassMembersToUserDefaults()
-        
-        CyclingRecords.syncLocalAndCloud(localToCloud: true)
-        
+        self.persistClassMembersIfNeeded()
+
         // Update unlocked icons
         self.updateUnlockedIcons()
     }
@@ -349,14 +396,27 @@ class CyclingRecords: ObservableObject {
         
         // Save if there is a change
         if change {
-            self.writeClassMembersToUserDefaults()
-            // Sync to iCloud
-            CyclingRecords.syncLocalAndCloud(localToCloud: true)
+            self.persistClassMembersIfNeeded()
         }
     }
     
     // Reset stored statistics (except unlocked app icons)
-    static public func resetStatistics() {
+    static public func resetStatistics(arguments: [String] = ProcessInfo.processInfo.arguments) {
+        if UITesting.shouldUseIsolatedPersistence(arguments: arguments) {
+            // Settings UI-smoke tests can exercise reset behavior; keep it in
+            // memory so they cannot wipe the user's actual cycling statistics.
+            CyclingRecords.shared.totalCyclingTime = defaultTotalCyclingTime
+            CyclingRecords.shared.totalCyclingDistance = defaultTotalCyclingDistance
+            CyclingRecords.shared.longestCyclingDistance = defaultLongestCyclingDistance
+            CyclingRecords.shared.longestCyclingTime = defaultLongestCyclingTime
+            CyclingRecords.shared.fastestAverageSpeed = defaultFastestAverageSpeed
+            CyclingRecords.shared.fastestAverageSpeedDate = nil
+            CyclingRecords.shared.longestCyclingDistanceDate = nil
+            CyclingRecords.shared.longestCyclingTimeDate = nil
+            CyclingRecords.shared.totalCyclingRoutes = defaultTotalCyclingRoutes
+            return
+        }
+
         // Local
         UserDefaults.standard.set(0.0, forKey: keys[0])
         UserDefaults.standard.set(0.0, forKey: keys[1])

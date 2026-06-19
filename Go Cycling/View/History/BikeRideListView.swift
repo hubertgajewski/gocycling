@@ -111,8 +111,10 @@ struct BikeRideListView: View {
                     }
                 })
             }
-            .navigationViewStyle(StackNavigationViewStyle())
         }
+        // iPad UI-smoke tests need the saved-route list visible; older iPadOS
+        // NavigationView defaults to split view and can open a blank detail pane.
+        .navigationViewStyle(StackNavigationViewStyle())
         // Move alert outside of navigation view due to a SwiftUI bug
         .alert(isPresented: $showingDeleteAlert) {
             Alert(title: Text("Are you sure that you want to delete this route?"),
