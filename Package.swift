@@ -18,6 +18,7 @@ let package = Package(
       exclude: [
         "AutoPauseState.swift",
         "Category.swift",
+        "CompletedRouteSaveCoordinator.swift",
         "ColourChoice.swift",
         "CyclingRecords.swift",
         "CyclingStatus.swift",

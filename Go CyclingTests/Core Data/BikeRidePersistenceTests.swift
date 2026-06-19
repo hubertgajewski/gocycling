@@ -22,6 +22,7 @@ struct BikeRidePersistenceTests {
     let persistence = makeInMemoryPersistenceController()
     let startTime = Date(timeIntervalSince1970: 1_800)
 
+    var saveResult: Result<BikeRide, Error>?
     await withCheckedContinuation { continuation in
       persistence.storeBikeRide(
         locations: [
@@ -34,9 +35,14 @@ struct BikeRidePersistenceTests {
         elevations: [15, nil, 21],
         startTime: startTime,
         time: 360
-      ) {
+      ) { result in
+        saveResult = result
         continuation.resume()
       }
+    }
+    guard case .success(let savedRide) = saveResult else {
+      Issue.record("Expected bike ride save to succeed")
+      return
     }
 
     let rides = try fetchRides(in: persistence.container.viewContext)
@@ -51,6 +57,7 @@ struct BikeRidePersistenceTests {
     #expect(ride.cyclingStartTime == startTime)
     #expect(ride.cyclingTime == 360)
     #expect(ride.cyclingRouteName == "Uncategorized")
+    #expect(savedRide.objectID == ride.objectID)
   }
 
   @Test("renames matching categories and leaves other rides unchanged")
@@ -134,6 +141,37 @@ struct BikeRidePersistenceTests {
     persistence.deleteAllBikeRides()
 
     #expect(try fetchRides(in: context).isEmpty)
+  }
+
+  @Test("route save fixture uses an isolated non-CloudKit store")
+  func routeSaveFixtureUsesIsolatedNonCloudKitStore() throws {
+    let suiteName = "GoCyclingTests.RouteSaveFixture.\(UUID().uuidString)"
+    let defaults = try #require(UserDefaults(suiteName: suiteName))
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+    defaults.set(true, forKey: iCloudSyncPreferenceKey)
+    let description = NSPersistentStoreDescription()
+    description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(
+      containerIdentifier: "iCloud.test.GoCycling"
+    )
+    let isolatedURL = FileManager.default.temporaryDirectory
+      .appendingPathComponent("GoCyclingTests-\(UUID().uuidString).sqlite")
+
+    #if DEBUG
+      let configured = PersistenceController.configureStoreForUITestingIfNeeded(
+        description,
+        arguments: UITesting.routeSaveFixtureLaunchArguments,
+        storeURL: isolatedURL
+      )
+
+      #expect(configured)
+      #expect(description.url == isolatedURL)
+      #expect(description.cloudKitContainerOptions == nil)
+      #expect(defaults.bool(forKey: iCloudSyncPreferenceKey) == true)
+      #expect(
+        defaults.persistentDomain(forName: suiteName)?[iCloudSyncPreferenceKey] as? Bool == true)
+    #else
+      #expect(Bool(true))
+    #endif
   }
 }
 

@@ -9,6 +9,8 @@ import XCTest
 
 // CI scaffolding: minimal UI smoke coverage until a follow-up issue refactors tests.
 class GoCyclingUITests: XCTestCase {
+  private static let uiTestingLaunchArgument = "-ui-testing"
+  private static let routeSaveFixtureLaunchArgument = "-ui-testing-route-save-fixture"
 
   private enum MainTab {
     case cycle
@@ -50,7 +52,7 @@ class GoCyclingUITests: XCTestCase {
 
   func testMainTabBarNavigatesToAllTabs() throws {
     let app = XCUIApplication()
-    app.launchArguments = [UITesting.launchArgument]
+    app.launchArguments = [Self.uiTestingLaunchArgument]
     app.launch()
 
     XCTAssertTrue(waitForMainChrome(in: app), "Expected Cycle tab chrome after launch")
@@ -66,6 +68,24 @@ class GoCyclingUITests: XCTestCase {
 
     tapTab(.settings, in: app)
     XCTAssertTrue(tabContent(.settings, in: app).waitForExistence(timeout: 5))
+  }
+
+  func testRouteSaveFixtureCreatesHistoryRide() throws {
+    let app = XCUIApplication()
+    app.launchArguments = [
+      Self.uiTestingLaunchArgument,
+      Self.routeSaveFixtureLaunchArgument,
+    ]
+    app.launch()
+
+    XCTAssertTrue(waitForMainChrome(in: app), "Expected Cycle tab chrome after launch")
+
+    tapTab(.history, in: app)
+    XCTAssertTrue(tabContent(.history, in: app).waitForExistence(timeout: 5))
+    XCTAssertTrue(app.staticTexts["Distance Cycled"].waitForExistence(timeout: 8))
+
+    tapTab(.cycle, in: app)
+    XCTAssertTrue(tabContent(.cycle, in: app).waitForExistence(timeout: 5))
   }
 
   /// iPhone uses a bottom `TabBar`; iPad uses nested floating tab item buttons.

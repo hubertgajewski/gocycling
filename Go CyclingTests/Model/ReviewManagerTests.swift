@@ -47,6 +47,24 @@ struct ReviewManagerTests {
     #expect(defaults.bool(forKey: ReviewManager.completedRouteKey))
   }
 
+  @Test("UI testing skips review counter writes")
+  func uiTestingSkipsReviewCounterWrites() async {
+    let snapshot = await PersistedStoreSnapshot(keys: reviewManagerStoreKeys)
+    defer { snapshot.restore() }
+
+    let defaults = UserDefaults.standard
+    defaults.set(2, forKey: ReviewManager.reviewCountKey)
+    defaults.set(false, forKey: ReviewManager.completedRouteKey)
+
+    ReviewManager.incrementReviewWorthyCount(arguments: [UITesting.launchArgument])
+    ReviewManager.completedRoute(arguments: [UITesting.launchArgument])
+    ReviewManager.requestReviewIfAppropriate(arguments: [UITesting.launchArgument])
+
+    #expect(defaults.integer(forKey: ReviewManager.reviewCountKey) == 2)
+    #expect(defaults.bool(forKey: ReviewManager.completedRouteKey) == false)
+    #expect(defaults.string(forKey: ReviewManager.reviewRequestVersionKey) == nil)
+  }
+
   @Test("returns App Store product and write-review URLs")
   func returnsAppStoreProductAndWriteReviewURLs() throws {
     #expect(

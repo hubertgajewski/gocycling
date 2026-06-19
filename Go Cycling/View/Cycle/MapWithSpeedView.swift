@@ -14,6 +14,9 @@ struct MapWithSpeedView: View {
 
     @Binding var cyclingStartTime: Date
     @Binding var timeCycling: TimeInterval
+    // Route-naming UI tests need the exact saved ride forwarded because fetching
+    // "latest" can choose the wrong route when saves finish close together.
+    var onRouteSaveSuccess: (BikeRide) -> Void = { _ in }
 
     @StateObject var locationManager = LocationViewModel.locationManager
     @Environment(\.colorScheme) var colorScheme
@@ -23,7 +26,12 @@ struct MapWithSpeedView: View {
 
     var body: some View {
         ZStack {
-            MapView(centerMapOnLocation: $mapCentered, cyclingStartTime: $cyclingStartTime, timeCycling: $timeCycling)
+            MapView(
+                centerMapOnLocation: $mapCentered,
+                cyclingStartTime: $cyclingStartTime,
+                timeCycling: $timeCycling,
+                onRouteSaveSuccess: onRouteSaveSuccess
+            )
             VStack {
                 MetricsPillView(
                     currentSpeed: $locationManager.displaySpeed,

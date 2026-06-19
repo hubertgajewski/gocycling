@@ -64,6 +64,18 @@ struct PreferencesConversionTests {
     #expect(Preferences.storedSortingChoice() == .dateDescending)
   }
 
+  @Test("falls back when stored history preferences are missing")
+  func fallsBackWhenStoredHistoryPreferencesAreMissing() async {
+    let snapshot = await PersistedStoreSnapshot(keys: preferenceStoreKeys)
+    defer { snapshot.restore() }
+
+    UserDefaults.standard.removeObject(forKey: "sortingChoice")
+    UserDefaults.standard.removeObject(forKey: "selectedRoute")
+
+    #expect(Preferences.storedSortingChoice() == .dateDescending)
+    #expect(Preferences.storedSelectedRoute() == "")
+  }
+
   @Test("converts legacy user preferences values")
   func convertsLegacyUserPreferencesValues() async {
     let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])

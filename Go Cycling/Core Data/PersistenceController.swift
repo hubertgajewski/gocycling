@@ -15,7 +15,7 @@ struct PersistenceController {
 
     let container: NSPersistentCloudKitContainer
 
-    init(inMemory: Bool = false) {
+    init(inMemory: Bool = false, arguments: [String] = ProcessInfo.processInfo.arguments) {
         container = NSPersistentCloudKitContainer(name: "GoCycling")
         
         guard let description = container.persistentStoreDescriptions.first else {
@@ -32,10 +32,26 @@ struct PersistenceController {
         
         if inMemory {
             description.url = URL(fileURLWithPath: "/dev/null")
+            // Unit tests need in-memory stores, and Core Data rejects CloudKit
+            // mirroring when the store is not backed by a normal SQLite URL.
+            description.cloudKitContainerOptions = nil
         }
-        
-        if(!Preferences.iCloudAvailable()){
-              description.cloudKitContainerOptions = nil
+        else {
+            #if DEBUG
+            // UI-smoke tests need persistence redirected before the store loads so
+            // seeded rides cannot be written into the user's CloudKit store.
+            let configuredForUITesting = PersistenceController.configureStoreForUITestingIfNeeded(
+                description,
+                arguments: arguments
+            )
+            if !configuredForUITesting && !Preferences.iCloudAvailable() {
+                description.cloudKitContainerOptions = nil
+            }
+            #else
+            if !Preferences.iCloudAvailable() {
+                description.cloudKitContainerOptions = nil
+            }
+            #endif
         }
 
         container.loadPersistentStores { description, error in
@@ -62,7 +78,45 @@ struct PersistenceController {
     }
     
     // MARK: Bike ride methods
-    func storeBikeRide(locations: [CLLocation?], speeds: [CLLocationSpeed?], distance: Double, elevations: [CLLocationDistance?], startTime: Date, time: Double, completion: @escaping () -> Void) {
+    #if DEBUG
+    @discardableResult
+    static func configureStoreForUITestingIfNeeded(
+        _ description: NSPersistentStoreDescription,
+        arguments: [String] = ProcessInfo.processInfo.arguments,
+        storeURL: URL = UITesting.isolatedPersistenceStoreURL
+    ) -> Bool {
+        guard UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return false }
+
+        // UI-smoke tests need SQLite because History fetches saved rides from Core
+        // Data, but CloudKit stays off so test rides cannot sync to the user.
+        description.url = storeURL
+        description.cloudKitContainerOptions = nil
+        return true
+    }
+
+    func isUsingPersistentStore(at expectedURL: URL) -> Bool {
+        // The UI fixture deletes/reseeds rides; tests need this guard so a
+        // misconfigured launch cannot erase the user's production ride store.
+        let expectedURL = Self.normalizedStoreURL(expectedURL)
+        return container.persistentStoreCoordinator.persistentStores.contains { store in
+            guard let storeURL = store.url else { return false }
+            return Self.normalizedStoreURL(storeURL) == expectedURL
+        }
+    }
+
+    private static func normalizedStoreURL(_ url: URL) -> URL {
+        url.standardizedFileURL.resolvingSymlinksInPath()
+    }
+    #endif
+
+    enum BikeRideStoreError: Error {
+        // Route-save tests need an explicit failure when Core Data does not return
+        // a saved BikeRide; otherwise callers could update records or show naming
+        // even though there is no concrete saved route to edit.
+        case savedRideUnavailable
+    }
+
+    func storeBikeRide(locations: [CLLocation?], speeds: [CLLocationSpeed?], distance: Double, elevations: [CLLocationDistance?], startTime: Date, time: Double, completion: @escaping (Result<BikeRide, Error>) -> Void) {
         // Copy value-type arrays before handing off to the background task
         let locationsCopy = locations
         let speedsCopy = speeds
@@ -111,13 +165,28 @@ struct PersistenceController {
 
             do {
                 try context.save()
+                // Route-naming UI tests need the exact saved object in the view
+                // context so naming targets this ride instead of racing a
+                // "latest ride" fetch.
+                let objectID = newBikeRide.objectID
                 print("Bike ride saved")
+                DispatchQueue.main.async {
+                    do {
+                        let savedRide = try container.viewContext.existingObject(with: objectID)
+                        if let savedBikeRide = savedRide as? BikeRide {
+                            completion(.success(savedBikeRide))
+                        } else {
+                            completion(.failure(BikeRideStoreError.savedRideUnavailable))
+                        }
+                    } catch {
+                        completion(.failure(error))
+                    }
+                }
             } catch {
                 print(error.localizedDescription)
-            }
-
-            DispatchQueue.main.async {
-                completion()
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
         }
     }
