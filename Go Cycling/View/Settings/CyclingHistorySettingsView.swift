@@ -8,10 +8,7 @@
 import SwiftUI
 
 struct CyclingHistorySettingsView: View {
-    let persistenceController = PersistenceController.shared
-    
     @EnvironmentObject var preferences: Preferences
-    @Environment(\.managedObjectContext) private var managedObjectContext
     
     // Access singleton TelemetryManager class object
     let telemetryManager = TelemetryManager.sharedTelemetryManager

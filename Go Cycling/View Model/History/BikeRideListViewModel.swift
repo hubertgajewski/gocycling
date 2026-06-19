@@ -16,14 +16,14 @@ class BikeRideListViewModel: ObservableObject {
     @Published var currentSortChoice: SortChoice
     @Published var currentName: String
 
-    private let categoryProvider: () -> [Category]
+    private var categoryProvider: () -> [Category]
     
     init(
-        bikeRides: [BikeRide] = BikeRide.allBikeRidesSorted(),
-        categories: [Category] = BikeRide.allCategories(),
-        currentSortChoice: SortChoice = Preferences.storedSortingChoice(),
-        currentName: String = Preferences.storedSelectedRoute(),
-        categoryProvider: @escaping () -> [Category] = BikeRide.allCategories,
+        bikeRides: [BikeRide] = [],
+        categories: [Category] = [],
+        currentSortChoice: SortChoice = .dateDescending,
+        currentName: String = "",
+        categoryProvider: @escaping () -> [Category] = { [] },
         reviewActionsEnabled: Bool = true
     ) {
         self.bikeRides = bikeRides
@@ -46,6 +46,27 @@ class BikeRideListViewModel: ObservableObject {
         
         // Request for review if appropriate
         ReviewManager.requestReviewIfAppropriate()
+    }
+
+    func useStorage(context: NSManagedObjectContext, preferences: Preferences) {
+        // History is constructed before SwiftUI environment values are available;
+        // load here so UI-test launches use the selected context and preferences.
+        let storedBikeRides = BikeRide.allBikeRides(in: context)
+        currentSortChoice = preferences.sortingChoiceConverted
+        bikeRides = BikeRide.allBikeRidesSorted(
+            from: storedBikeRides,
+            sortingChoice: currentSortChoice
+        )
+        categories = BikeRide.allCategories(from: storedBikeRides)
+        currentName = preferences.selectedRoute
+        categoryProvider = {
+            BikeRide.allCategories(from: BikeRide.allBikeRides(in: context))
+        }
+
+        let valid = validateCategory(name: currentName)
+        if (valid == false) {
+            currentName = ""
+        }
     }
     
     // This is the default ordering

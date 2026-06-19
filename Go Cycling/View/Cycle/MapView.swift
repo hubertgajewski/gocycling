@@ -12,8 +12,6 @@ import CoreLocation
 struct MapView: UIViewRepresentable {
     typealias UIViewType = MKMapView
     
-    let persistenceController = PersistenceController.shared
-
     @EnvironmentObject var cyclingStatus: CyclingStatus
     
     @StateObject var locationManager = LocationViewModel.locationManager
@@ -151,8 +149,12 @@ struct MapView: UIViewRepresentable {
                     )
                     locationManager.endCyclingSession()
                     locationManager.stopTrackingBackgroundLocation()
+                    // Completed routes must save into the launch-selected
+                    // context so isolated UI-test rides stay out of shared data.
                     CompletedRouteSaveCoordinator(
-                        persistenceController: persistenceController,
+                        persistenceController: ManagedObjectContextBikeRideStore(
+                            context: managedObjectContext
+                        ),
                         records: records
                     ).save(completedRoute, cleanupAfterSuccess: {
                         // Route-save tests cover stale completions; ignoring old

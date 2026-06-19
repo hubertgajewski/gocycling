@@ -8,10 +8,7 @@
 import SwiftUI
 
 struct SyncSettingsView: View {
-    var persistenceController = PersistenceController.shared
-    
     @EnvironmentObject var preferences: Preferences
-    @Environment(\.managedObjectContext) private var managedObjectContext
     
     @State private var showingAlert = false
     

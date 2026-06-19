@@ -430,8 +430,8 @@ struct CompletedRouteSaveTests {
       #expect(storage.records.totalCyclingRoutes == 0)
     }
 
-    @Test("app launch storage seeds route fixture with selected arguments")
-    func appLaunchStorageSeedsRouteFixtureWithSelectedArguments() async throws {
+    @Test("app launch storage seeds route fixture with selected arguments and records")
+    func appLaunchStorageSeedsRouteFixtureWithSelectedArgumentsAndRecords() async throws {
       let persistence = PersistenceController(arguments: UITesting.routeSaveFixtureLaunchArguments)
       let storage = AppLaunchStorage.make(
         arguments: UITesting.routeSaveFixtureLaunchArguments,
@@ -443,7 +443,6 @@ struct CompletedRouteSaveTests {
       var saveResult: Result<Void, Error>?
       await withCheckedContinuation { continuation in
         storage.seedRouteSaveFixtureIfNeeded(
-          records: RecordingCyclingRecordsUpdater(),
           completion: { result in
             saveResult = result
             continuation.resume()
@@ -456,6 +455,9 @@ struct CompletedRouteSaveTests {
         return
       }
       #expect(try fetchRides(in: persistence.container.viewContext).count == 1)
+      #expect(storage.records.totalCyclingRoutes == 1)
+      #expect(storage.records.totalCyclingDistance == 1_500)
+      #expect(storage.records.totalCyclingTime == 300)
     }
 
     @Test("reset view deletes routes from selected context")
@@ -469,6 +471,38 @@ struct CompletedRouteSaveTests {
 
       #expect(try fetchRides(in: selectedPersistence.container.viewContext).isEmpty)
       #expect(try fetchRides(in: sharedLikePersistence.container.viewContext).count == 1)
+    }
+
+    @Test("context bike ride store saves into selected context")
+    func contextBikeRideStoreSavesIntoSelectedContext() async throws {
+      let selectedPersistence = PersistenceController(inMemory: true)
+      let sharedLikePersistence = PersistenceController(inMemory: true)
+      let completedRoute = CompletedRouteSnapshot(
+        locations: [CLLocation(latitude: 51.5, longitude: -0.12)],
+        speeds: [4.2],
+        distance: 1_500,
+        elevations: [15],
+        startTime: Date(timeIntervalSince1970: 1_800),
+        time: 300
+      )
+      let saver = CompletedRouteSaveCoordinator(
+        persistenceController: ManagedObjectContextBikeRideStore(
+          context: selectedPersistence.container.viewContext
+        ),
+        records: RecordingCyclingRecordsUpdater()
+      )
+
+      await withCheckedContinuation { continuation in
+        saver.save(
+          completedRoute,
+          completion: { _ in
+            continuation.resume()
+          }
+        )
+      }
+
+      #expect(try fetchRides(in: selectedPersistence.container.viewContext).count == 1)
+      #expect(try fetchRides(in: sharedLikePersistence.container.viewContext).isEmpty)
     }
 
     @Test("route save fixture model initialization leaves stores unchanged")

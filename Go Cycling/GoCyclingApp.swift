@@ -118,11 +118,11 @@ struct AppLaunchStorage {
         records: CyclingRecordsUpdating? = nil,
         completion: @escaping (Result<Void, Error>) -> Void = { _ in }
     ) {
-        // Keep the fixture gate and fixture execution on the same selected
-        // arguments so injected launches cannot pass one check and skip the next.
+        // Keep the fixture gate, fixture execution, and records update on the
+        // same selected launch state so seeded rides do not diverge from UI.
         UITestingRouteSaveFixture.runIfNeeded(
             persistenceController: persistenceController,
-            records: records,
+            records: records ?? self.records,
             arguments: arguments,
             completion: completion
         )

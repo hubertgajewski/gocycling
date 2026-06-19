@@ -35,9 +35,12 @@ extension BikeRide {
         allBikeRides(in: PersistenceController.shared.container.viewContext)
     }
     
-    static func allBikeRidesSorted(from bikeRidesUnsorted: [BikeRide]) -> [BikeRide] {
+    static func allBikeRidesSorted(
+        from bikeRidesUnsorted: [BikeRide],
+        sortingChoice: SortChoice
+    ) -> [BikeRide] {
         var bikeRides: [BikeRide] = []
-        switch Preferences.shared.sortingChoiceConverted {
+        switch sortingChoice {
         case .distanceAscending:
             bikeRides = BikeRide.sortByDistance(list: bikeRidesUnsorted, ascending: true)
         case .distanceDescending:
@@ -52,6 +55,13 @@ extension BikeRide {
             bikeRides = BikeRide.sortByTime(list: bikeRidesUnsorted, ascending: false)
         }
         return bikeRides
+    }
+
+    static func allBikeRidesSorted(from bikeRidesUnsorted: [BikeRide]) -> [BikeRide] {
+        allBikeRidesSorted(
+            from: bikeRidesUnsorted,
+            sortingChoice: Preferences.shared.sortingChoiceConverted
+        )
     }
 
     static func allBikeRidesSorted() -> [BikeRide] {
@@ -77,7 +87,7 @@ extension BikeRide {
     }
     
     static func allCategories(from bikeRides: [BikeRide]) -> [Category] {
-        let allBikeRides = allBikeRidesSorted(from: bikeRides)
+        let allBikeRides = bikeRides
         var categories: [Category] = []
         var names: [String] = []
         var numbers: [Int] = []
@@ -121,35 +131,39 @@ extension BikeRide {
     }
     
     // Functions to get data for the charts on the statistics tab
-    static func bikeRidesInPastWeek() -> [BikeRide] {
-        let context = PersistenceController.shared.container.viewContext
+    // Bar-chart detail views load after SwiftUI injects the selected context, so
+    // date-window fetches need context overloads instead of opening shared storage.
+    static func bikeRidesInPastWeek(in context: NSManagedObjectContext) -> [BikeRide] {
         let fetchRequest: NSFetchRequest<BikeRide> = BikeRide.fetchRequestsWithDateRanges()[0] ?? BikeRide.fetchRequest()
-        do {
-            let items = try context.fetch(fetchRequest)
-            return items
-        }
-        catch let error as NSError {
-            print("Error getting BikeRides: \(error.localizedDescription), \(error.userInfo)")
-        }
-        return [BikeRide]()
+        return bikeRides(matching: fetchRequest, in: context)
+    }
+
+    static func bikeRidesInPastWeek() -> [BikeRide] {
+        bikeRidesInPastWeek(in: PersistenceController.shared.container.viewContext)
     }
     
-    static func bikeRidesInPast5Weeks() -> [BikeRide] {
-        let context = PersistenceController.shared.container.viewContext
+    static func bikeRidesInPast5Weeks(in context: NSManagedObjectContext) -> [BikeRide] {
         let fetchRequest: NSFetchRequest<BikeRide> = BikeRide.fetchRequestsWithDateRanges()[2] ?? BikeRide.fetchRequest()
-        do {
-            let items = try context.fetch(fetchRequest)
-            return items
-        }
-        catch let error as NSError {
-            print("Error getting BikeRides: \(error.localizedDescription), \(error.userInfo)")
-        }
-        return [BikeRide]()
+        return bikeRides(matching: fetchRequest, in: context)
+    }
+
+    static func bikeRidesInPast5Weeks() -> [BikeRide] {
+        bikeRidesInPast5Weeks(in: PersistenceController.shared.container.viewContext)
+    }
+
+    static func bikeRidesInPast30Weeks(in context: NSManagedObjectContext) -> [BikeRide] {
+        let fetchRequest: NSFetchRequest<BikeRide> = BikeRide.fetchRequestsWithDateRanges()[4] ?? BikeRide.fetchRequest()
+        return bikeRides(matching: fetchRequest, in: context)
     }
     
     static func bikeRidesInPast30Weeks() -> [BikeRide] {
-        let context = PersistenceController.shared.container.viewContext
-        let fetchRequest: NSFetchRequest<BikeRide> = BikeRide.fetchRequestsWithDateRanges()[4] ?? BikeRide.fetchRequest()
+        bikeRidesInPast30Weeks(in: PersistenceController.shared.container.viewContext)
+    }
+
+    private static func bikeRides(
+        matching fetchRequest: NSFetchRequest<BikeRide>,
+        in context: NSManagedObjectContext
+    ) -> [BikeRide] {
         do {
             let items = try context.fetch(fetchRequest)
             return items

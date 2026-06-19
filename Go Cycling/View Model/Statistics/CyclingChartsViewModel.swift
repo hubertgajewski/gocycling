@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import CoreData
 
 // Contains all of the data to be used to construct the statistics charts
 class CyclingChartsViewModel: ObservableObject {
@@ -14,9 +15,9 @@ class CyclingChartsViewModel: ObservableObject {
                                          "Activity in the Past 5 Weeks",
                                          "Activity in the Past 30 Weeks"]
     
-    @Published var pastWeekData: [BikeRide] = BikeRide.bikeRidesInPastWeek()
-    @Published var past5WeeksData: [BikeRide] = BikeRide.bikeRidesInPast5Weeks()
-    @Published var past30WeeksData: [BikeRide] = BikeRide.bikeRidesInPast30Weeks()
+    @Published var pastWeekData: [BikeRide] = []
+    @Published var past5WeeksData: [BikeRide] = []
+    @Published var past30WeeksData: [BikeRide] = []
     
     // Index 0-2 are distance data, indexes 3-5 are time data and indexes 6-8 are number of routes data
     @Published var pastData: [[Double]] = [[Double].init(repeating: 0.0, count: 7), [Double].init(repeating: 0.0, count: 5), [Double].init(repeating: 0.0, count: 6),
@@ -27,16 +28,31 @@ class CyclingChartsViewModel: ObservableObject {
                                                      [Double].init(repeating: 0.0, count: 7), [Double].init(repeating: 0.0, count: 5), [Double].init(repeating: 0.0, count: 6),
                                                      [Double].init(repeating: 0.0, count: 7), [Double].init(repeating: 0.0, count: 5), [Double].init(repeating: 0.0, count: 6)]
     
-    init() {
+    init(reviewActionsEnabled: Bool = true) {
         self.setPastWeekFormattedData()
         self.setPast5WeeksFormattedData()
         self.setPast30WeeksFormattedData()
+
+        guard reviewActionsEnabled else {
+            return
+        }
         
         // Launching charts view is a review worthy action
         ReviewManager.incrementReviewWorthyCount()
         
         // Request for review if appropriate
         ReviewManager.requestReviewIfAppropriate()
+    }
+
+    func useBikeRideContext(_ context: NSManagedObjectContext) {
+        // Bar-chart detail is created before environment-backed storage can be
+        // read; load from the selected context once SwiftUI provides it.
+        pastWeekData = BikeRide.bikeRidesInPastWeek(in: context)
+        past5WeeksData = BikeRide.bikeRidesInPast5Weeks(in: context)
+        past30WeeksData = BikeRide.bikeRidesInPast30Weeks(in: context)
+        setPastWeekFormattedData()
+        setPast5WeeksFormattedData()
+        setPast30WeeksFormattedData()
     }
     
     // Below are 3 functions to setup the arrays of data for the charts on the statistics tab

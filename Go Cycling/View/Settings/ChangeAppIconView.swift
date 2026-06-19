@@ -9,12 +9,9 @@
 import SwiftUI
 
 struct ChangeAppIconView: View {
-    let persistenceController = PersistenceController.shared
-    
     @EnvironmentObject var iconNames: IconNames
     @EnvironmentObject var preferences: Preferences
     @EnvironmentObject var records: CyclingRecords
-    @Environment(\.managedObjectContext) private var managedObjectContext
     
     let telemetryManager = TelemetryManager.sharedTelemetryManager
     let telemetryTabSection = TelemetrySettingsSection.Customization

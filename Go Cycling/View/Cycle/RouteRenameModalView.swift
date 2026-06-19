@@ -9,10 +9,6 @@ import SwiftUI
 import CoreData
 
 struct RouteRenameModalView: View {
-    let persistenceController = PersistenceController.shared
-    
-    @EnvironmentObject var bikeRides: BikeRideStorage
-
     @Environment(\.managedObjectContext) private var managedObjectContext
     @Environment(\.presentationMode) var presentationMode
     
@@ -97,6 +93,9 @@ struct RouteRenameModalView: View {
             .padding()
             Divider()
         }
+        .onAppear {
+            routeNamingViewModel.useBikeRideContext(managedObjectContext)
+        }
     }
     
     func savePressed() {
@@ -120,8 +119,13 @@ struct RouteRenameModalView: View {
             }
         }
         
-        // Need to update names
-        persistenceController.updateBikeRideCategories(oldCategoriesToUpdate: oldNames, newCategoryNames: newNames)
+        // Category edits must use the launch-selected History context; otherwise
+        // UI-test category changes can be applied to the shared store instead.
+        PersistenceController.updateBikeRideCategories(
+            in: managedObjectContext,
+            oldCategoriesToUpdate: oldNames,
+            newCategoryNames: newNames
+        )
 
         self.showEditModal = false
     }

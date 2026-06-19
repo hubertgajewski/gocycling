@@ -286,4 +286,29 @@ struct CyclingChartsViewModelTests {
     let blockLabel = formattedChartDateRange(from: blockStart, to: blockEnd, calendar: calendar)
     #expect(viewModel.getIndividualDateRange(index: 2, entryIndex: 4) == blockLabel)
   }
+
+  @Test("loads chart data from selected context")
+  func loadsChartDataFromSelectedContext() async throws {
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
+    defer { snapshot.restore() }
+
+    let context = makeInMemoryChartPersistence().container.viewContext
+    _ = makeChartRide(
+      in: context,
+      distance: 1_000,
+      time: 600,
+      start: daysFromToday(-1)
+    )
+    try context.save()
+    let viewModel = CyclingChartsViewModel()
+
+    viewModel.useBikeRideContext(context)
+
+    #expect(viewModel.pastWeekData.count == 1)
+    #expect(viewModel.past5WeeksData.count == 1)
+    #expect(viewModel.past30WeeksData.count == 1)
+    #expect(viewModel.pastData[0][5] == 1_000)
+    #expect(viewModel.pastData[3][5] == 600)
+    #expect(viewModel.pastData[6][5] == 1)
+  }
 }

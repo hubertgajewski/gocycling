@@ -176,6 +176,72 @@ struct BikeRideListViewModelTests {
 
     #expect(viewModel.currentName == "")
   }
+
+  @Test("loads rides and preferences from selected context")
+  func loadsRidesAndPreferencesFromSelectedContext() async throws {
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
+    defer { snapshot.restore() }
+
+    let context = PersistenceController(inMemory: true).container.viewContext
+    _ = makeListRide(
+      in: context,
+      name: "Training",
+      distance: 2_000,
+      start: listDate(2026, 6, 16),
+      time: 900
+    )
+    _ = makeListRide(
+      in: context,
+      name: "Errands",
+      distance: 1_000,
+      start: listDate(2026, 6, 15),
+      time: 600
+    )
+    try context.save()
+    let preferences = Preferences(arguments: [UITesting.launchArgument])
+    preferences.updateStringPreference(
+      preference: .sortingChoice,
+      value: SortChoice.distanceAscending.rawValue
+    )
+    preferences.updateStringPreference(preference: .selectedRoute, value: "Training")
+    let viewModel = BikeRideListViewModel(reviewActionsEnabled: false)
+
+    viewModel.useStorage(context: context, preferences: preferences)
+
+    #expect(viewModel.bikeRides.map(\.cyclingRouteName) == ["Errands", "Training"])
+    #expect(viewModel.currentSortChoice == .distanceAscending)
+    #expect(viewModel.currentName == "Training")
+    #expect(viewModel.categories.contains { $0.name == "Training" && $0.number == 1 })
+  }
+
+  @Test("route naming loads names from selected context")
+  func routeNamingLoadsNamesFromSelectedContext() async throws {
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
+    defer { snapshot.restore() }
+
+    let context = PersistenceController(inMemory: true).container.viewContext
+    _ = makeListRide(
+      in: context,
+      name: "Training",
+      distance: 2_000,
+      start: listDate(2026, 6, 16),
+      time: 900
+    )
+    _ = makeListRide(
+      in: context,
+      name: "Uncategorized",
+      distance: 1_000,
+      start: listDate(2026, 6, 15),
+      time: 600
+    )
+    try context.save()
+    let viewModel = RouteNamingViewModel()
+
+    viewModel.useBikeRideContext(context)
+
+    #expect(viewModel.allBikeRides.count == 2)
+    #expect(viewModel.routeNames == ["Training"])
+  }
 }
 
 private func makeListViewModel(

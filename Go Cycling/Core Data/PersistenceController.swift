@@ -118,50 +118,17 @@ struct PersistenceController {
 
     func storeBikeRide(locations: [CLLocation?], speeds: [CLLocationSpeed?], distance: Double, elevations: [CLLocationDistance?], startTime: Date, time: Double, completion: @escaping (Result<BikeRide, Error>) -> Void) {
         // Copy value-type arrays before handing off to the background task
-        let locationsCopy = locations
-        let speedsCopy = speeds
-        let elevationsCopy = elevations
+        let payload = BikeRideStorePayload(
+            locations: locations,
+            speeds: speeds,
+            distance: distance,
+            elevations: elevations,
+            startTime: startTime,
+            time: time
+        )
 
         container.performBackgroundTask { context in
-            var latitudes: [CLLocationDegrees] = []
-            var longitudes: [CLLocationDegrees] = []
-            var speedsValidated: [CLLocationSpeed] = []
-            var elevationsValidated: [CLLocationDistance] = []
-
-            for location in locationsCopy {
-                // Only include coordinates where neither latitude nor longitude is nil
-                if let currentLatitude = location?.coordinate.latitude {
-                    if let currentLongitude = location?.coordinate.longitude {
-                        latitudes.append(currentLatitude)
-                        longitudes.append(currentLongitude)
-                    }
-                }
-            }
-
-            for speed in speedsCopy {
-                // Only store non nil speeds
-                if let currentSpeed = speed {
-                    speedsValidated.append(currentSpeed)
-                }
-            }
-
-            for elevation in elevationsCopy {
-                // Only store non nil altitudes
-                if let currentElevation = elevation {
-                    elevationsValidated.append(currentElevation)
-                }
-            }
-
-            let newBikeRide = BikeRide(context: context)
-            newBikeRide.cyclingLatitudes = latitudes
-            newBikeRide.cyclingLongitudes = longitudes
-            newBikeRide.cyclingSpeeds = speedsValidated
-            newBikeRide.cyclingDistance = distance
-            newBikeRide.cyclingElevations = elevationsValidated
-            newBikeRide.cyclingStartTime = startTime
-            newBikeRide.cyclingTime = time
-            // Default category
-            newBikeRide.cyclingRouteName = "Uncategorized"
+            let newBikeRide = payload.insertBikeRide(in: context)
 
             do {
                 try context.save()
@@ -238,7 +205,35 @@ struct PersistenceController {
     }
     
     func updateBikeRideCategories(oldCategoriesToUpdate: [String], newCategoryNames: [String]) {
-        let context = container.viewContext
+        Self.updateBikeRideCategories(
+            in: container.viewContext,
+            oldCategoriesToUpdate: oldCategoriesToUpdate,
+            newCategoryNames: newCategoryNames
+        )
+    }
+
+    // Route naming receives the launch-selected context from SwiftUI; updating
+    // the ride in its own context avoids falling back to PersistenceController.shared.
+    static func updateBikeRideRouteName(existingBikeRide: BikeRide, routeName: String) {
+        guard let context = existingBikeRide.managedObjectContext else { return }
+        context.performAndWait {
+            existingBikeRide.cyclingRouteName = routeName
+            do {
+                try context.save()
+                print("Bike ride updated")
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+    }
+
+    // Category editing can run from a view backed by an isolated UI-test store,
+    // so bulk updates must fetch and save through that selected context.
+    static func updateBikeRideCategories(
+        in context: NSManagedObjectContext,
+        oldCategoriesToUpdate: [String],
+        newCategoryNames: [String]
+    ) {
         if (newCategoryNames.count > 0 && (newCategoryNames.count == oldCategoriesToUpdate.count)) {
             for (index, name) in newCategoryNames.enumerated() {
                 let fetchRequest: NSFetchRequest<BikeRide> = BikeRide.fetchRequest()
@@ -246,16 +241,7 @@ struct PersistenceController {
                 do {
                     let results = try context.fetch(fetchRequest)
                     for ride in results {
-                        updateBikeRideRouteName(
-                            existingBikeRide: ride,
-                            latitudes: ride.cyclingLatitudes,
-                            longitudes: ride.cyclingLongitudes,
-                            speeds: ride.cyclingSpeeds,
-                            distance: ride.cyclingDistance,
-                            elevations: ride.cyclingElevations,
-                            startTime: ride.cyclingStartTime,
-                            time: ride.cyclingTime,
-                            routeName: name)
+                        Self.updateBikeRideRouteName(existingBikeRide: ride, routeName: name)
                     }
                 } catch {
                     print(error.localizedDescription)
@@ -340,6 +326,119 @@ struct PersistenceController {
             } catch {
                 print(error.localizedDescription)
             }
+        }
+    }
+}
+
+private struct BikeRideStorePayload {
+    let latitudes: [CLLocationDegrees]
+    let longitudes: [CLLocationDegrees]
+    let speeds: [CLLocationSpeed]
+    let distance: Double
+    let elevations: [CLLocationDistance]
+    let startTime: Date
+    let time: Double
+
+    init(
+        locations: [CLLocation?],
+        speeds: [CLLocationSpeed?],
+        distance: Double,
+        elevations: [CLLocationDistance?],
+        startTime: Date,
+        time: Double
+    ) {
+        var latitudes: [CLLocationDegrees] = []
+        var longitudes: [CLLocationDegrees] = []
+        var speedsValidated: [CLLocationSpeed] = []
+        var elevationsValidated: [CLLocationDistance] = []
+
+        for location in locations {
+            // Only include coordinates where neither latitude nor longitude is nil.
+            if let currentLatitude = location?.coordinate.latitude {
+                if let currentLongitude = location?.coordinate.longitude {
+                    latitudes.append(currentLatitude)
+                    longitudes.append(currentLongitude)
+                }
+            }
+        }
+
+        for speed in speeds {
+            if let currentSpeed = speed {
+                speedsValidated.append(currentSpeed)
+            }
+        }
+
+        for elevation in elevations {
+            if let currentElevation = elevation {
+                elevationsValidated.append(currentElevation)
+            }
+        }
+
+        self.latitudes = latitudes
+        self.longitudes = longitudes
+        self.speeds = speedsValidated
+        self.distance = distance
+        self.elevations = elevationsValidated
+        self.startTime = startTime
+        self.time = time
+    }
+
+    func insertBikeRide(in context: NSManagedObjectContext) -> BikeRide {
+        guard let entity = NSEntityDescription.entity(forEntityName: "BikeRide", in: context) else {
+            fatalError("Missing BikeRide entity")
+        }
+        let newBikeRide = BikeRide(entity: entity, insertInto: context)
+        newBikeRide.cyclingLatitudes = latitudes
+        newBikeRide.cyclingLongitudes = longitudes
+        newBikeRide.cyclingSpeeds = speeds
+        newBikeRide.cyclingDistance = distance
+        newBikeRide.cyclingElevations = elevations
+        newBikeRide.cyclingStartTime = startTime
+        newBikeRide.cyclingTime = time
+        newBikeRide.cyclingRouteName = "Uncategorized"
+        return newBikeRide
+    }
+}
+
+struct ManagedObjectContextBikeRideStore: BikeRideStoring {
+    let context: NSManagedObjectContext
+
+    func storeBikeRide(
+        locations: [CLLocation?],
+        speeds: [CLLocationSpeed?],
+        distance: Double,
+        elevations: [CLLocationDistance?],
+        startTime: Date,
+        time: Double,
+        completion: @escaping (Result<BikeRide, Error>) -> Void
+    ) {
+        let payload = BikeRideStorePayload(
+            locations: locations,
+            speeds: speeds,
+            distance: distance,
+            elevations: elevations,
+            startTime: startTime,
+            time: time
+        )
+        let save = {
+            let newBikeRide = payload.insertBikeRide(in: context)
+
+            do {
+                try context.save()
+                print("Bike ride saved")
+                completion(.success(newBikeRide))
+            } catch {
+                print(error.localizedDescription)
+                completion(.failure(error))
+            }
+        }
+
+        // MapView only receives launch-selected Core Data through the SwiftUI
+        // environment; this store keeps completed-route saves on that context.
+        if context.concurrencyType == .mainQueueConcurrencyType && Thread.isMainThread {
+            save()
+        } else {
+            context.perform(save)
         }
     }
 }

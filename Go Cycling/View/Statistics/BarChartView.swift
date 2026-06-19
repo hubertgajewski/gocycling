@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct BarChartView: View {
     var index: Int
@@ -13,6 +14,7 @@ struct BarChartView: View {
     @StateObject var chartViewModel = CyclingChartsViewModel()
     
     @EnvironmentObject var preferences: Preferences
+    @Environment(\.managedObjectContext) private var managedObjectContext
     @Environment(\.colorScheme) var colorScheme
     
     @State private var selectedValue = ""
@@ -92,6 +94,9 @@ struct BarChartView: View {
             resetValues()
         })
         .onAppear {
+            // Detail charts are built before their model can read environment
+            // storage, so populate them from the selected launch context here.
+            chartViewModel.useBikeRideContext(managedObjectContext)
             self.sendTelemetrySignal(index: index)
         }
     }

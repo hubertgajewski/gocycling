@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct RouteNameModalView: View {
-    let persistenceController = PersistenceController.shared
-
     @Environment(\.managedObjectContext) private var managedObjectContext
     @Environment(\.presentationMode) var presentationMode
 
@@ -144,8 +142,12 @@ struct RouteNameModalView: View {
             }
         }
         .onAppear {
+            routeNamingViewModel.useBikeRideContext(managedObjectContext)
             if (bikeRideToEdit != nil && bikeRideToEdit?.cyclingRouteName != "Uncategorized") {
-                self.selectedNameIndex = routeNamingViewModel.routeNames.firstIndex(of: bikeRideToEdit!.cyclingRouteName)!
+                self.selectedNameIndex =
+                    routeNamingViewModel.routeNames.firstIndex(
+                        of: bikeRideToEdit!.cyclingRouteName
+                    ) ?? 0
             }
             else {
                 self.selectedNameIndex = 0
@@ -212,16 +214,12 @@ struct RouteNameModalView: View {
     // Route-naming tests need one update path so a naming flow cannot copy a
     // different field set while only the category should change.
     private func updateBikeRideRouteName(ride: BikeRide, routeName: String) {
-        persistenceController.updateBikeRideRouteName(
+        // Naming must update the BikeRide in its selected launch context; using
+        // shared persistence here can rename a different store than the UI shows.
+        PersistenceController.updateBikeRideRouteName(
             existingBikeRide: ride,
-            latitudes: ride.cyclingLatitudes,
-            longitudes: ride.cyclingLongitudes,
-            speeds: ride.cyclingSpeeds,
-            distance: ride.cyclingDistance,
-            elevations: ride.cyclingElevations,
-            startTime: ride.cyclingStartTime,
-            time: ride.cyclingTime,
-            routeName: routeName)
+            routeName: routeName
+        )
     }
 }
 

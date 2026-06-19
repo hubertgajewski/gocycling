@@ -176,6 +176,29 @@ struct BikeRidePersistenceTests {
     #expect(ride.cyclingTime == 720)
   }
 
+  @Test("updates route names through selected context helpers")
+  func updatesRouteNamesThroughSelectedContextHelpers() async throws {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+    defer { snapshot.restore() }
+
+    let selectedPersistence = makeInMemoryPersistenceController()
+    let selectedContext = selectedPersistence.container.viewContext
+    let selectedRide = makeRide(in: selectedContext, name: "Commute", distance: 1_000)
+    try selectedContext.save()
+
+    PersistenceController.updateBikeRideRouteName(
+      existingBikeRide: selectedRide,
+      routeName: "Training"
+    )
+    PersistenceController.updateBikeRideCategories(
+      in: selectedContext,
+      oldCategoriesToUpdate: ["Training"],
+      newCategoryNames: ["Race"]
+    )
+
+    #expect(try fetchRides(in: selectedContext).map(\.cyclingRouteName) == ["Race"])
+  }
+
   @Test("stores and updates records entities")
   func storesAndUpdatesRecordsEntities() async throws {
     let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])

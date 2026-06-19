@@ -10,11 +10,9 @@ import CoreLocation
 import CoreData
 
 struct BikeRideListView: View {
-    let persistenceController = PersistenceController.shared
-    
     @EnvironmentObject var preferences: Preferences
     
-    @ObservedObject var bikeRideViewModel = BikeRideListViewModel()
+    @StateObject var bikeRideViewModel = BikeRideListViewModel()
     
     @Environment(\.managedObjectContext) private var managedObjectContext
     
@@ -24,7 +22,7 @@ struct BikeRideListView: View {
     @State private var sheetToPresent: SheetToPresent = .filter
     @State private var updateCategories = false
     @State private var toBeDeleted: IndexSet?
-    @State private var selectedName: String = Preferences.storedSelectedRoute()
+    @State private var selectedName: String = ""
     
     let telemetryManager = TelemetryManager.sharedTelemetryManager
     let telemetryTab = TelemetryTab.History
@@ -78,6 +76,13 @@ struct BikeRideListView: View {
                     }
                 }
                 .onAppear {
+                    // History view state is created before environment storage is
+                    // available; load here from the selected launch context.
+                    bikeRideViewModel.useStorage(
+                        context: managedObjectContext,
+                        preferences: preferences
+                    )
+                    selectedName = bikeRideViewModel.currentName
                     bikeRideViewModel.updateCategories()
                 }
                 .sheet(isPresented: $showingSheet, onDismiss: {
@@ -145,8 +150,6 @@ struct BikeRideListView: View {
 }
 
 struct ListView: View {
-    let persistenceController = PersistenceController.shared
-    
     @EnvironmentObject var preferences: Preferences
     
     @Environment(\.managedObjectContext) private var managedObjectContext
