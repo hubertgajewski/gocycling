@@ -5,6 +5,7 @@
 //  Created by Anthony Hopkins on 2021-03-14.
 //
 
+import CoreData
 import SwiftUI
 import TelemetryDeck
 
@@ -79,24 +80,74 @@ enum AppLaunchMigration {
     }
 }
 
+struct AppLaunchStorage {
+    let persistenceController: PersistenceController
+    let bikeRides: BikeRideStorage
+    let preferences: Preferences
+    let records: CyclingRecords
+
+    var viewContext: NSManagedObjectContext {
+        persistenceController.container.viewContext
+    }
+
+    func savedPreferences() -> UserPreferences? {
+        UserPreferences.savedPreferences(in: viewContext)
+    }
+
+    func storedRecords() -> Records? {
+        Records.getStoredRecords(in: viewContext)
+    }
+
+    static func make(
+        arguments: [String] = ProcessInfo.processInfo.arguments,
+        persistenceControllerFactory: ([String]) -> PersistenceController = { _ in
+            PersistenceController.shared
+        },
+        bikeRideStorageFactory: (NSManagedObjectContext) -> BikeRideStorage = {
+            BikeRideStorage(managedObjectContext: $0)
+        },
+        preferencesFactory: ([String]) -> Preferences = { _ in Preferences.shared },
+        recordsFactory: ([String]) -> CyclingRecords = { _ in CyclingRecords.shared }
+    ) -> AppLaunchStorage {
+        let persistenceController = persistenceControllerFactory(arguments)
+        let bikeRides = bikeRideStorageFactory(persistenceController.container.viewContext)
+        let preferences = preferencesFactory(arguments)
+        let records = recordsFactory(arguments)
+
+        return AppLaunchStorage(
+            persistenceController: persistenceController,
+            bikeRides: bikeRides,
+            preferences: preferences,
+            records: records
+        )
+    }
+}
+
 @main
 struct GoCyclingApp: App {
-    
-    let persistenceController = PersistenceController.shared
+
+    private let launchStorage: AppLaunchStorage
+    let persistenceController: PersistenceController
     @Environment(\.scenePhase) var scenePhase
     
     @StateObject var bikeRides: BikeRideStorage
-    @StateObject var cyclingStatus = CyclingStatus()
-    @StateObject var preferences = Preferences.shared
-    @StateObject var records = CyclingRecords.shared
+    @StateObject var cyclingStatus: CyclingStatus
+    @StateObject var preferences: Preferences
+    @StateObject var records: CyclingRecords
     
     init() {
+        self.init(launchStorage: .make())
+    }
+
+    init(launchStorage: AppLaunchStorage) {
+        self.launchStorage = launchStorage
+        self.persistenceController = launchStorage.persistenceController
+        self._bikeRides = StateObject(wrappedValue: launchStorage.bikeRides)
+        self._preferences = StateObject(wrappedValue: launchStorage.preferences)
+        self._records = StateObject(wrappedValue: launchStorage.records)
+        self._cyclingStatus = StateObject(wrappedValue: CyclingStatus())
+
         AppLaunchTelemetry.configureIfNeeded()
-        
-        // Retrieve stored data to be used by all views - create state objects for environment objects
-        let managedObjectContext = persistenceController.container.viewContext
-        let bikeRidesStorage = BikeRideStorage(managedObjectContext: managedObjectContext)
-        self._bikeRides = StateObject(wrappedValue: bikeRidesStorage)
     }
 
     var body: some Scene {
@@ -125,19 +176,24 @@ struct GoCyclingApp: App {
 
                     AppLaunchMigration.runIfNeeded(
                         migratePreferences: {
-                            if let oldPreferences = UserPreferences.savedPreferences() {
-                                preferences.initialUserPreferencesMigration(existingPreferences: oldPreferences)
+                            if let oldPreferences = launchStorage.savedPreferences() {
+                                preferences.initialUserPreferencesMigration(
+                                    existingPreferences: oldPreferences
+                                )
                             }
                         },
                         migrateRecords: {
-                            if let oldRecords = Records.getStoredRecords() {
-                                records.initialRecordsMigration(existingRecords: oldRecords, existingBikeRides: bikeRides.storedBikeRides)
+                            if let oldRecords = launchStorage.storedRecords() {
+                                records.initialRecordsMigration(
+                                    existingRecords: oldRecords,
+                                    existingBikeRides: bikeRides.storedBikeRides
+                                )
                             }
                         }
                     )
                     
                     // Disable auto lock if that setting is enabled
-                    if (preferences.autoLockDisabled) {
+                    if preferences.autoLockDisabled {
                         UIApplication.shared.isIdleTimerDisabled = true
                     }
 

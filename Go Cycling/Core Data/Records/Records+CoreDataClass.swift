@@ -106,7 +106,10 @@ public class Records: NSManagedObject {
 
 extension Records {
     static func getStoredRecords() -> Records? {
-        let context = PersistenceController.shared.container.viewContext
+        getStoredRecords(in: PersistenceController.shared.container.viewContext)
+    }
+
+    static func getStoredRecords(in context: NSManagedObjectContext) -> Records? {
         let fetchRequest: NSFetchRequest<Records> = Records.fetchRequest()
         do {
             let items = try context.fetch(fetchRequest)

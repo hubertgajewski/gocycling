@@ -34,7 +34,10 @@ public class UserPreferences: NSManagedObject {
 
 extension UserPreferences {
     static func savedPreferences() -> UserPreferences? {
-        let context = PersistenceController.shared.container.viewContext
+        savedPreferences(in: PersistenceController.shared.container.viewContext)
+    }
+
+    static func savedPreferences(in context: NSManagedObjectContext) -> UserPreferences? {
         let fetchRequest: NSFetchRequest<UserPreferences> = UserPreferences.fetchRequest()
         do {
             let items = try context.fetch(fetchRequest)

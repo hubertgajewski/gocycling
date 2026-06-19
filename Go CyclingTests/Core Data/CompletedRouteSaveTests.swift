@@ -357,6 +357,77 @@ struct CompletedRouteSaveTests {
       #expect(setupCalls.first?.enabled == false)
     }
 
+    @Test("app launch storage creates state from selected persistence")
+    func appLaunchStorageCreatesStateFromSelectedPersistence() {
+      var events: [String] = []
+      let arguments = [UITesting.launchArgument]
+      let persistence = PersistenceController(inMemory: true, arguments: arguments)
+
+      let storage = AppLaunchStorage.make(
+        arguments: arguments,
+        persistenceControllerFactory: { arguments in
+          let isIsolated = UITesting.shouldUseIsolatedPersistence(arguments: arguments)
+          events.append("persistence:\(isIsolated)")
+          return persistence
+        },
+        bikeRideStorageFactory: { context in
+          events.append(
+            context === persistence.container.viewContext
+              ? "bikeRides:selected-context"
+              : "bikeRides:other-context"
+          )
+          return BikeRideStorage(managedObjectContext: context)
+        },
+        preferencesFactory: { arguments in
+          let isIsolated = UITesting.shouldUseIsolatedPersistence(arguments: arguments)
+          events.append("preferences:\(isIsolated)")
+          return Preferences(arguments: arguments)
+        },
+        recordsFactory: { arguments in
+          let isIsolated = UITesting.shouldUseIsolatedPersistence(arguments: arguments)
+          events.append("records:\(isIsolated)")
+          return CyclingRecords(arguments: arguments)
+        }
+      )
+
+      #expect(
+        events == [
+          "persistence:true",
+          "bikeRides:selected-context",
+          "preferences:true",
+          "records:true",
+        ])
+      #expect(
+        storage.persistenceController.container.viewContext === persistence.container.viewContext
+      )
+      #expect(storage.preferences.iCloudOn == false)
+      #expect(storage.records.totalCyclingRoutes == 0)
+    }
+
+    @Test("app launch storage reads legacy migration data from selected persistence")
+    func appLaunchStorageReadsLegacyMigrationDataFromSelectedPersistence() throws {
+      let arguments = [UITesting.launchArgument]
+      let persistence = PersistenceController(inMemory: true, arguments: arguments)
+      try insertLegacyPreferences(
+        in: persistence.container.viewContext,
+        selectedRoute: "Selected legacy route"
+      )
+      try insertLegacyRecords(
+        in: persistence.container.viewContext,
+        totalCyclingRoutes: 4
+      )
+
+      let storage = AppLaunchStorage.make(
+        arguments: arguments,
+        persistenceControllerFactory: { _ in persistence }
+      )
+
+      let legacyPreferences = try #require(storage.savedPreferences())
+      let legacyRecords = try #require(storage.storedRecords())
+      #expect(legacyPreferences.selectedRoute == "Selected legacy route")
+      #expect(legacyRecords.totalCyclingRoutes == 4)
+    }
+
     @Test("route save fixture model initialization leaves stores unchanged")
     func routeSaveFixtureModelInitializationLeavesStoresUnchanged() async {
       let keys = routeSaveFixturePreferenceStoreKeys + cyclingRecordStoreKeys
@@ -641,4 +712,46 @@ private func fetchRides(in context: NSManagedObjectContext) throws -> [BikeRide]
     NSSortDescriptor(keyPath: \BikeRide.cyclingStartTime, ascending: true)
   ]
   return try context.fetch(request)
+}
+
+@discardableResult
+private func insertLegacyPreferences(
+  in context: NSManagedObjectContext,
+  selectedRoute: String
+) throws -> UserPreferences {
+  let preferences = UserPreferences(context: context)
+  preferences.usingMetric = false
+  preferences.displayingMetrics = true
+  preferences.colourChoice = ColourChoice.green.rawValue
+  preferences.largeMetrics = false
+  preferences.sortingChoice = SortChoice.dateAscending.rawValue
+  preferences.deletionConfirmation = true
+  preferences.deletionEnabled = true
+  preferences.iconIndex = 2
+  preferences.namedRoutes = true
+  preferences.selectedRoute = selectedRoute
+  preferences.autoLockDisabled = false
+  preferences.healthSyncEnabled = false
+  try context.save()
+  return preferences
+}
+
+@discardableResult
+private func insertLegacyRecords(
+  in context: NSManagedObjectContext,
+  totalCyclingRoutes: Int64
+) throws -> Records {
+  let records = Records(context: context)
+  records.totalCyclingTime = 1_200
+  records.totalCyclingDistance = 6_000
+  records.totalCyclingRoutes = totalCyclingRoutes
+  records.unlockedIcons = [false, true, false, false, false, false]
+  records.longestCyclingDistance = 3_000
+  records.longestCyclingTime = 600
+  records.fastestAverageSpeed = 8
+  records.fastestAverageSpeedDate = Date(timeIntervalSince1970: 3_000)
+  records.longestCyclingDistanceDate = Date(timeIntervalSince1970: 3_100)
+  records.longestCyclingTimeDate = Date(timeIntervalSince1970: 3_200)
+  try context.save()
+  return records
 }
