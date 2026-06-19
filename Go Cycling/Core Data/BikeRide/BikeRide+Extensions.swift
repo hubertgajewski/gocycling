@@ -9,6 +9,15 @@ import Foundation
 import CoreData
 
 extension BikeRide {
+
+    // Testability: route-name, category, and sort helpers are covered by unit tests
+    // that seed rides in an in-memory Core Data store (see BikeRideExtensionsTests
+    // and makeInMemoryChartPersistence). The zero-arg APIs below still use
+    // PersistenceController.shared for production; injectable overloads exist so
+    // tests never open or write to the app singleton store, which fails on CI with
+    // Core Data error 134020 when the store config differs. Date-range fetchers
+    // below are unchanged; those tests exercise fetch requests directly instead of
+    // the shared store.
     
     static func allBikeRides(in context: NSManagedObjectContext) -> [BikeRide] {
         let fetchRequest: NSFetchRequest<BikeRide> = BikeRide.fetchRequest()
