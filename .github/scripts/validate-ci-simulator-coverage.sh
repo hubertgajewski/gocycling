@@ -7,8 +7,10 @@ readme="$repo_root/README.md"
 fork_changes="$repo_root/FORK_CHANGES.md"
 resolver="$repo_root/.github/scripts/ios-simulator-destination.sh"
 coverage_summary="$repo_root/.github/scripts/write-xccov-summary.py"
+merge_script="$repo_root/.github/scripts/merge-combined-coverage.sh"
+restore_script="$repo_root/.github/scripts/restore-xcresult-bundle.sh"
 
-python3 - "$workflow" "$readme" "$fork_changes" "$coverage_summary" <<'PY'
+python3 - "$workflow" "$readme" "$fork_changes" "$coverage_summary" "$merge_script" "$restore_script" <<'PY'
 import re
 import sys
 from pathlib import Path
@@ -17,6 +19,8 @@ workflow = Path(sys.argv[1]).read_text()
 readme = Path(sys.argv[2]).read_text()
 fork_changes = Path(sys.argv[3]).read_text()
 coverage_summary = Path(sys.argv[4])
+merge_script = Path(sys.argv[5])
+restore_script = Path(sys.argv[6])
 failures: list[str] = []
 
 unit_match = re.search(r"(?ms)^  unit-tests:\n(?P<body>.*?)(?:\n  [A-Za-z0-9_-]+:\n|\Z)", workflow)
@@ -29,14 +33,41 @@ else:
         failures.append("unit-tests job name must mention the requested iPhone 17 simulator")
     if "-enableCodeCoverage YES" not in unit_body:
         failures.append("unit-tests must enable Xcode code coverage")
-    if "xcrun xccov view --report --json TestResults/unit.xcresult > TestResults/coverage.json" not in unit_body:
-        failures.append("unit-tests must generate coverage JSON with xccov")
-    if "write-xccov-summary.py" not in unit_body or "GITHUB_STEP_SUMMARY" not in unit_body:
-        failures.append("unit-tests must publish coverage to the GitHub job summary")
-    if "TestResults/coverage.json" not in unit_body or "unit-test-coverage" not in unit_body:
-        failures.append("unit-tests must upload coverage artifacts")
+    if "unit-test-coverage-result" not in unit_body:
+        failures.append("unit-tests must upload unit.xcresult for coverage merge")
+    if "xcrun xccov view --report --json TestResults/unit.xcresult > TestResults/coverage.json" in unit_body:
+        failures.append("unit-tests must not publish unit-only coverage; use the coverage job")
     if not coverage_summary.exists():
         failures.append("coverage summary script not found")
+    if not merge_script.exists():
+        failures.append("merge-combined-coverage script not found")
+    if not restore_script.exists():
+        failures.append("restore-xcresult-bundle script not found")
+
+coverage_match = re.search(r"(?ms)^  coverage:\n(?P<body>.*?)(?:\n  [A-Za-z0-9_-]+:\n|\Z)", workflow)
+if not coverage_match:
+    failures.append("coverage job not found")
+else:
+    coverage_body = coverage_match.group("body")
+    if "merge-combined-coverage.sh" not in coverage_body:
+        failures.append("coverage job must merge unit and UI coverage with merge-combined-coverage.sh")
+    if "TestResults/coverage.json" not in coverage_body:
+        failures.append("coverage job must produce combined coverage JSON")
+    if "write-xccov-summary.py" not in coverage_body or "GITHUB_STEP_SUMMARY" not in coverage_body:
+        failures.append("coverage job must publish combined coverage to the GitHub job summary")
+    if "TestResults/coverage.json" not in coverage_body or "combined-test-coverage" not in coverage_body:
+        failures.append("coverage job must upload combined coverage artifacts")
+    if "unit-test-coverage-result" not in coverage_body or "ui-test-coverage-ios26-iphone" not in coverage_body:
+        failures.append("coverage job must download unit and ios26-iphone UI coverage artifacts")
+    if "artifacts/unit-coverage" not in coverage_body or "artifacts/ui-coverage" not in coverage_body:
+        failures.append("coverage job must download artifacts into separate directories")
+    if "restore-xcresult-bundle.sh" not in coverage_body:
+        failures.append("coverage job must restore flattened xcresult artifacts before merge")
+    runs_on = re.search(r"(?m)^\s+runs-on:\s*(?P<value>.+)$", coverage_body)
+    if not runs_on or "vars.RUNNER" not in runs_on.group("value"):
+        failures.append("coverage job runs-on must honor vars.RUNNER")
+    if "unit-only-coverage.json" not in merge_script.read_text():
+        failures.append("merge-combined-coverage must verify combined Go Cycling.app coverage is not lower than unit-only")
 
 match = re.search(r"(?ms)^  ui-tests:\n(?P<body>.*?)(?:\n  [A-Za-z0-9_-]+:\n|\Z)", workflow)
 if not match:
@@ -94,6 +125,11 @@ else:
         missing = families - observed.get(os_name, set())
         if missing:
             failures.append(f"ui-tests matrix missing {', '.join(sorted(missing))} entry for {os_name}")
+
+    if 'if [[ "${{ matrix.id }}" == "ios26-iphone" ]]; then' not in body:
+        failures.append("ui-tests must enable code coverage for ios26-iphone")
+    if "ui-test-coverage-ios26-iphone" not in body:
+        failures.append("ui-tests must upload ios26-iphone coverage artifact")
 
 doc_text = "\n".join((workflow, readme, fork_changes))
 if "iOS/iPadOS 14-16" not in doc_text and "iOS/iPadOS 14, 15, or 16" not in doc_text:
