@@ -402,24 +402,21 @@ class CyclingRecords: ObservableObject {
     
     // Reset stored statistics (except unlocked app icons)
     static public func resetStatistics(arguments: [String] = ProcessInfo.processInfo.arguments) {
-        CyclingRecords.shared.resetStatistics(arguments: arguments)
+        if UITesting.shouldUseIsolatedPersistence(arguments: arguments) {
+            CyclingRecords.shared.resetStatisticsInMemory()
+            return
+        }
+
+        CyclingRecords.shared.resetStatistics()
     }
 
     // Reset the selected records object; UI-test launches may use an isolated
     // instance while production still reaches this through CyclingRecords.shared.
-    public func resetStatistics(arguments: [String] = ProcessInfo.processInfo.arguments) {
-        if UITesting.shouldUseIsolatedPersistence(arguments: arguments) {
+    public func resetStatistics() {
+        if !persistsRecordUpdates {
             // Settings UI-smoke tests can exercise reset behavior; keep it in
             // memory so they cannot wipe the user's actual cycling statistics.
-            totalCyclingTime = CyclingRecords.defaultTotalCyclingTime
-            totalCyclingDistance = CyclingRecords.defaultTotalCyclingDistance
-            longestCyclingDistance = CyclingRecords.defaultLongestCyclingDistance
-            longestCyclingTime = CyclingRecords.defaultLongestCyclingTime
-            fastestAverageSpeed = CyclingRecords.defaultFastestAverageSpeed
-            fastestAverageSpeedDate = nil
-            longestCyclingDistanceDate = nil
-            longestCyclingTimeDate = nil
-            totalCyclingRoutes = CyclingRecords.defaultTotalCyclingRoutes
+            resetStatisticsInMemory()
             return
         }
 
@@ -451,5 +448,17 @@ class CyclingRecords: ObservableObject {
         
         // Update class members
         writeToClassMembers()
+    }
+
+    private func resetStatisticsInMemory() {
+        totalCyclingTime = CyclingRecords.defaultTotalCyclingTime
+        totalCyclingDistance = CyclingRecords.defaultTotalCyclingDistance
+        longestCyclingDistance = CyclingRecords.defaultLongestCyclingDistance
+        longestCyclingTime = CyclingRecords.defaultLongestCyclingTime
+        fastestAverageSpeed = CyclingRecords.defaultFastestAverageSpeed
+        fastestAverageSpeedDate = nil
+        longestCyclingDistanceDate = nil
+        longestCyclingTimeDate = nil
+        totalCyclingRoutes = CyclingRecords.defaultTotalCyclingRoutes
     }
 }

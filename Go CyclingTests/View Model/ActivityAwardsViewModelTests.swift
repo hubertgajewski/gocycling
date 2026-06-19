@@ -132,6 +132,30 @@ struct ActivityAwardsViewModelTests {
     #expect(viewModel.progressValues.map(Double.init) == [1.0, 1.0, 0.5, 1.0, 1.0, 0.5])
   }
 
+  @Test("switching to injected records ignores shared award alert state")
+  func switchingToInjectedRecordsIgnoresSharedAwardAlertState() async {
+    let snapshots = await makeAwardsSnapshots()
+    defer { snapshots.restore() }
+
+    let sharedRecords = CyclingRecords.shared
+    sharedRecords.unlockedIcons = [true, false, false, false, false, false]
+
+    let selectedRecords = CyclingRecords(arguments: [UITesting.launchArgument])
+    selectedRecords.unlockedIcons = [false, false, false, false, false, false]
+    selectedRecords.longestCyclingDistance = 5_000
+    selectedRecords.totalCyclingDistance = 50_000
+
+    let viewModel = ActivityAwardsViewModel(
+      recordsPublisher: Empty<Int, Never>().eraseToAnyPublisher()
+    )
+
+    viewModel.useRecords(selectedRecords)
+
+    #expect(!viewModel.alertForNewIcon)
+    #expect(!UserDefaults.standard.bool(forKey: "alertedBronze1"))
+    #expect(viewModel.progressValues.map(Double.init) == [0.5, 0.2, 0.1, 0.5, 0.2, 0.1])
+  }
+
   @Test("returns medal order and localized award names")
   func returnsMedalOrderAndAwardNames() async {
     let snapshots = await makeAwardsSnapshots()

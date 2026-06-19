@@ -118,11 +118,16 @@ struct AppLaunchStorage {
     // Production still resolves to the existing shared app singletons.
     // The default factories keep production on shared singletons, but UI-test
     // arguments must create argument-scoped state so they do not mutate defaults.
+    static func make() -> AppLaunchStorage {
+        make(
+            arguments: ProcessInfo.processInfo.arguments,
+            persistenceControllerFactory: { _ in PersistenceController.shared }
+        )
+    }
+
     static func make(
-        arguments: [String] = ProcessInfo.processInfo.arguments,
-        persistenceControllerFactory: ([String]) -> PersistenceController = { _ in
-            PersistenceController.shared
-        },
+        arguments: [String],
+        persistenceControllerFactory: ([String]) -> PersistenceController,
         bikeRideStorageFactory: (NSManagedObjectContext) -> BikeRideStorage = {
             BikeRideStorage(managedObjectContext: $0)
         },
@@ -182,7 +187,7 @@ struct GoCyclingApp: App {
         self._records = StateObject(wrappedValue: launchStorage.records)
         self._cyclingStatus = StateObject(wrappedValue: CyclingStatus())
 
-        AppLaunchTelemetry.configureIfNeeded()
+        AppLaunchTelemetry.configureIfNeeded(arguments: launchStorage.arguments)
     }
 
     var body: some Scene {
@@ -212,6 +217,7 @@ struct GoCyclingApp: App {
                     // Legacy Core Data migration must read from the selected
                     // launch store before migrated values are copied to defaults.
                     AppLaunchMigration.runIfNeeded(
+                        arguments: launchStorage.arguments,
                         migratePreferences: {
                             if let oldPreferences = launchStorage.savedPreferences() {
                                 preferences.initialUserPreferencesMigration(

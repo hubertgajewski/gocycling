@@ -612,7 +612,7 @@ struct CyclingRecordsTests {
     records.longestCyclingTimeDate = date(2026, 5, 3)
     records.totalCyclingRoutes = 7
 
-    records.resetStatistics(arguments: [UITesting.launchArgument])
+    records.resetStatistics()
 
     #expect(records.totalCyclingTime == 0)
     #expect(records.totalCyclingDistance == 0)

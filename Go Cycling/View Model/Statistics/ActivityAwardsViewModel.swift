@@ -104,7 +104,6 @@ class ActivityAwardsViewModel: ObservableObject {
             print("Updating records")
             self.records = self.sourceRecords
         }
-        self.records = records
         
         // Launching statistics tab is a review worthy action
         ReviewManager.incrementReviewWorthyCount()
@@ -116,10 +115,9 @@ class ActivityAwardsViewModel: ObservableObject {
     // Statistics supplies the launch-selected records after environment
     // injection so awards cannot drift to CyclingRecords.shared during UI tests.
     func useRecords(_ records: CyclingRecords) {
-        guard records !== sourceRecords else { return }
-
         sourceRecords = records
         unlockedIcons = records.unlockedIcons
+        alertForNewIcon = false
         cancellable = records.$totalCyclingRoutes.sink { [weak self] _ in
             guard let self = self else { return }
             print("Updating records")
