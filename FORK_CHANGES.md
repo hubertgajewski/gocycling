@@ -39,7 +39,7 @@ Simulator builds typically work with a free Personal Team once signing is config
 
 ## Continuous Integration
 
-GitHub Actions runs on every push to `main` and on pull requests. Jobs run in a fail-fast sequence: **Swift format** → **SwiftPM unit tests** → **unit tests** and **UI smoke tests** in parallel. A formatting or SwiftPM failure does not start simulator jobs. When repository variable `CI_RUN_UNIT_TESTS` is `false`, SwiftPM and Xcode unit jobs are skipped and UI smoke may still run after format passes.
+GitHub Actions runs on every push to `main` and on pull requests. Jobs run in a fail-fast sequence: **Swift format** → **SwiftPM unit tests** → **unit tests** and **UI smoke tests** in parallel. A formatting or SwiftPM failure does not start simulator jobs. When repository variable `CI_RUN_UNIT_TESTS` is `false`, SwiftPM and Xcode unit jobs are skipped and UI smoke may still run after format passes. Unit and UI simulator jobs are intentionally parallel after SwiftPM so UI feedback is not blocked on the iPhone 17 unit lane.
 
 - **Swift format** - `swift-format` linting for `Go CyclingTests` and `Go CyclingUITests`
 - **SwiftPM unit tests** - `swift test` for the package-compatible formatting unit-test slice
