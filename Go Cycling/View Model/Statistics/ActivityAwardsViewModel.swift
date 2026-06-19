@@ -12,10 +12,10 @@ import Combine
 
 class ActivityAwardsViewModel: ObservableObject {
     
-    private var initialRecords = CyclingRecords.shared
+    private var sourceRecords: CyclingRecords
     
     @Published var progressValues: [CGFloat] = [CGFloat].init(repeating: 0.0, count: 6)
-    @Published var unlockedIcons = CyclingRecords.shared.unlockedIcons
+    @Published var unlockedIcons: [Bool]
     @Published var progressStrings: [String] = [String].init(repeating: "0% Complete", count: 6)
     
     // Boolean to display alert for newly unlocked icon
@@ -23,8 +23,9 @@ class ActivityAwardsViewModel: ObservableObject {
     
     @Published var records: CyclingRecords? {
         willSet {
+            let updatedRecords = newValue ?? sourceRecords
             // Update published values when records change
-            unlockedIcons = CyclingRecords.shared.unlockedIcons
+            unlockedIcons = updatedRecords.unlockedIcons
             for index in 0..<CyclingRecords.awardValues.count {
                 var progressFloat: CGFloat = 0.0
                 // If icon is already unlocked then set progress to 100%
@@ -69,7 +70,7 @@ class ActivityAwardsViewModel: ObservableObject {
                 }
                 // Single route awards
                 else if (index < 3) {
-                    let distance = self.initialRecords.longestCyclingDistance
+                    let distance = updatedRecords.longestCyclingDistance
                     progressFloat = CGFloat(distance/CyclingRecords.awardValues[index]) > 1.0 ? 1.0 : CGFloat(distance/Records.awardValues[index])
                     progressValues[index] = progressFloat
                     let roundedProgress = round(progressFloat * 10000) / 100.0
@@ -77,7 +78,7 @@ class ActivityAwardsViewModel: ObservableObject {
                 }
                 // Cummulative route awards
                 else {
-                    let distance = self.initialRecords.totalCyclingDistance
+                    let distance = updatedRecords.totalCyclingDistance
                     progressFloat = CGFloat(distance/CyclingRecords.awardValues[index]) > 1.0 ? 1.0 : CGFloat(distance/Records.awardValues[index])
                     progressValues[index] = progressFloat
                     let roundedProgress = round(progressFloat * 10000) / 100.0
@@ -93,17 +94,38 @@ class ActivityAwardsViewModel: ObservableObject {
     private var cancellable: AnyCancellable?
     
     // Total cycling routes changes each time the records change
-    init(recordsPublisher: AnyPublisher<Int, Never> = CyclingRecords.shared.$totalCyclingRoutes.eraseToAnyPublisher()) {
-        cancellable = recordsPublisher.sink { records in
+    init(records: CyclingRecords = CyclingRecords.shared, recordsPublisher: AnyPublisher<Int, Never>? = nil) {
+        self.sourceRecords = records
+        self.unlockedIcons = records.unlockedIcons
+
+        let publisher = recordsPublisher ?? records.$totalCyclingRoutes.eraseToAnyPublisher()
+        cancellable = publisher.sink { [weak self] _ in
+            guard let self = self else { return }
             print("Updating records")
-            self.records = self.initialRecords
+            self.records = self.sourceRecords
         }
+        self.records = records
         
         // Launching statistics tab is a review worthy action
         ReviewManager.incrementReviewWorthyCount()
         
         // Request for review if appropriate
         ReviewManager.requestReviewIfAppropriate()
+    }
+
+    // Statistics supplies the launch-selected records after environment
+    // injection so awards cannot drift to CyclingRecords.shared during UI tests.
+    func useRecords(_ records: CyclingRecords) {
+        guard records !== sourceRecords else { return }
+
+        sourceRecords = records
+        unlockedIcons = records.unlockedIcons
+        cancellable = records.$totalCyclingRoutes.sink { [weak self] _ in
+            guard let self = self else { return }
+            print("Updating records")
+            self.records = self.sourceRecords
+        }
+        self.records = records
     }
     
     func getAwardName(index: Int, usingMetric: Bool) -> String {

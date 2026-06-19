@@ -402,48 +402,54 @@ class CyclingRecords: ObservableObject {
     
     // Reset stored statistics (except unlocked app icons)
     static public func resetStatistics(arguments: [String] = ProcessInfo.processInfo.arguments) {
+        CyclingRecords.shared.resetStatistics(arguments: arguments)
+    }
+
+    // Reset the selected records object; UI-test launches may use an isolated
+    // instance while production still reaches this through CyclingRecords.shared.
+    public func resetStatistics(arguments: [String] = ProcessInfo.processInfo.arguments) {
         if UITesting.shouldUseIsolatedPersistence(arguments: arguments) {
             // Settings UI-smoke tests can exercise reset behavior; keep it in
             // memory so they cannot wipe the user's actual cycling statistics.
-            CyclingRecords.shared.totalCyclingTime = defaultTotalCyclingTime
-            CyclingRecords.shared.totalCyclingDistance = defaultTotalCyclingDistance
-            CyclingRecords.shared.longestCyclingDistance = defaultLongestCyclingDistance
-            CyclingRecords.shared.longestCyclingTime = defaultLongestCyclingTime
-            CyclingRecords.shared.fastestAverageSpeed = defaultFastestAverageSpeed
-            CyclingRecords.shared.fastestAverageSpeedDate = nil
-            CyclingRecords.shared.longestCyclingDistanceDate = nil
-            CyclingRecords.shared.longestCyclingTimeDate = nil
-            CyclingRecords.shared.totalCyclingRoutes = defaultTotalCyclingRoutes
+            totalCyclingTime = CyclingRecords.defaultTotalCyclingTime
+            totalCyclingDistance = CyclingRecords.defaultTotalCyclingDistance
+            longestCyclingDistance = CyclingRecords.defaultLongestCyclingDistance
+            longestCyclingTime = CyclingRecords.defaultLongestCyclingTime
+            fastestAverageSpeed = CyclingRecords.defaultFastestAverageSpeed
+            fastestAverageSpeedDate = nil
+            longestCyclingDistanceDate = nil
+            longestCyclingTimeDate = nil
+            totalCyclingRoutes = CyclingRecords.defaultTotalCyclingRoutes
             return
         }
 
         // Local
-        UserDefaults.standard.set(0.0, forKey: keys[0])
-        UserDefaults.standard.set(0.0, forKey: keys[1])
-        UserDefaults.standard.set(0.0, forKey: keys[3])
-        UserDefaults.standard.set(0.0, forKey: keys[4])
-        UserDefaults.standard.set(0.0, forKey: keys[5])
+        UserDefaults.standard.set(0.0, forKey: CyclingRecords.keys[0])
+        UserDefaults.standard.set(0.0, forKey: CyclingRecords.keys[1])
+        UserDefaults.standard.set(0.0, forKey: CyclingRecords.keys[3])
+        UserDefaults.standard.set(0.0, forKey: CyclingRecords.keys[4])
+        UserDefaults.standard.set(0.0, forKey: CyclingRecords.keys[5])
         // Need to be explicit about removing these as setting them to nil isn't going to work (the Date? typed records)
-        UserDefaults.standard.removeObject(forKey: keys[6])
-        UserDefaults.standard.removeObject(forKey: keys[7])
-        UserDefaults.standard.removeObject(forKey: keys[8])
+        UserDefaults.standard.removeObject(forKey: CyclingRecords.keys[6])
+        UserDefaults.standard.removeObject(forKey: CyclingRecords.keys[7])
+        UserDefaults.standard.removeObject(forKey: CyclingRecords.keys[8])
         
-        UserDefaults.standard.set(0, forKey: keys[9])
+        UserDefaults.standard.set(0, forKey: CyclingRecords.keys[9])
         
         // iCloud
-        NSUbiquitousKeyValueStore.default.set(0.0, forKey: keys[0])
-        NSUbiquitousKeyValueStore.default.set(0.0, forKey: keys[1])
-        NSUbiquitousKeyValueStore.default.set(0.0, forKey: keys[3])
-        NSUbiquitousKeyValueStore.default.set(0.0, forKey: keys[4])
-        NSUbiquitousKeyValueStore.default.set(0.0, forKey: keys[5])
+        NSUbiquitousKeyValueStore.default.set(0.0, forKey: CyclingRecords.keys[0])
+        NSUbiquitousKeyValueStore.default.set(0.0, forKey: CyclingRecords.keys[1])
+        NSUbiquitousKeyValueStore.default.set(0.0, forKey: CyclingRecords.keys[3])
+        NSUbiquitousKeyValueStore.default.set(0.0, forKey: CyclingRecords.keys[4])
+        NSUbiquitousKeyValueStore.default.set(0.0, forKey: CyclingRecords.keys[5])
         // Need to be explicit about removing these as setting them to nil isn't going to work (the Date? typed records)
-        NSUbiquitousKeyValueStore.default.removeObject(forKey: keys[6])
-        NSUbiquitousKeyValueStore.default.removeObject(forKey: keys[7])
-        NSUbiquitousKeyValueStore.default.removeObject(forKey: keys[8])
+        NSUbiquitousKeyValueStore.default.removeObject(forKey: CyclingRecords.keys[6])
+        NSUbiquitousKeyValueStore.default.removeObject(forKey: CyclingRecords.keys[7])
+        NSUbiquitousKeyValueStore.default.removeObject(forKey: CyclingRecords.keys[8])
         
-        NSUbiquitousKeyValueStore.default.set(0 as Int, forKey: keys[9])
+        NSUbiquitousKeyValueStore.default.set(0 as Int, forKey: CyclingRecords.keys[9])
         
         // Update class members
-        CyclingRecords.shared.writeToClassMembers()
+        writeToClassMembers()
     }
 }

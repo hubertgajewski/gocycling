@@ -83,6 +83,9 @@ enum AppLaunchMigration {
 // Groups launch-time storage decisions so persistence is selected once before
 // storage-backed state objects, views, or migrations can touch Core Data.
 struct AppLaunchStorage {
+    // Keep the launch arguments with the selected storage so later launch gates
+    // use the same UI-test mode that built persistence, preferences, and records.
+    let arguments: [String]
     let persistenceController: PersistenceController
     let bikeRides: BikeRideStorage
     let preferences: Preferences
@@ -100,6 +103,14 @@ struct AppLaunchStorage {
 
     func storedRecords() -> Records? {
         Records.getStoredRecords(in: viewContext)
+    }
+
+    var shouldUseIsolatedPersistence: Bool {
+        UITesting.shouldUseIsolatedPersistence(arguments: arguments)
+    }
+
+    var shouldSeedRouteSaveFixture: Bool {
+        UITesting.shouldSeedRouteSaveFixture(arguments: arguments)
     }
 
     // UI-test launches must select the isolated Core Data store before any
@@ -134,6 +145,7 @@ struct AppLaunchStorage {
         let records = recordsFactory(arguments)
 
         return AppLaunchStorage(
+            arguments: arguments,
             persistenceController: persistenceController,
             bikeRides: bikeRides,
             preferences: preferences,
@@ -185,7 +197,7 @@ struct GoCyclingApp: App {
                     #if DEBUG
                     // UI-smoke tests need a saved route from the real save path so
                     // History is verified without relying on live GPS/timer data.
-                    if UITesting.shouldSeedRouteSaveFixture() {
+                    if launchStorage.shouldSeedRouteSaveFixture {
                         UITestingRouteSaveFixture.runIfNeeded(
                             persistenceController: persistenceController
                         )
@@ -195,7 +207,7 @@ struct GoCyclingApp: App {
 
                     // UI-smoke tests need to stop here because the remaining launch
                     // work can mutate real preferences or telemetry state.
-                    guard !UITesting.shouldUseIsolatedPersistence() else { return }
+                    guard !launchStorage.shouldUseIsolatedPersistence else { return }
 
                     // Legacy Core Data migration must read from the selected
                     // launch store before migrated values are copied to defaults.

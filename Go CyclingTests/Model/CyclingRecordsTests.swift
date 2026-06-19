@@ -596,6 +596,35 @@ struct CyclingRecordsTests {
     #expect(CyclingRecords.shared.longestCyclingTimeDate == nil)
     #expect(CyclingRecords.shared.unlockedIcons == unlockedIcons)
   }
+
+  @Test("UI testing reset statistics resets selected records in memory")
+  func uiTestingResetStatisticsResetsSelectedRecordsInMemory() {
+    let records = CyclingRecords(arguments: [UITesting.launchArgument])
+    let unlockedIcons = [true, false, true, false, true, false]
+    records.totalCyclingTime = 4_000
+    records.totalCyclingDistance = 75_000
+    records.unlockedIcons = unlockedIcons
+    records.longestCyclingDistance = 25_000
+    records.longestCyclingTime = 2_000
+    records.fastestAverageSpeed = 8
+    records.fastestAverageSpeedDate = date(2026, 5, 1)
+    records.longestCyclingDistanceDate = date(2026, 5, 2)
+    records.longestCyclingTimeDate = date(2026, 5, 3)
+    records.totalCyclingRoutes = 7
+
+    records.resetStatistics(arguments: [UITesting.launchArgument])
+
+    #expect(records.totalCyclingTime == 0)
+    #expect(records.totalCyclingDistance == 0)
+    #expect(records.totalCyclingRoutes == 0)
+    #expect(records.longestCyclingDistance == 0)
+    #expect(records.longestCyclingTime == 0)
+    #expect(records.fastestAverageSpeed == 0)
+    #expect(records.fastestAverageSpeedDate == nil)
+    #expect(records.longestCyclingDistanceDate == nil)
+    #expect(records.longestCyclingTimeDate == nil)
+    #expect(records.unlockedIcons == unlockedIcons)
+  }
 }
 
 private func seedRecordStores(

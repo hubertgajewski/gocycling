@@ -95,8 +95,9 @@ struct ResetView: View {
     }
     
     func resetStoredStatistics() {
-        // Reset to default records
-        CyclingRecords.resetStatistics()
+        // Reset the selected records instance so UI-test launch storage cannot
+        // diverge from the state object shown in Statistics and Settings.
+        records.resetStatistics()
         
         telemetryManager.sendSettingsSignal(
             section: telemetryTabSection,

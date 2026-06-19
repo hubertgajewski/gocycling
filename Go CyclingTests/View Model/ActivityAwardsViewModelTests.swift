@@ -106,6 +106,32 @@ struct ActivityAwardsViewModelTests {
     #expect(!viewModel.alertForNewIcon)
   }
 
+  @Test("uses injected records when updating awards")
+  func usesInjectedRecordsWhenUpdatingAwards() async {
+    let snapshots = await makeAwardsSnapshots()
+    defer { snapshots.restore() }
+
+    let sharedRecords = CyclingRecords.shared
+    sharedRecords.unlockedIcons = [false, false, false, false, false, false]
+    sharedRecords.longestCyclingDistance = 0
+    sharedRecords.totalCyclingDistance = 0
+
+    let selectedRecords = CyclingRecords(arguments: [UITesting.launchArgument])
+    selectedRecords.unlockedIcons = [false, false, false, false, false, false]
+    selectedRecords.longestCyclingDistance = 25_000
+    selectedRecords.totalCyclingDistance = 250_000
+
+    let subject = PassthroughSubject<Int, Never>()
+    let viewModel = ActivityAwardsViewModel(
+      records: selectedRecords,
+      recordsPublisher: subject.eraseToAnyPublisher()
+    )
+
+    subject.send(1)
+
+    #expect(viewModel.progressValues.map(Double.init) == [1.0, 1.0, 0.5, 1.0, 1.0, 0.5])
+  }
+
   @Test("returns medal order and localized award names")
   func returnsMedalOrderAndAwardNames() async {
     let snapshots = await makeAwardsSnapshots()

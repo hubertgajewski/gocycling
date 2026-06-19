@@ -11,6 +11,9 @@ struct ActivityAwardsView: View {
     @StateObject var activityAwardsViewModel = ActivityAwardsViewModel()
     
     @EnvironmentObject var preferences: Preferences
+    // Awards must observe the selected launch records, not the shared singleton,
+    // when UI-test launches use isolated in-memory record state.
+    @EnvironmentObject var records: CyclingRecords
     
     @State var showingNewIconAlert = false
     
@@ -37,6 +40,7 @@ struct ActivityAwardsView: View {
             )
         }
         .onAppear {
+            activityAwardsViewModel.useRecords(records)
             if (activityAwardsViewModel.alertForNewIcon) {
                 showingNewIconAlert = true
                 
@@ -52,5 +56,6 @@ struct ActivityAwardsView: View {
 struct ActivityAwardsView_Previews: PreviewProvider {
     static var previews: some View {
         ActivityAwardsView()
+            .environmentObject(CyclingRecords.shared)
     }
 }
