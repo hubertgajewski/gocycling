@@ -276,28 +276,28 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           name: unit-test-coverage-result
-          path: .
+          path: artifacts/unit-coverage
 
       - name: Download UI smoke coverage result
         uses: actions/download-artifact@v7
         with:
           name: ui-test-coverage-ios26-iphone
-          path: .
+          path: artifacts/ui-coverage
 
       - name: Merge unit and UI code coverage
         run: |
+          chmod +x .github/scripts/restore-xcresult-bundle.sh
           chmod +x .github/scripts/merge-combined-coverage.sh
-          unit_bundle="$(find . -type d -name 'unit.xcresult' | head -1)"
-          ui_bundle="$(find . -type d -name 'ui-ios26-iphone.xcresult' | head -1)"
-          if [[ -z "$unit_bundle" || -z "$ui_bundle" ]]; then
-            echo "coverage merge error: could not locate downloaded result bundles" >&2
-            find . \( -name 'unit.xcresult' -o -name 'ui-ios26-iphone.xcresult' \) -type d >&2 || true
-            exit 1
-          fi
           mkdir -p TestResults
+          .github/scripts/restore-xcresult-bundle.sh \
+            artifacts/unit-coverage \
+            TestResults/unit.xcresult
+          .github/scripts/restore-xcresult-bundle.sh \
+            artifacts/ui-coverage \
+            TestResults/ui-ios26-iphone.xcresult
           .github/scripts/merge-combined-coverage.sh \
-            "$unit_bundle" \
-            "$ui_bundle" \
+            TestResults/unit.xcresult \
+            TestResults/ui-ios26-iphone.xcresult \
             TestResults
 
       - name: Publish combined code coverage summary

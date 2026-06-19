@@ -8,8 +8,9 @@ fork_changes="$repo_root/FORK_CHANGES.md"
 resolver="$repo_root/.github/scripts/ios-simulator-destination.sh"
 coverage_summary="$repo_root/.github/scripts/write-xccov-summary.py"
 merge_script="$repo_root/.github/scripts/merge-combined-coverage.sh"
+restore_script="$repo_root/.github/scripts/restore-xcresult-bundle.sh"
 
-python3 - "$workflow" "$readme" "$fork_changes" "$coverage_summary" "$merge_script" <<'PY'
+python3 - "$workflow" "$readme" "$fork_changes" "$coverage_summary" "$merge_script" "$restore_script" <<'PY'
 import re
 import sys
 from pathlib import Path
@@ -19,6 +20,7 @@ readme = Path(sys.argv[2]).read_text()
 fork_changes = Path(sys.argv[3]).read_text()
 coverage_summary = Path(sys.argv[4])
 merge_script = Path(sys.argv[5])
+restore_script = Path(sys.argv[6])
 failures: list[str] = []
 
 unit_match = re.search(r"(?ms)^  unit-tests:\n(?P<body>.*?)(?:\n  [A-Za-z0-9_-]+:\n|\Z)", workflow)
@@ -39,6 +41,8 @@ else:
         failures.append("coverage summary script not found")
     if not merge_script.exists():
         failures.append("merge-combined-coverage script not found")
+    if not restore_script.exists():
+        failures.append("restore-xcresult-bundle script not found")
 
 coverage_match = re.search(r"(?ms)^  coverage:\n(?P<body>.*?)(?:\n  [A-Za-z0-9_-]+:\n|\Z)", workflow)
 if not coverage_match:
@@ -55,6 +59,10 @@ else:
         failures.append("coverage job must upload combined coverage artifacts")
     if "unit-test-coverage-result" not in coverage_body or "ui-test-coverage-ios26-iphone" not in coverage_body:
         failures.append("coverage job must download unit and ios26-iphone UI coverage artifacts")
+    if "artifacts/unit-coverage" not in coverage_body or "artifacts/ui-coverage" not in coverage_body:
+        failures.append("coverage job must download artifacts into separate directories")
+    if "restore-xcresult-bundle.sh" not in coverage_body:
+        failures.append("coverage job must restore flattened xcresult artifacts before merge")
     runs_on = re.search(r"(?m)^\s+runs-on:\s*(?P<value>.+)$", coverage_body)
     if not runs_on or "vars.RUNNER" not in runs_on.group("value"):
         failures.append("coverage job runs-on must honor vars.RUNNER")
