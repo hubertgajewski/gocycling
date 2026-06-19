@@ -10,6 +10,9 @@ enum UITesting {
     // launch strings are the stable contract between test target and app.
     static let launchArgument = "-ui-testing"
     static let routeSaveFixtureArgument = "-ui-testing-route-save-fixture"
+    // Cycle controls UI tests need deterministic alerts and timer behavior
+    // without applying those fixtures to every UI-testing launch.
+    static let cycleControlsFixtureArgument = "-ui-testing-cycle-controls-fixture"
     static let routeSaveFixtureLaunchArguments = [
         launchArgument,
         routeSaveFixtureArgument,
@@ -34,6 +37,10 @@ enum UITesting {
         shouldUseIsolatedPersistence(arguments: arguments) && arguments.contains(routeSaveFixtureArgument)
     }
 
+    static func shouldUseCycleControlsFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        shouldUseIsolatedPersistence(arguments: arguments) && arguments.contains(cycleControlsFixtureArgument)
+    }
+
     static var shouldRequestLocationAuthorization: Bool {
         !isEnabled
     }
@@ -51,6 +58,10 @@ enum UITesting {
     }
 
     static func shouldSeedRouteSaveFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        false
+    }
+
+    static func shouldUseCycleControlsFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
         false
     }
 

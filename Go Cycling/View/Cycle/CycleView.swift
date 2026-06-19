@@ -240,10 +240,10 @@ private extension View {
         openSettings: @escaping () -> Void
     ) -> some View {
         if #available(iOS 15.0, *) {
-            alert("Location settings may not be correct", isPresented: isPresented) {
-                Button("Open Settings", action: openSettings)
+            alert(CycleAlertCopy.locationSettingsTitle, isPresented: isPresented) {
+                Button(CycleAlertCopy.openSettingsButton, action: openSettings)
                     .accessibilityIdentifier(AccessibilityIdentifier.Cycle.locationSettingsOpenSettingsButton)
-                Button("Ignore", role: .cancel) { }
+                Button(CycleAlertCopy.ignoreButton, role: .cancel) { }
                     .accessibilityIdentifier(AccessibilityIdentifier.Cycle.locationSettingsIgnoreButton)
             } message: {
                 Text(message)
@@ -251,10 +251,10 @@ private extension View {
         } else {
             // Alert about visiting settings if location access is not allowed
             alert(isPresented: isPresented) {
-                Alert(title: Text("Location settings may not be correct"),
+                Alert(title: Text(CycleAlertCopy.locationSettingsTitle),
                       message: Text(message),
-                      primaryButton: .default(Text("Open Settings"), action: openSettings),
-                      secondaryButton: .cancel(Text("Ignore"))
+                      primaryButton: .default(Text(CycleAlertCopy.openSettingsButton), action: openSettings),
+                      secondaryButton: .cancel(Text(CycleAlertCopy.ignoreButton))
                 )
             }
         }
@@ -266,23 +266,35 @@ private extension View {
         confirmStop: @escaping () -> Void
     ) -> some View {
         if #available(iOS 15.0, *) {
-            alert("Are you sure that you want to end the current route?", isPresented: isPresented) {
-                Button("Stop", role: .destructive, action: confirmStop)
+            alert(CycleAlertCopy.stopConfirmationTitle, isPresented: isPresented) {
+                Button(CycleAlertCopy.stopButton, role: .destructive, action: confirmStop)
                     .accessibilityIdentifier(AccessibilityIdentifier.Cycle.stopConfirmationStopButton)
-                Button("Cancel", role: .cancel) { }
+                Button(CycleAlertCopy.cancelButton, role: .cancel) { }
                     .accessibilityIdentifier(AccessibilityIdentifier.Cycle.stopConfirmationCancelButton)
             } message: {
-                Text("Please confirm that you are ready to end the current route.")
+                Text(CycleAlertCopy.stopConfirmationMessage)
             }
         } else {
             // Confirmation alert about ending the current route
             alert(isPresented: isPresented) {
-                Alert(title: Text("Are you sure that you want to end the current route?"),
-                      message: Text("Please confirm that you are ready to end the current route."),
-                      primaryButton: .destructive(Text("Stop"), action: confirmStop),
-                      secondaryButton: .cancel()
+                Alert(title: Text(CycleAlertCopy.stopConfirmationTitle),
+                      message: Text(CycleAlertCopy.stopConfirmationMessage),
+                      primaryButton: .destructive(Text(CycleAlertCopy.stopButton), action: confirmStop),
+                      secondaryButton: .cancel(Text(CycleAlertCopy.cancelButton))
                 )
             }
         }
     }
+}
+
+// Shared by the iOS 15 identifier-bearing alerts and the iOS 14 Alert fallback
+// so UI-test support does not create separate user-facing copy paths.
+private enum CycleAlertCopy {
+    static let locationSettingsTitle = "Location settings may not be correct"
+    static let openSettingsButton = "Open Settings"
+    static let ignoreButton = "Ignore"
+    static let stopConfirmationTitle = "Are you sure that you want to end the current route?"
+    static let stopConfirmationMessage = "Please confirm that you are ready to end the current route."
+    static let stopButton = "Stop"
+    static let cancelButton = "Cancel"
 }

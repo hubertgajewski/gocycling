@@ -141,9 +141,9 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     // Used to decide whether to show a location settings alert when the user starts a session
     func setLocationAlertStatus() {
-        if UITesting.isEnabled && locationSettingsAlertMessage.isEmpty {
-            // UI-smoke tests need a deterministic alert so cycle-control identifiers
-            // can be exercised even when the simulator already granted Always access.
+        if UITesting.shouldUseCycleControlsFixture() && locationSettingsAlertMessage.isEmpty {
+            // The Cycle controls UI test needs a deterministic alert to exercise
+            // alert action identifiers even on simulators with Always access.
             locationSettingsAlertMessage = LocationSettingsAlertPolicy.alertMessage(for: .denied)
         }
         if (locationSettingsAlertMessage != "") {
@@ -175,8 +175,12 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         writeHealthData = Preferences.storedHealthSyncEnabled()
 
         locationManager.startUpdatingHeading()
-        stalenessTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            self?.handleStalenessTick()
+        // The Cycle controls fixture suppresses staleness auto-pause so the UI
+        // test can assert Pause/Resume identifiers without a timer race.
+        if !UITesting.shouldUseCycleControlsFixture() {
+            stalenessTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+                self?.handleStalenessTick()
+            }
         }
         autoPauseState = .moving
     }
