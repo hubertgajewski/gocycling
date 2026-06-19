@@ -44,6 +44,7 @@ jobs:
         run: xcrun swift-format lint --recursive --strict "Go CyclingTests" "Go CyclingUITests"
 
   swift-unit-tests:
+    needs: swift-format
     if: github.repository == 'hubertgajewski/gocycling' && vars.CI_RUN_UNIT_TESTS != 'false'
     name: SwiftPM unit tests (complements Xcode)
     runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'macos-26' || vars.RUNNER || 'macos-26' }}
@@ -70,7 +71,13 @@ jobs:
         run: swift test
 
   unit-tests:
-    if: github.repository == 'hubertgajewski/gocycling' && vars.CI_RUN_UNIT_TESTS != 'false'
+    needs: [swift-format, swift-unit-tests]
+    if: >-
+      always() &&
+      needs.swift-format.result == 'success' &&
+      needs.swift-unit-tests.result == 'success' &&
+      github.repository == 'hubertgajewski/gocycling' &&
+      vars.CI_RUN_UNIT_TESTS != 'false'
     name: Unit tests (iPhone 17)
     runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'macos-26' || vars.RUNNER || 'macos-26' }}
     timeout-minutes: 12
@@ -143,7 +150,13 @@ jobs:
           if-no-files-found: ignore
 
   ui-tests:
-    if: github.repository == 'hubertgajewski/gocycling' && vars.CI_RUN_UI_TESTS != 'false'
+    needs: [swift-format, swift-unit-tests]
+    if: >-
+      always() &&
+      needs.swift-format.result == 'success' &&
+      (needs.swift-unit-tests.result == 'success' || needs.swift-unit-tests.result == 'skipped') &&
+      github.repository == 'hubertgajewski/gocycling' &&
+      vars.CI_RUN_UI_TESTS != 'false'
     name: UI smoke (${{ matrix.runtime }} / ${{ matrix.device_label }})
     runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && matrix.os || vars.RUNNER || matrix.os }}
     timeout-minutes: 20
