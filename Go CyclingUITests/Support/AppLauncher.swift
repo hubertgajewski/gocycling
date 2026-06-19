@@ -5,6 +5,7 @@
 
 import XCTest
 
+/// Launch arguments understood by the app's DEBUG-only UI-testing seams.
 enum LaunchArgument {
   static let uiTesting = "-ui-testing"
   static let routeSaveFixture = "-ui-testing-route-save-fixture"
@@ -14,6 +15,11 @@ enum LaunchArgument {
   static let applePersistenceIgnoreState = "-ApplePersistenceIgnoreState"
 }
 
+/// Creates consistently configured app instances for UI tests.
+///
+/// All UI tests should launch through this helper so test mode, English
+/// fallback labels, and state-restoration isolation stay consistent across the
+/// iPhone and iPad smoke matrix.
 struct AppLauncher {
   private let baseArguments = [
     LaunchArgument.uiTesting,

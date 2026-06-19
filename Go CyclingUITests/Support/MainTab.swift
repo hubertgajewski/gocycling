@@ -1,9 +1,8 @@
-//
-//  MainTab.swift
-//  Go CyclingUITests
-//
-
-enum MainTab: CaseIterable {
+/// Main app tabs and the locators needed to select and verify them.
+///
+/// `englishLabel` covers iPhone tab bars, `imageIdentifier` covers iPad
+/// floating tab buttons, and `contentIdentifier` verifies the selected root.
+enum MainTab {
   case cycle
   case history
   case statistics

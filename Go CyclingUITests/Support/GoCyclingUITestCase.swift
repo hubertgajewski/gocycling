@@ -5,6 +5,10 @@
 
 import XCTest
 
+/// Base class for launched-app UI tests.
+///
+/// Owns fail-fast behavior, app launch tracking, failure screenshots, and app
+/// termination so individual tests can focus on their workflow assertions.
 class GoCyclingUITestCase: XCTestCase {
   private let appLauncher = AppLauncher()
   private(set) var app: XCUIApplication?

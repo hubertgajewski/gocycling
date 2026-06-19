@@ -1,8 +1,7 @@
-//
-//  AccessibilityIDs.swift
-//  Go CyclingUITests
-//
-
+/// UI-test mirror of app-owned accessibility identifiers.
+///
+/// UI tests are black-box and cannot import the app target's helpers, so values
+/// here must stay in sync with `Go Cycling/Support/UITesting.swift`.
 enum AccessibilityID {
   enum MainTab {
     static let cycleContent = "main-tab-cycle"

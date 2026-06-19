@@ -5,6 +5,11 @@
 
 import XCTest
 
+/// Screen object for the app shell's main tab navigation.
+///
+/// This is the only UI-test helper that should know how tab buttons are exposed
+/// on iPhone versus iPad. It does not own tab-specific controls such as Cycle
+/// start, pause, or stop buttons.
 final class MainTabBarScreen {
   private let app: XCUIApplication
 

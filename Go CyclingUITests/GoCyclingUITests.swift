@@ -7,6 +7,10 @@
 
 import XCTest
 
+/// Existing fixture-backed UI smoke coverage.
+///
+/// This file keeps the pre-harness Cycle and route-save scenarios passing while
+/// newer UI tests move into focused files under `Go CyclingUITests/Tests`.
 final class GoCyclingUITests: GoCyclingUITestCase {
   private enum AlertLabel {
     static let openSettings = "Open Settings"

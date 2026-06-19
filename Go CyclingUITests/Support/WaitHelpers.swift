@@ -5,6 +5,10 @@
 
 import XCTest
 
+/// Shared wait policy for UI tests.
+///
+/// Keeping timeouts named and centralized avoids scattered raw waits and keeps
+/// future tuning explicit when simulator timing changes.
 enum Wait {
   enum Timeout {
     static let short: TimeInterval = 3
