@@ -161,6 +161,12 @@
 		9DAB831C25FECAD400F5C42E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9DAB831B25FECAD400F5C42E /* Assets.xcassets */; };
 		9DAB831F25FECAD400F5C42E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9DAB831E25FECAD400F5C42E /* Preview Assets.xcassets */; };
 		9DAB833525FECAD400F5C42E /* GoCyclingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAB833425FECAD400F5C42E /* GoCyclingUITests.swift */; };
+		AA0000902026061900000001 /* MainTabNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000912026061900000001 /* MainTabNavigationTests.swift */; };
+		AA0000932026061900000001 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000942026061900000001 /* AppLauncher.swift */; };
+		AA0000952026061900000001 /* WaitHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000962026061900000001 /* WaitHelpers.swift */; };
+		AA0000972026061900000001 /* AccessibilityIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000982026061900000001 /* AccessibilityIDs.swift */; };
+		AA0001012026061900000001 /* GoCyclingUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001022026061900000001 /* GoCyclingUITestCase.swift */; };
+		AA0001032026061900000001 /* MainTabBarScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001042026061900000001 /* MainTabBarScreen.swift */; };
 		9DAB835E25FECCB000F5C42E /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAB835D25FECCB000F5C42E /* MainView.swift */; };
 		9DAB837025FED0A300F5C42E /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAB836F25FED0A300F5C42E /* HistoryView.swift */; };
 		9DAB837525FED2F800F5C42E /* TimerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAB837425FED2F800F5C42E /* TimerButton.swift */; };
@@ -376,6 +382,12 @@
 		9DAB833025FECAD400F5C42E /* Go CyclingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Go CyclingUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DAB833425FECAD400F5C42E /* GoCyclingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoCyclingUITests.swift; sourceTree = "<group>"; };
 		9DAB833625FECAD400F5C42E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA0000912026061900000001 /* MainTabNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabNavigationTests.swift; sourceTree = "<group>"; };
+		AA0000942026061900000001 /* AppLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLauncher.swift; sourceTree = "<group>"; };
+		AA0000962026061900000001 /* WaitHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitHelpers.swift; sourceTree = "<group>"; };
+		AA0000982026061900000001 /* AccessibilityIDs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityIDs.swift; sourceTree = "<group>"; };
+		AA0001022026061900000001 /* GoCyclingUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoCyclingUITestCase.swift; sourceTree = "<group>"; };
+		AA0001042026061900000001 /* MainTabBarScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarScreen.swift; sourceTree = "<group>"; };
 		9DAB835D25FECCB000F5C42E /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		9DAB836F25FED0A300F5C42E /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		9DAB837425FED2F800F5C42E /* TimerButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerButton.swift; sourceTree = "<group>"; };
@@ -833,10 +845,40 @@
 		9DAB833325FECAD400F5C42E /* Go CyclingUITests */ = {
 			isa = PBXGroup;
 			children = (
-				9DAB833425FECAD400F5C42E /* GoCyclingUITests.swift */,
+				AA0001052026061900000001 /* Support */,
+				AA0001062026061900000001 /* Screens */,
+				AA0000922026061900000001 /* Tests */,
 				9DAB833625FECAD400F5C42E /* Info.plist */,
 			);
 			path = "Go CyclingUITests";
+			sourceTree = "<group>";
+		};
+		AA0001052026061900000001 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000982026061900000001 /* AccessibilityIDs.swift */,
+				AA0000942026061900000001 /* AppLauncher.swift */,
+				AA0001022026061900000001 /* GoCyclingUITestCase.swift */,
+				AA0000962026061900000001 /* WaitHelpers.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		AA0001062026061900000001 /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				AA0001042026061900000001 /* MainTabBarScreen.swift */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		AA0000922026061900000001 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				9DAB833425FECAD400F5C42E /* GoCyclingUITests.swift */,
+				AA0000912026061900000001 /* MainTabNavigationTests.swift */,
+			);
+			path = Tests;
 			sourceTree = "<group>";
 		};
 		9DAB836525FED02A00F5C42E /* View */ = {
@@ -1219,6 +1261,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				9DAB833525FECAD400F5C42E /* GoCyclingUITests.swift in Sources */,
+				AA0000902026061900000001 /* MainTabNavigationTests.swift in Sources */,
+				AA0000932026061900000001 /* AppLauncher.swift in Sources */,
+				AA0000952026061900000001 /* WaitHelpers.swift in Sources */,
+				AA0000972026061900000001 /* AccessibilityIDs.swift in Sources */,
+				AA0001012026061900000001 /* GoCyclingUITestCase.swift in Sources */,
+				AA0001032026061900000001 /* MainTabBarScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
