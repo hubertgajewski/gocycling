@@ -141,11 +141,6 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     // Used to decide whether to show a location settings alert when the user starts a session
     func setLocationAlertStatus() {
-        if UITesting.isEnabled && locationSettingsAlertMessage.isEmpty {
-            // UI-smoke tests need a deterministic alert so cycle-control identifiers
-            // can be exercised even when the simulator already granted Always access.
-            locationSettingsAlertMessage = LocationSettingsAlertPolicy.alertMessage(for: .denied)
-        }
         if (locationSettingsAlertMessage != "") {
             showLocationSettingsAlert = true
         }

@@ -39,7 +39,6 @@ struct MapWithSpeedView: View {
                     currentDistance: $locationManager.cyclingTotalDistance,
                     pillColor: Color(UserPreferences.convertColourChoiceToUIColor(colour: preferences.colourChoiceConverted))
                 )
-                .accessibilityIdentifier("main-tab-cycle")
                 Spacer()
                 HStack {
                     Spacer()
@@ -49,14 +48,12 @@ struct MapWithSpeedView: View {
                                 MapSystemImageButton(systemImageString: "lock", buttonColour: (UserPreferences.convertColourChoiceToUIColor(colour: preferences.colourChoiceConverted)))
                                     .padding(.bottom, 5)
                                 }
-                            .accessibilityIdentifier(AccessibilityIdentifier.Cycle.mapLockButton)
                         }
                         else {
                             Button (action: {self.toggleMapCentered()}) {
                                 MapSystemImageButton(systemImageString: "lock.open", buttonColour: (UserPreferences.convertColourChoiceToUIColor(colour: preferences.colourChoiceConverted)))
                                     .padding(.bottom, 5)
                                 }
-                            .accessibilityIdentifier(AccessibilityIdentifier.Cycle.mapUnlockButton)
                         }
                     }
                     Spacer()

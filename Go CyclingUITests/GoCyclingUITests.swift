@@ -12,23 +12,6 @@ class GoCyclingUITests: XCTestCase {
   private static let uiTestingLaunchArgument = "-ui-testing"
   private static let routeSaveFixtureLaunchArgument = "-ui-testing-route-save-fixture"
 
-  // Keep in sync with AccessibilityIdentifier.Cycle in Support/UITesting.swift.
-  // UI tests stay black-box and cannot import app-only helpers.
-  private enum CycleIdentifier {
-    static let timerDisplay = "cycle-timer-display"
-    static let mapLockButton = "cycle-map-lock-button"
-    static let mapUnlockButton = "cycle-map-unlock-button"
-    static let startButton = "cycle-start-button"
-    static let pauseButton = "cycle-pause-button"
-    static let resumeButton = "cycle-resume-button"
-    static let stopButton = "cycle-stop-button"
-    static let locationSettingsOpenSettingsButton =
-      "cycle-location-settings-open-settings-button"
-    static let locationSettingsIgnoreButton = "cycle-location-settings-ignore-button"
-    static let stopConfirmationStopButton = "cycle-stop-confirmation-stop-button"
-    static let stopConfirmationCancelButton = "cycle-stop-confirmation-cancel-button"
-  }
-
   private enum MainTab {
     case cycle
     case history
@@ -75,7 +58,7 @@ class GoCyclingUITests: XCTestCase {
     XCTAssertTrue(waitForMainChrome(in: app), "Expected Cycle tab chrome after launch")
 
     XCTAssertTrue(tabContent(.cycle, in: app).waitForExistence(timeout: 5))
-    XCTAssertTrue(app.buttons[CycleIdentifier.startButton].waitForExistence(timeout: 3))
+    XCTAssertTrue(app.buttons["Start"].waitForExistence(timeout: 3))
 
     tapTab(.history, in: app)
     XCTAssertTrue(tabContent(.history, in: app).waitForExistence(timeout: 5))
@@ -105,72 +88,6 @@ class GoCyclingUITests: XCTestCase {
     XCTAssertTrue(tabContent(.cycle, in: app).waitForExistence(timeout: 5))
   }
 
-  func testCycleControlsExposeStableAccessibilityIdentifiers() throws {
-    let app = XCUIApplication()
-    app.launchArguments = [Self.uiTestingLaunchArgument]
-    app.launch()
-
-    XCTAssertTrue(waitForMainChrome(in: app), "Expected Cycle tab chrome after launch")
-    XCTAssertTrue(tabContent(.cycle, in: app).waitForExistence(timeout: 5))
-
-    XCTAssertTrue(app.staticTexts[CycleIdentifier.timerDisplay].waitForExistence(timeout: 3))
-    XCTAssertTrue(app.buttons[CycleIdentifier.mapLockButton].waitForExistence(timeout: 3))
-
-    app.buttons[CycleIdentifier.mapLockButton].tap()
-    XCTAssertTrue(app.buttons[CycleIdentifier.mapUnlockButton].waitForExistence(timeout: 3))
-
-    app.buttons[CycleIdentifier.startButton].tap()
-
-    let openSettings = app.buttons.matching(
-      identifier: CycleIdentifier.locationSettingsOpenSettingsButton
-    ).firstMatch
-    XCTAssertTrue(openSettings.waitForExistence(timeout: 3))
-
-    let ignoreLocationAlert = app.buttons.matching(
-      identifier: CycleIdentifier.locationSettingsIgnoreButton
-    ).firstMatch
-    XCTAssertTrue(ignoreLocationAlert.waitForExistence(timeout: 3))
-    ignoreLocationAlert.tap()
-
-    let pauseButton = app.buttons[CycleIdentifier.pauseButton]
-    let resumeButton = app.buttons[CycleIdentifier.resumeButton]
-    guard
-      let visibleCyclingControl = waitForEither(
-        pauseButton,
-        resumeButton,
-        timeout: 3
-      )
-    else {
-      XCTFail("Expected either Pause or Resume after dismissing the location alert")
-      return
-    }
-    if visibleCyclingControl.identifier == CycleIdentifier.resumeButton {
-      visibleCyclingControl.tap()
-    }
-
-    XCTAssertTrue(pauseButton.waitForExistence(timeout: 3))
-    XCTAssertTrue(app.buttons[CycleIdentifier.stopButton].waitForExistence(timeout: 3))
-
-    pauseButton.tap()
-    XCTAssertTrue(resumeButton.waitForExistence(timeout: 3))
-    XCTAssertTrue(app.buttons[CycleIdentifier.stopButton].waitForExistence(timeout: 3))
-
-    app.buttons[CycleIdentifier.stopButton].tap()
-
-    let confirmStop = app.buttons.matching(
-      identifier: CycleIdentifier.stopConfirmationStopButton
-    ).firstMatch
-    XCTAssertTrue(confirmStop.waitForExistence(timeout: 3))
-
-    let cancelStop = app.buttons.matching(
-      identifier: CycleIdentifier.stopConfirmationCancelButton
-    ).firstMatch
-    XCTAssertTrue(cancelStop.waitForExistence(timeout: 3))
-    cancelStop.tap()
-
-    XCTAssertTrue(app.buttons[CycleIdentifier.resumeButton].waitForExistence(timeout: 3))
-  }
-
   /// iPhone uses a bottom `TabBar`; iPad uses nested floating tab item buttons.
   private func waitForMainChrome(in app: XCUIApplication) -> Bool {
     if app.tabBars.firstMatch.waitForExistence(timeout: 2) {
@@ -193,30 +110,6 @@ class GoCyclingUITests: XCTestCase {
 
   private func tabContent(_ tab: MainTab, in app: XCUIApplication) -> XCUIElement {
     app.descendants(matching: .any).matching(identifier: tab.contentIdentifier).firstMatch
-  }
-
-  private func waitForEither(
-    _ firstElement: XCUIElement,
-    _ secondElement: XCUIElement,
-    timeout: TimeInterval
-  ) -> XCUIElement? {
-    let deadline = Date().addingTimeInterval(timeout)
-    while Date() < deadline {
-      if firstElement.exists {
-        return firstElement
-      }
-      if secondElement.exists {
-        return secondElement
-      }
-      RunLoop.current.run(until: Date().addingTimeInterval(0.05))
-    }
-    if firstElement.exists {
-      return firstElement
-    }
-    if secondElement.exists {
-      return secondElement
-    }
-    return nil
   }
 
   private func tapTab(_ tab: MainTab, in app: XCUIApplication) {
