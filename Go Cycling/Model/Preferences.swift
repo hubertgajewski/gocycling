@@ -78,8 +78,21 @@ class Preferences: ObservableObject {
     static private let defaultIconIndex = 0
     static private let defaultICloudOn = false
     static private let defaultTelemetryEnabled = true
+
+    #if DEBUG
+    // Serialized Preferences tests pass explicit launch arguments; static iCloud
+    // helpers read the most recent init arguments instead of ProcessInfo.
+    private static var unitTestLaunchArguments: [String] = ProcessInfo.processInfo.arguments
+
+    static func resetUnitTestLaunchArgumentsForTesting() {
+        unitTestLaunchArguments = []
+    }
+    #endif
     
     init(arguments: [String] = ProcessInfo.processInfo.arguments) {
+        #if DEBUG
+        Self.unitTestLaunchArguments = arguments
+        #endif
         if UITesting.shouldUseIsolatedPersistence(arguments: arguments) {
             // UI-smoke tests need predictable defaults, but writing the normal
             // initialization keys would mutate the user's app preferences.
@@ -230,6 +243,12 @@ class Preferences: ObservableObject {
         if UserDefaults.standard.object(forKey: Preferences.iCloudOnKey) == nil {
             UserDefaults.standard.set(false, forKey: Preferences.iCloudOnKey)
         }
+        #if DEBUG
+        if UITesting.shouldSimulateICloudSyncAvailable(arguments: unitTestLaunchArguments),
+           UserDefaults.standard.bool(forKey: Preferences.iCloudOnKey) {
+            return true
+        }
+        #endif
         // Check if iCloud is available
         var iCloudAvailable = false
         if FileManager.default.ubiquityIdentityToken != nil {

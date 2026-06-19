@@ -13,6 +13,10 @@ enum UITesting {
     // Cycle controls UI tests need deterministic alerts and timer behavior
     // without applying those fixtures to every UI-testing launch.
     static let cycleControlsFixtureArgument = "-ui-testing-cycle-controls-fixture"
+    // Unit tests opt in explicitly so iCloud sync paths run without a signed-in
+    // iCloud account; must be paired with iCloudOn in UserDefaults.
+    static let simulateICloudSyncLaunchArgument = "-simulate-icloud-sync-for-tests"
+    static let simulateICloudSyncLaunchArguments = [simulateICloudSyncLaunchArgument]
     static let routeSaveFixtureLaunchArguments = [
         launchArgument,
         routeSaveFixtureArgument,
@@ -41,6 +45,10 @@ enum UITesting {
         shouldUseIsolatedPersistence(arguments: arguments) && arguments.contains(cycleControlsFixtureArgument)
     }
 
+    static func shouldSimulateICloudSyncAvailable(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        arguments.contains(simulateICloudSyncLaunchArgument)
+    }
+
     static var shouldRequestLocationAuthorization: Bool {
         !isEnabled
     }
@@ -62,6 +70,10 @@ enum UITesting {
     }
 
     static func shouldUseCycleControlsFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        false
+    }
+
+    static func shouldSimulateICloudSyncAvailable(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
         false
     }
 

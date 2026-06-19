@@ -193,13 +193,17 @@ func ubiquitousStorePersistsValues() -> Bool {
 }
 
 /// Returns whether iCloud KVS sync tests can run in the current environment.
-/// Callers must seed `iCloudOn` (via `iCloudSyncPreferenceKey`) before constructing
-/// `Preferences`; this helper checks only an iCloud identity token and that the
-/// ubiquitous store persists values — the same token requirement as
-/// `Preferences.iCloudAvailable()`, plus a store probe. CI simulators may satisfy
-/// the probe without a signed-in iCloud account.
-func iCloudKeyValueSyncAvailableForTests() -> Bool {
-  FileManager.default.ubiquityIdentityToken != nil && ubiquitousStorePersistsValues()
+/// Pass `UITesting.simulateICloudSyncLaunchArguments` to `Preferences(arguments:)`
+/// so unit tests exercise sync paths without a signed-in iCloud account. Callers
+/// must seed `iCloudOn` before constructing `Preferences`.
+func iCloudKeyValueSyncAvailableForTests(
+  arguments: [String] = UITesting.simulateICloudSyncLaunchArguments
+) -> Bool {
+  guard ubiquitousStorePersistsValues() else { return false }
+  if UITesting.shouldSimulateICloudSyncAvailable(arguments: arguments) {
+    return true
+  }
+  return FileManager.default.ubiquityIdentityToken != nil
 }
 
 @Suite("PersistedStoreSnapshot", .serialized)
