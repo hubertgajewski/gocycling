@@ -109,6 +109,8 @@ extension Records {
         getStoredRecords(in: PersistenceController.shared.container.viewContext)
     }
 
+    // App launch migration passes the selected store context here so UI-test
+    // launches do not fall back to the production-backed shared context.
     static func getStoredRecords(in context: NSManagedObjectContext) -> Records? {
         let fetchRequest: NSFetchRequest<Records> = Records.fetchRequest()
         do {

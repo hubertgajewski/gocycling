@@ -80,12 +80,16 @@ enum AppLaunchMigration {
     }
 }
 
+// Groups launch-time storage decisions so persistence is selected once before
+// storage-backed state objects, views, or migrations can touch Core Data.
 struct AppLaunchStorage {
     let persistenceController: PersistenceController
     let bikeRides: BikeRideStorage
     let preferences: Preferences
     let records: CyclingRecords
 
+    // Migration helpers read through this selected context instead of resolving
+    // PersistenceController.shared again after launch-store selection.
     var viewContext: NSManagedObjectContext {
         persistenceController.container.viewContext
     }
@@ -129,6 +133,8 @@ struct AppLaunchStorage {
 @main
 struct GoCyclingApp: App {
 
+    // Retain the selected launch storage so onAppear migrations use the same
+    // context that was injected into the first rendered view hierarchy.
     private let launchStorage: AppLaunchStorage
     let persistenceController: PersistenceController
     @Environment(\.scenePhase) var scenePhase
@@ -143,6 +149,8 @@ struct GoCyclingApp: App {
     }
 
     init(launchStorage: AppLaunchStorage) {
+        // Construct every storage-backed StateObject from the launch seam so the
+        // app cannot mix isolated UI-test storage with production singletons.
         self.launchStorage = launchStorage
         self.persistenceController = launchStorage.persistenceController
         self._bikeRides = StateObject(wrappedValue: launchStorage.bikeRides)
@@ -177,6 +185,8 @@ struct GoCyclingApp: App {
                     // work can mutate real preferences or telemetry state.
                     guard !UITesting.shouldUseIsolatedPersistence() else { return }
 
+                    // Legacy Core Data migration must read from the selected
+                    // launch store before migrated values are copied to defaults.
                     AppLaunchMigration.runIfNeeded(
                         migratePreferences: {
                             if let oldPreferences = launchStorage.savedPreferences() {

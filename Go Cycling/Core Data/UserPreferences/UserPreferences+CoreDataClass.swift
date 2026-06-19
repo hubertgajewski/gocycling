@@ -37,6 +37,8 @@ extension UserPreferences {
         savedPreferences(in: PersistenceController.shared.container.viewContext)
     }
 
+    // App launch migration passes the selected store context here so UI-test
+    // launches do not fall back to the production-backed shared context.
     static func savedPreferences(in context: NSManagedObjectContext) -> UserPreferences? {
         let fetchRequest: NSFetchRequest<UserPreferences> = UserPreferences.fetchRequest()
         do {
