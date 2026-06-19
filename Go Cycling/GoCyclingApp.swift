@@ -98,6 +98,9 @@ struct AppLaunchStorage {
         Records.getStoredRecords(in: viewContext)
     }
 
+    // UI-test launches must select the isolated Core Data store before any
+    // storage-backed state object or legacy migration can touch production data.
+    // Production still resolves to the existing shared app singletons.
     static func make(
         arguments: [String] = ProcessInfo.processInfo.arguments,
         persistenceControllerFactory: ([String]) -> PersistenceController = { _ in
