@@ -311,6 +311,4 @@ jobs:
             TestResults/coverage.json
             TestResults/combined.xccovreport
             TestResults/combined.xccovarchive
-            TestResults/unit.xcresult
-            TestResults/ui-ios26-iphone.xcresult
           if-no-files-found: error
