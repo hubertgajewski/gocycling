@@ -9,9 +9,17 @@ import Foundation
 import CoreData
 
 extension BikeRide {
+
+    // Testability: route-name, category, and sort helpers are covered by unit tests
+    // that seed rides in an in-memory Core Data store (see BikeRideExtensionsTests
+    // and makeInMemoryChartPersistence). The zero-arg APIs below still use
+    // PersistenceController.shared for production; injectable overloads exist so
+    // tests never open or write to the app singleton store, which fails on CI with
+    // Core Data error 134020 when the store config differs. Date-range fetchers
+    // below are unchanged; those tests exercise fetch requests directly instead of
+    // the shared store.
     
-    static func allBikeRides() -> [BikeRide] {
-        let context = PersistenceController.shared.container.viewContext
+    static func allBikeRides(in context: NSManagedObjectContext) -> [BikeRide] {
         let fetchRequest: NSFetchRequest<BikeRide> = BikeRide.fetchRequest()
         do {
             let items = try context.fetch(fetchRequest)
@@ -22,9 +30,12 @@ extension BikeRide {
         }
         return [BikeRide]()
     }
+
+    static func allBikeRides() -> [BikeRide] {
+        allBikeRides(in: PersistenceController.shared.container.viewContext)
+    }
     
-    static func allBikeRidesSorted() -> [BikeRide] {
-        let bikeRidesUnsorted = allBikeRides()
+    static func allBikeRidesSorted(from bikeRidesUnsorted: [BikeRide]) -> [BikeRide] {
         var bikeRides: [BikeRide] = []
         switch Preferences.shared.sortingChoiceConverted {
         case .distanceAscending:
@@ -42,12 +53,15 @@ extension BikeRide {
         }
         return bikeRides
     }
+
+    static func allBikeRidesSorted() -> [BikeRide] {
+        allBikeRidesSorted(from: allBikeRides())
+    }
     
-    static func allRouteNames() -> [String] {
-        let allBikeRides = allBikeRides()
+    static func allRouteNames(from bikeRides: [BikeRide]) -> [String] {
         var uniqueNames: [String] = []
 
-        for ride in allBikeRides {
+        for ride in bikeRides {
             if (uniqueNames.firstIndex(of: ride.cyclingRouteName) == nil) {
                 if (ride.cyclingRouteName != "Uncategorized") {
                     uniqueNames.append(ride.cyclingRouteName)
@@ -57,9 +71,13 @@ extension BikeRide {
         
         return uniqueNames.sorted { $0.lowercased() < $1.lowercased() }
     }
+
+    static func allRouteNames() -> [String] {
+        allRouteNames(from: allBikeRides())
+    }
     
-    static func allCategories() -> [Category] {
-        let allBikeRides = allBikeRidesSorted()
+    static func allCategories(from bikeRides: [BikeRide]) -> [Category] {
+        let allBikeRides = allBikeRidesSorted(from: bikeRides)
         var categories: [Category] = []
         var names: [String] = []
         var numbers: [Int] = []
@@ -96,6 +114,10 @@ extension BikeRide {
         }
         
         return categories
+    }
+
+    static func allCategories() -> [Category] {
+        allCategories(from: allBikeRides())
     }
     
     // Functions to get data for the charts on the statistics tab

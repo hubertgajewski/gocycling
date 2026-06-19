@@ -146,6 +146,23 @@ struct BikeRideListViewModelTests {
     #expect(!viewModel.filterEnabledCheck())
   }
 
+  @Test("increments review-worthy count when review actions are enabled")
+  func incrementsReviewWorthyCountWhenReviewActionsAreEnabled() async {
+    let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)
+    defer { snapshot.restore() }
+
+    UserDefaults.standard.set(0, forKey: ReviewManager.reviewCountKey)
+    UserDefaults.standard.set(false, forKey: ReviewManager.completedRouteKey)
+
+    _ = BikeRideListViewModel(
+      bikeRides: [],
+      categories: [],
+      reviewActionsEnabled: true
+    )
+
+    #expect(UserDefaults.standard.integer(forKey: ReviewManager.reviewCountKey) == 1)
+  }
+
   @Test("clears invalid selected route during initialization")
   func clearsInvalidSelectedRouteDuringInitialization() async {
     let snapshot = await PersistedStoreSnapshot(keys: viewModelStoreKeys)

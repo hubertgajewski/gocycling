@@ -143,6 +143,102 @@ struct BikeRidePersistenceTests {
     #expect(try fetchRides(in: context).isEmpty)
   }
 
+  @Test("updates an existing bike ride route name and metrics")
+  func updatesExistingBikeRideRouteNameAndMetrics() async throws {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+    defer { snapshot.restore() }
+
+    let persistence = makeInMemoryPersistenceController()
+    let context = persistence.container.viewContext
+    let ride = makeRide(in: context, name: "Uncategorized", distance: 1_000)
+    try context.save()
+
+    let startTime = Date(timeIntervalSince1970: 3_600)
+    persistence.updateBikeRideRouteName(
+      existingBikeRide: ride,
+      latitudes: [51.5, 52.0],
+      longitudes: [-0.12, -0.2],
+      speeds: [4.0, 5.0],
+      distance: 2_500,
+      elevations: [10, 20],
+      startTime: startTime,
+      time: 720,
+      routeName: "Commute"
+    )
+
+    #expect(ride.cyclingRouteName == "Commute")
+    #expect(ride.cyclingLatitudes == [51.5, 52.0])
+    #expect(ride.cyclingLongitudes == [-0.12, -0.2])
+    #expect(ride.cyclingSpeeds == [4.0, 5.0])
+    #expect(ride.cyclingDistance == 2_500)
+    #expect(ride.cyclingElevations == [10, 20])
+    #expect(ride.cyclingStartTime == startTime)
+    #expect(ride.cyclingTime == 720)
+  }
+
+  @Test("stores and updates records entities")
+  func storesAndUpdatesRecordsEntities() async throws {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+    defer { snapshot.restore() }
+
+    let persistence = makeInMemoryPersistenceController()
+    let context = persistence.container.viewContext
+    let startDate = Date(timeIntervalSince1970: 1_800)
+
+    persistence.storeRecords(
+      totalDistance: 10_000,
+      totalTime: 2_000,
+      totalRoutes: 3,
+      unlockedIcons: [true, false, false, false, false, false],
+      longestDistance: 5_000,
+      longestTime: 900,
+      fastestAvgSpeed: 6,
+      longestDistanceDate: startDate,
+      longestTimeDate: startDate,
+      fastestAvgSpeedDate: startDate
+    )
+
+    let storedRecords = try fetchRecords(in: context)
+    #expect(storedRecords.count == 1)
+    let records = try #require(storedRecords.first)
+    #expect(records.totalCyclingDistance == 10_000)
+    #expect(records.totalCyclingTime == 2_000)
+    #expect(records.totalCyclingRoutes == 3)
+    #expect(records.longestCyclingDistance == 5_000)
+    #expect(records.unlockedIcons == [true, false, false, false, false, false])
+
+    let updatedDate = Date(timeIntervalSince1970: 3_600)
+    persistence.updateRecords(
+      existingRecords: records,
+      totalDistance: 15_000,
+      totalTime: 2_500,
+      totalRoutes: 4,
+      longestDistance: 7_000,
+      longestTime: 1_100,
+      fastestAvgSpeed: 7,
+      longestDistanceDate: updatedDate,
+      longestTimeDate: updatedDate,
+      fastestAvgSpeedDate: updatedDate
+    )
+
+    #expect(records.totalCyclingDistance == 15_000)
+    #expect(records.totalCyclingTime == 2_500)
+    #expect(records.totalCyclingRoutes == 4)
+    #expect(records.longestCyclingDistance == 7_000)
+    #expect(records.longestCyclingTime == 1_100)
+    #expect(records.fastestAverageSpeed == 7)
+    #expect(records.longestCyclingDistanceDate == updatedDate)
+  }
+
+  @Test("save is a no-op when the view context has no changes")
+  func saveIsNoOpWhenViewContextHasNoChanges() async {
+    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
+    defer { snapshot.restore() }
+
+    let persistence = makeInMemoryPersistenceController()
+    persistence.save()
+  }
+
   @Test("route save fixture uses an isolated non-CloudKit store")
   func routeSaveFixtureUsesIsolatedNonCloudKitStore() throws {
     let suiteName = "GoCyclingTests.RouteSaveFixture.\(UUID().uuidString)"
@@ -209,4 +305,9 @@ private func fetchRides(in context: NSManagedObjectContext) throws -> [BikeRide]
 
 private func countsByRouteName(_ rides: [BikeRide]) -> [String: Int] {
   Dictionary(grouping: rides, by: \.cyclingRouteName).mapValues(\.count)
+}
+
+private func fetchRecords(in context: NSManagedObjectContext) throws -> [Records] {
+  let request: NSFetchRequest<Records> = Records.fetchRequest()
+  return try context.fetch(request)
 }

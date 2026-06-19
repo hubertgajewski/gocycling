@@ -3,6 +3,7 @@
 //  Go CyclingTests
 //
 
+import CoreData
 import CoreLocation
 import Foundation
 import Testing
@@ -425,6 +426,114 @@ struct CyclingRecordsTests {
     )
   }
 
+  @Test("migrates existing records entity values into defaults")
+  @MainActor
+  func migratesExistingRecordsEntityValuesIntoDefaults() async throws {
+    let snapshot = await PersistedStoreSnapshot(
+      keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+    defer { snapshot.restore() }
+
+    let context = PersistenceController(inMemory: true).container.viewContext
+    let entity = NSEntityDescription.entity(forEntityName: "Records", in: context)!
+    let existingRecords = Records(entity: entity, insertInto: context)
+    existingRecords.totalCyclingDistance = 12_000
+    existingRecords.totalCyclingTime = 1_800
+    existingRecords.totalCyclingRoutes = 4
+    existingRecords.unlockedIcons = [true, false, true, false, false, false]
+    existingRecords.longestCyclingDistance = 6_000
+    existingRecords.longestCyclingTime = 900
+    existingRecords.fastestAverageSpeed = 7
+    existingRecords.longestCyclingDistanceDate = date(2026, 5, 1)
+    existingRecords.longestCyclingTimeDate = date(2026, 5, 2)
+    existingRecords.fastestAverageSpeedDate = date(2026, 5, 3)
+
+    let records = CyclingRecords()
+    records.initialRecordsMigration(existingRecords: existingRecords, existingBikeRides: [])
+
+    #expect(records.totalCyclingDistance == 12_000)
+    #expect(records.totalCyclingTime == 1_800)
+    #expect(records.totalCyclingRoutes == 4)
+    #expect(records.unlockedIcons == [true, false, true, false, false, false])
+    #expect(records.longestCyclingDistance == 6_000)
+    #expect(records.fastestAverageSpeed == 7)
+    #expect(UserDefaults.standard.double(forKey: "totalCyclingDistance") == 12_000)
+    #expect(UserDefaults.standard.integer(forKey: "totalCyclingRoutes") == 4)
+  }
+
+  @Test("derives records from existing bike rides when no records entity exists")
+  @MainActor
+  func derivesRecordsFromExistingBikeRidesWhenNoRecordsEntityExists() async {
+    let snapshot = await PersistedStoreSnapshot(
+      keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+    defer { snapshot.restore() }
+
+    let context = PersistenceController(inMemory: true).container.viewContext
+    let ride = makeMigrationRide(
+      in: context,
+      distance: 5_000,
+      start: date(2026, 6, 10),
+      time: 1_000,
+      speeds: [6]
+    )
+
+    let records = CyclingRecords()
+    records.initialRecordsMigration(existingRecords: nil, existingBikeRides: [ride])
+
+    #expect(records.totalCyclingDistance == 5_000)
+    #expect(records.totalCyclingTime == 1_000)
+    #expect(records.totalCyclingRoutes == 1)
+    #expect(records.longestCyclingDistance == 5_000)
+    #expect(records.fastestAverageSpeed == 5)
+    #expect(UserDefaults.standard.double(forKey: "totalCyclingDistance") == 5_000)
+  }
+
+  @Test("UI testing skips records migration writes")
+  @MainActor
+  func uiTestingSkipsRecordsMigrationWrites() async {
+    let snapshot = await PersistedStoreSnapshot(
+      keys: cyclingRecordStoreKeys + [iCloudSyncPreferenceKey])
+    defer { snapshot.restore() }
+    let assertICloud = ubiquitousStorePersistsValues()
+
+    seedRecordStores(
+      totalTime: 42,
+      totalDistance: 43,
+      unlockedIcons: [true, false, true, false, true, false],
+      longestDistance: 44,
+      longestTime: 45,
+      fastestAverageSpeed: 46,
+      fastestAverageSpeedDate: date(2026, 5, 1),
+      longestDistanceDate: date(2026, 5, 2),
+      longestTimeDate: date(2026, 5, 3),
+      totalRoutes: 7
+    )
+
+    let context = PersistenceController(inMemory: true).container.viewContext
+    let ride = makeMigrationRide(
+      in: context,
+      distance: 5_000,
+      start: date(2026, 6, 10),
+      time: 1_000,
+      speeds: [6]
+    )
+    let records = CyclingRecords(arguments: [UITesting.launchArgument])
+    records.initialRecordsMigration(existingRecords: nil, existingBikeRides: [ride])
+
+    expectPersistedRecords(
+      totalTime: 42,
+      totalDistance: 43,
+      unlockedIcons: [true, false, true, false, true, false],
+      longestDistance: 44,
+      longestTime: 45,
+      fastestAverageSpeed: 46,
+      fastestAverageSpeedDate: date(2026, 5, 1),
+      longestDistanceDate: date(2026, 5, 2),
+      longestTimeDate: date(2026, 5, 3),
+      totalRoutes: 7,
+      assertICloud: assertICloud
+    )
+  }
+
   @Test("resets statistics while preserving unlocked icons")
   @MainActor
   func resetsStatisticsWhilePreservingUnlockedIcons() async {
@@ -605,6 +714,26 @@ private func expectPersistedRecords(
     )
     #expect(NSUbiquitousKeyValueStore.default.longLong(forKey: "totalCyclingRoutes") == totalRoutes)
   }
+}
+
+private func makeMigrationRide(
+  in context: NSManagedObjectContext,
+  distance: Double,
+  start: Date,
+  time: Double,
+  speeds: [CLLocationSpeed]
+) -> BikeRide {
+  let entity = NSEntityDescription.entity(forEntityName: "BikeRide", in: context)!
+  let ride = BikeRide(entity: entity, insertInto: context)
+  ride.cyclingRouteName = "Migration ride"
+  ride.cyclingDistance = distance
+  ride.cyclingStartTime = start
+  ride.cyclingTime = time
+  ride.cyclingSpeeds = speeds
+  ride.cyclingLatitudes = []
+  ride.cyclingLongitudes = []
+  ride.cyclingElevations = []
+  return ride
 }
 
 private func date(_ year: Int, _ month: Int, _ day: Int) -> Date {
