@@ -11,6 +11,44 @@ import XCTest
 /// on iPhone versus iPad. It does not own tab-specific controls such as Cycle
 /// start, pause, or stop buttons.
 final class MainTabBarScreen {
+  /// Main app tabs and the locators needed to select and verify them.
+  ///
+  /// `englishLabel` covers iPhone tab bars, `imageIdentifier` covers iPad
+  /// floating tab buttons, and `contentIdentifier` verifies the selected root.
+  enum Tab {
+    case cycle
+    case history
+    case statistics
+    case settings
+
+    var imageIdentifier: String {
+      switch self {
+      case .cycle: return "bicycle"
+      case .history: return "clock.arrow.circlepath"
+      case .statistics: return "chart.bar.xaxis"
+      case .settings: return "gear"
+      }
+    }
+
+    var englishLabel: String {
+      switch self {
+      case .cycle: return "Cycle"
+      case .history: return "History"
+      case .statistics: return "Statistics"
+      case .settings: return "Settings"
+      }
+    }
+
+    var contentIdentifier: String {
+      switch self {
+      case .cycle: return AccessibilityID.MainTab.cycleContent
+      case .history: return AccessibilityID.MainTab.historyContent
+      case .statistics: return AccessibilityID.MainTab.statisticsContent
+      case .settings: return AccessibilityID.MainTab.settingsContent
+      }
+    }
+  }
+
   private let app: XCUIApplication
 
   init(app: XCUIApplication) {
@@ -27,7 +65,7 @@ final class MainTabBarScreen {
   }
 
   func select(
-    _ tab: MainTab,
+    _ tab: Tab,
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
@@ -37,7 +75,7 @@ final class MainTabBarScreen {
   }
 
   func assertSelected(
-    _ tab: MainTab,
+    _ tab: Tab,
     timeout: TimeInterval = Wait.Timeout.standard,
     file: StaticString = #filePath,
     line: UInt = #line
@@ -45,7 +83,7 @@ final class MainTabBarScreen {
     Wait.assertExists(tabContent(tab), timeout: timeout, file: file, line: line)
   }
 
-  private func tabButton(_ tab: MainTab) -> XCUIElement {
+  private func tabButton(_ tab: Tab) -> XCUIElement {
     let tabBarByLabel = app.tabBars.buttons[tab.englishLabel]
     if tabBarByLabel.exists {
       return tabBarByLabel.firstMatch
@@ -59,7 +97,7 @@ final class MainTabBarScreen {
     return app.buttons.matching(identifier: tab.imageIdentifier).firstMatch
   }
 
-  private func tabContent(_ tab: MainTab) -> XCUIElement {
+  private func tabContent(_ tab: Tab) -> XCUIElement {
     app.descendants(matching: .any).matching(identifier: tab.contentIdentifier).firstMatch
   }
 }

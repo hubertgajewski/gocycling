@@ -165,7 +165,6 @@
 		AA0000932026061900000001 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000942026061900000001 /* AppLauncher.swift */; };
 		AA0000952026061900000001 /* WaitHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000962026061900000001 /* WaitHelpers.swift */; };
 		AA0000972026061900000001 /* AccessibilityIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000982026061900000001 /* AccessibilityIDs.swift */; };
-		AA0000992026061900000001 /* MainTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001002026061900000001 /* MainTab.swift */; };
 		AA0001012026061900000001 /* GoCyclingUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001022026061900000001 /* GoCyclingUITestCase.swift */; };
 		AA0001032026061900000001 /* MainTabBarScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001042026061900000001 /* MainTabBarScreen.swift */; };
 		9DAB835E25FECCB000F5C42E /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAB835D25FECCB000F5C42E /* MainView.swift */; };
@@ -387,7 +386,6 @@
 		AA0000942026061900000001 /* AppLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLauncher.swift; sourceTree = "<group>"; };
 		AA0000962026061900000001 /* WaitHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitHelpers.swift; sourceTree = "<group>"; };
 		AA0000982026061900000001 /* AccessibilityIDs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityIDs.swift; sourceTree = "<group>"; };
-		AA0001002026061900000001 /* MainTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTab.swift; sourceTree = "<group>"; };
 		AA0001022026061900000001 /* GoCyclingUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoCyclingUITestCase.swift; sourceTree = "<group>"; };
 		AA0001042026061900000001 /* MainTabBarScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarScreen.swift; sourceTree = "<group>"; };
 		9DAB835D25FECCB000F5C42E /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
@@ -861,7 +859,6 @@
 				AA0000982026061900000001 /* AccessibilityIDs.swift */,
 				AA0000942026061900000001 /* AppLauncher.swift */,
 				AA0001022026061900000001 /* GoCyclingUITestCase.swift */,
-				AA0001002026061900000001 /* MainTab.swift */,
 				AA0000962026061900000001 /* WaitHelpers.swift */,
 			);
 			path = Support;
@@ -1268,7 +1265,6 @@
 				AA0000932026061900000001 /* AppLauncher.swift in Sources */,
 				AA0000952026061900000001 /* WaitHelpers.swift in Sources */,
 				AA0000972026061900000001 /* AccessibilityIDs.swift in Sources */,
-				AA0000992026061900000001 /* MainTab.swift in Sources */,
 				AA0001012026061900000001 /* GoCyclingUITestCase.swift in Sources */,
 				AA0001032026061900000001 /* MainTabBarScreen.swift in Sources */,
 			);
