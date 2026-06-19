@@ -26,11 +26,11 @@ final class GoCyclingUITests: GoCyclingUITestCase {
     XCTAssertTrue(mainTabs.waitForMainChrome(), "Expected Cycle tab chrome after launch")
 
     mainTabs.select(.history)
-    mainTabs.assertContentVisible(.history)
+    mainTabs.assertSelected(.history)
     Wait.assertExists(app.staticTexts["Distance Cycled"], timeout: Wait.Timeout.fixture)
 
     mainTabs.select(.cycle)
-    mainTabs.assertContentVisible(.cycle)
+    mainTabs.assertSelected(.cycle)
   }
 
   func testCycleControlsExposeStableAccessibilityIdentifiers() throws {
@@ -38,7 +38,7 @@ final class GoCyclingUITests: GoCyclingUITestCase {
     let mainTabs = MainTabBarScreen(app: app)
 
     XCTAssertTrue(mainTabs.waitForMainChrome(), "Expected Cycle tab chrome after launch")
-    mainTabs.assertContentVisible(.cycle)
+    mainTabs.assertSelected(.cycle)
 
     Wait.assertExists(app.staticTexts[AccessibilityID.Cycle.timerDisplay])
     Wait.assertExists(app.buttons[AccessibilityID.Cycle.mapLockButton])

@@ -36,7 +36,7 @@ final class MainTabBarScreen {
     button.tap()
   }
 
-  func assertContentVisible(
+  func assertSelected(
     _ tab: MainTab,
     timeout: TimeInterval = Wait.Timeout.standard,
     file: StaticString = #filePath,
