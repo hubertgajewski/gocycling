@@ -60,6 +60,8 @@ enum UITesting {
     #endif
 }
 
+// Black-box UI tests can only find controls through the rendered app process,
+// so app code owns these stable identifiers and the test target mirrors them.
 enum AccessibilityIdentifier {
     enum Cycle {
         static let timerDisplay = "cycle-timer-display"

@@ -44,6 +44,8 @@ struct CycleView: View {
                     openSettings: openLocationSettings
                 )
                 VStack(spacing: 4) {
+                    // UI tests assert Cycle state through stable identifiers
+                    // instead of localized text, formatting, or SF Symbol names.
                     Text(MetricsFormatting.formatElapsedTimer(time: timer.totalAccumulatedTime))
                         .font(.custom("Avenir", size: 40))
                         .accessibilityIdentifier(AccessibilityIdentifier.Cycle.timerDisplay)
@@ -153,6 +155,8 @@ struct CycleView: View {
         )
     }
 
+    // Extracted so the iOS 15 alert buttons can carry UI-test identifiers while
+    // sharing the same production action with the iOS 14 Alert fallback.
     func openLocationSettings() {
         // Pause the current cycling session
         self.timer.pause()
@@ -191,6 +195,8 @@ struct CycleView: View {
         )
     }
 
+    // Extracted so the identifier-bearing stop-confirmation alert and the
+    // iOS 14 Alert fallback cannot drift in their route-ending behavior.
     func stopCyclingAfterConfirmation() {
         // Completing a route is a review worthy event
         ReviewManager.incrementReviewWorthyCount()
@@ -223,6 +229,9 @@ struct CycleView_Previews: PreviewProvider {
     }
 }
 
+// UI tests need identifiers on alert actions. The iOS 15 alert builder exposes
+// Button views that can carry identifiers; the legacy Alert fallback preserves
+// iOS 14 behavior where those identifiers cannot be attached.
 private extension View {
     @ViewBuilder
     func cycleLocationSettingsAlert(
