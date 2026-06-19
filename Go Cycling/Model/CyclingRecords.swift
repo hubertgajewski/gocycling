@@ -400,7 +400,8 @@ class CyclingRecords: ObservableObject {
         }
     }
     
-    // Reset stored statistics (except unlocked app icons)
+    // Keep the legacy static entry point for existing callers; new UI paths call
+    // the selected records instance so isolated UI-test launches do not touch shared.
     static public func resetStatistics(arguments: [String] = ProcessInfo.processInfo.arguments) {
         if UITesting.shouldUseIsolatedPersistence(arguments: arguments) {
             CyclingRecords.shared.resetStatisticsInMemory()
@@ -450,6 +451,8 @@ class CyclingRecords: ObservableObject {
         writeToClassMembers()
     }
 
+    // Share the in-memory reset between legacy static UI-test calls and the
+    // selected-instance path used by Settings during isolated launches.
     private func resetStatisticsInMemory() {
         totalCyclingTime = CyclingRecords.defaultTotalCyclingTime
         totalCyclingDistance = CyclingRecords.defaultTotalCyclingDistance

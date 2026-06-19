@@ -11,9 +11,11 @@ import CoreData
 import Combine
 
 class ActivityAwardsViewModel: ObservableObject {
-    
+
+    // Awards used to read CyclingRecords.shared directly; holding the source
+    // records lets isolated UI-test launches display their selected record state.
     private var sourceRecords: CyclingRecords
-    
+
     @Published var progressValues: [CGFloat] = [CGFloat].init(repeating: 0.0, count: 6)
     @Published var unlockedIcons: [Bool]
     @Published var progressStrings: [String] = [String].init(repeating: "0% Complete", count: 6)
@@ -23,6 +25,8 @@ class ActivityAwardsViewModel: ObservableObject {
     
     @Published var records: CyclingRecords? {
         willSet {
+            // Recompute from the selected records object instead of the shared
+            // singleton so injected launch storage drives every awards update.
             let updatedRecords = newValue ?? sourceRecords
             // Update published values when records change
             unlockedIcons = updatedRecords.unlockedIcons
@@ -92,8 +96,9 @@ class ActivityAwardsViewModel: ObservableObject {
     var medalOrder: [Medal] = [.bronze, .silver, .gold, .bronze, .silver, .gold]
     
     private var cancellable: AnyCancellable?
-    
-    // Total cycling routes changes each time the records change
+
+    // Tests can inject a publisher, but production binds to the selected records
+    // object so award progress follows launch storage after environment injection.
     init(records: CyclingRecords = CyclingRecords.shared, recordsPublisher: AnyPublisher<Int, Never>? = nil) {
         self.sourceRecords = records
         self.unlockedIcons = records.unlockedIcons

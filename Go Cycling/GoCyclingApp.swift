@@ -125,6 +125,8 @@ struct AppLaunchStorage {
         )
     }
 
+    // Tests pass synthetic launch arguments here, so the persistence factory is
+    // explicit to prevent a UI-test argument set from silently using shared data.
     static func make(
         arguments: [String],
         persistenceControllerFactory: ([String]) -> PersistenceController,
@@ -187,6 +189,8 @@ struct GoCyclingApp: App {
         self._records = StateObject(wrappedValue: launchStorage.records)
         self._cyclingStatus = StateObject(wrappedValue: CyclingStatus())
 
+        // Telemetry reads user defaults during setup; pass the selected launch
+        // arguments so UI-test launches keep that side effect disabled.
         AppLaunchTelemetry.configureIfNeeded(arguments: launchStorage.arguments)
     }
 
@@ -236,7 +240,7 @@ struct GoCyclingApp: App {
                     )
                     
                     // Disable auto lock if that setting is enabled
-                    if preferences.autoLockDisabled {
+                    if (preferences.autoLockDisabled) {
                         UIApplication.shared.isIdleTimerDisabled = true
                     }
 

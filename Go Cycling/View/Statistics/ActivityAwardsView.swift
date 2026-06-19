@@ -40,6 +40,8 @@ struct ActivityAwardsView: View {
             )
         }
         .onAppear {
+            // The StateObject is created before environment records are available;
+            // bind it here so isolated launches do not keep the shared singleton.
             activityAwardsViewModel.useRecords(records)
             if (activityAwardsViewModel.alertForNewIcon) {
                 showingNewIconAlert = true
