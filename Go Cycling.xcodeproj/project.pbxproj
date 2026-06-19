@@ -850,7 +850,6 @@
 				AA0001052026061900000001 /* Support */,
 				AA0001062026061900000001 /* Screens */,
 				AA0000922026061900000001 /* Tests */,
-				9DAB833425FECAD400F5C42E /* GoCyclingUITests.swift */,
 				9DAB833625FECAD400F5C42E /* Info.plist */,
 			);
 			path = "Go CyclingUITests";
@@ -879,6 +878,7 @@
 		AA0000922026061900000001 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				9DAB833425FECAD400F5C42E /* GoCyclingUITests.swift */,
 				AA0000912026061900000001 /* MainTabNavigationTests.swift */,
 			);
 			path = Tests;

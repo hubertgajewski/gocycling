@@ -26,16 +26,14 @@ final class MainTabBarScreen {
     return Wait.exists(tabButton(.cycle), timeout: timeout)
   }
 
-  @discardableResult
   func select(
     _ tab: MainTab,
     file: StaticString = #filePath,
     line: UInt = #line
-  ) -> MainTabBarScreen {
+  ) {
     let button = tabButton(tab)
     Wait.assertExists(button, timeout: Wait.Timeout.short, file: file, line: line)
     button.tap()
-    return self
   }
 
   func assertContentVisible(
