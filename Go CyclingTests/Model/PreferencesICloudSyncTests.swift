@@ -51,8 +51,7 @@ struct PreferencesICloudSyncTests {
     defer { snapshot.restore() }
 
     UserDefaults.standard.set(true, forKey: iCloudSyncPreferenceKey)
-    Preferences.resetUnitTestLaunchArgumentsForTesting()
-    #expect(Preferences.iCloudAvailable() == false)
+    #expect(Preferences.iCloudAvailable(arguments: []) == false)
   }
 
   @Test("writes default preferences to cloud on first launch when iCloud sync is enabled")
@@ -67,7 +66,7 @@ struct PreferencesICloudSyncTests {
     clearPreferenceStores()
     UserDefaults.standard.set(true, forKey: iCloudSyncPreferenceKey)
 
-    let preferences = Preferences(arguments: simulatedICloudLaunchArguments)
+    let preferences = Preferences(arguments: [UnitTestSeam.simulateICloudAvailableLaunchArgument])
 
     #expect(preferences.usingMetric == true)
     #expect(preferences.colourChoiceConverted == .blue)
@@ -91,7 +90,7 @@ struct PreferencesICloudSyncTests {
     clearPreferenceStores()
     seedLocalOnlyInitializedStore(metric: false, colour: ColourChoice.orange.rawValue)
 
-    _ = Preferences(arguments: simulatedICloudLaunchArguments)
+    _ = Preferences(arguments: [UnitTestSeam.simulateICloudAvailableLaunchArgument])
 
     #expect(UserDefaults.standard.bool(forKey: "metric") == false)
     #expect(UserDefaults.standard.string(forKey: "colour") == ColourChoice.orange.rawValue)
@@ -114,7 +113,7 @@ struct PreferencesICloudSyncTests {
     clearPreferenceStores()
     seedCloudOnlyInitializedStore(metric: false, colour: ColourChoice.red.rawValue)
 
-    let preferences = Preferences(arguments: simulatedICloudLaunchArguments)
+    let preferences = Preferences(arguments: [UnitTestSeam.simulateICloudAvailableLaunchArgument])
 
     #expect(preferences.usingMetric == false)
     #expect(preferences.colourChoiceConverted == .red)
@@ -141,7 +140,7 @@ struct PreferencesICloudSyncTests {
       iCloudOn: true
     )
 
-    let preferences = Preferences(arguments: simulatedICloudLaunchArguments)
+    let preferences = Preferences(arguments: [UnitTestSeam.simulateICloudAvailableLaunchArgument])
 
     #expect(preferences.usingMetric == false)
     #expect(preferences.colourChoiceConverted == .red)
@@ -167,7 +166,7 @@ struct PreferencesICloudSyncTests {
       iCloudOn: false
     )
 
-    let preferences = Preferences(arguments: simulatedICloudLaunchArguments)
+    let preferences = Preferences(arguments: [UnitTestSeam.simulateICloudAvailableLaunchArgument])
     #expect(preferences.usingMetric == true)
     #expect(preferences.colourChoiceConverted == .blue)
 
@@ -198,7 +197,7 @@ struct PreferencesICloudSyncTests {
       iCloudOn: true
     )
 
-    let preferences = Preferences(arguments: simulatedICloudLaunchArguments)
+    let preferences = Preferences(arguments: [UnitTestSeam.simulateICloudAvailableLaunchArgument])
     NSUbiquitousKeyValueStore.default.set(true, forKey: "metric")
     NSUbiquitousKeyValueStore.default.set(ColourChoice.violet.rawValue, forKey: "colour")
     NSUbiquitousKeyValueStore.default.synchronize()
@@ -214,8 +213,6 @@ struct PreferencesICloudSyncTests {
     #expect(UserDefaults.standard.string(forKey: "colour") == ColourChoice.violet.rawValue)
   }
 }
-
-private let simulatedICloudLaunchArguments = UITesting.simulateICloudSyncLaunchArguments
 
 private let preferenceICloudStoreKeys = [
   "didSetupPreferences",

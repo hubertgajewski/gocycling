@@ -111,6 +111,7 @@
 		9D8169FA263FA4CE00DED7F8 /* IconNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8169F9263FA4CE00DED7F8 /* IconNames.swift */; };
 		9D816A0F263FBD0600DED7F8 /* CyclingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D816A0E263FBD0600DED7F8 /* CyclingStatus.swift */; };
 		AA0000032026061600000001 /* UITesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022026061600000001 /* UITesting.swift */; };
+		AA0000832026061900000001 /* UnitTestSeam.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000822026061900000001 /* UnitTestSeam.swift */; };
 		AA0000062026061700000001 /* MetricsFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000082026061700000001 /* MetricsFormattingTests.swift */; };
 		AA0000072026061700000001 /* RecordsFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000092026061700000001 /* RecordsFormattingTests.swift */; };
 		AA0000152026061700000001 /* PersistedStoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000122026061700000001 /* PersistedStoreSnapshot.swift */; };
@@ -321,6 +322,7 @@
 		9D8169F9263FA4CE00DED7F8 /* IconNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconNames.swift; sourceTree = "<group>"; };
 		9D816A0E263FBD0600DED7F8 /* CyclingStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CyclingStatus.swift; sourceTree = "<group>"; };
 		AA0000022026061600000001 /* UITesting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITesting.swift; sourceTree = "<group>"; };
+		AA0000822026061900000001 /* UnitTestSeam.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitTestSeam.swift; sourceTree = "<group>"; };
 		AA0000082026061700000001 /* MetricsFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsFormattingTests.swift; sourceTree = "<group>"; };
 		AA0000092026061700000001 /* RecordsFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsFormattingTests.swift; sourceTree = "<group>"; };
 		AA0000112026061700000001 /* CyclingRecordsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CyclingRecordsTests.swift; sourceTree = "<group>"; };
@@ -602,6 +604,7 @@
 			isa = PBXGroup;
 			children = (
 				AA0000022026061600000001 /* UITesting.swift */,
+				AA0000822026061900000001 /* UnitTestSeam.swift */,
 				AA0000652026061800000001 /* UITestingRouteSaveFixture.swift */,
 			);
 			path = Support;
@@ -1141,6 +1144,7 @@
 				9D1ED54D2643CF5A005A97ED /* UIAppearViewController.swift in Sources */,
 				9D816A0F263FBD0600DED7F8 /* CyclingStatus.swift in Sources */,
 				AA0000032026061600000001 /* UITesting.swift in Sources */,
+				AA0000832026061900000001 /* UnitTestSeam.swift in Sources */,
 				9D55B9F726522D8D00B622E5 /* RouteRenameModalView.swift in Sources */,
 				9D6E5357262BB299008FD7C1 /* ColourView.swift in Sources */,
 				9D8169DC263F815600DED7F8 /* ChangeAppIconView.swift in Sources */,

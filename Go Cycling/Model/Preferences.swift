@@ -79,20 +79,10 @@ class Preferences: ObservableObject {
     static private let defaultICloudOn = false
     static private let defaultTelemetryEnabled = true
 
-    #if DEBUG
-    // Serialized Preferences tests pass explicit launch arguments; static iCloud
-    // helpers read the most recent init arguments instead of ProcessInfo.
-    private static var unitTestLaunchArguments: [String] = ProcessInfo.processInfo.arguments
-
-    static func resetUnitTestLaunchArgumentsForTesting() {
-        unitTestLaunchArguments = []
-    }
-    #endif
+    private let launchArguments: [String]
     
     init(arguments: [String] = ProcessInfo.processInfo.arguments) {
-        #if DEBUG
-        Self.unitTestLaunchArguments = arguments
-        #endif
+        self.launchArguments = arguments
         if UITesting.shouldUseIsolatedPersistence(arguments: arguments) {
             // UI-smoke tests need predictable defaults, but writing the normal
             // initialization keys would mutate the user's app preferences.
@@ -116,7 +106,7 @@ class Preferences: ObservableObject {
         }
 
         // First check if iCloud is available
-        let iCloudStatus = Preferences.iCloudAvailable()
+        let iCloudStatus = Preferences.iCloudAvailable(arguments: arguments)
         
         // Next check if preferences have ever been setup
         var status = Preferences.havePreferencesBeenInitialized()
@@ -143,19 +133,19 @@ class Preferences: ObservableObject {
         // On device is setup
         case 1:
             if iCloudStatus {
-                Preferences.syncLocalAndCloud(localToCloud: true)
+                Preferences.syncLocalAndCloud(localToCloud: true, arguments: arguments)
                 NSUbiquitousKeyValueStore.default.set(true, forKey: Preferences.initKey)
             }
         // iCloud is setup
         case 2:
             if iCloudStatus {
-                Preferences.syncLocalAndCloud(localToCloud: false)
+                Preferences.syncLocalAndCloud(localToCloud: false, arguments: arguments)
                 UserDefaults.standard.set(true, forKey: Preferences.initKey)
             }
         // Everything is setup
         case 3:
             if iCloudStatus {
-                Preferences.syncLocalAndCloud(localToCloud: false)
+                Preferences.syncLocalAndCloud(localToCloud: false, arguments: arguments)
             }
         default:
             fatalError("Index out of range")
@@ -191,8 +181,9 @@ class Preferences: ObservableObject {
     
     @objc func keysDidChangeOnCloud(notification: Notification) {
         // Force this update to run on the main thread, but asynchronously
+        let launchArguments = self.launchArguments
         DispatchQueue.main.async {
-            Preferences.syncLocalAndCloud(localToCloud: false)
+            Preferences.syncLocalAndCloud(localToCloud: false, arguments: launchArguments)
             self.writeToClassMembers()
         }
     }
@@ -238,13 +229,13 @@ class Preferences: ObservableObject {
             : true
     }
 
-    static public func iCloudAvailable() -> Bool {
+    static public func iCloudAvailable(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
         // Set iCloud preference if it doesn't exist
         if UserDefaults.standard.object(forKey: Preferences.iCloudOnKey) == nil {
             UserDefaults.standard.set(false, forKey: Preferences.iCloudOnKey)
         }
         #if DEBUG
-        if UITesting.shouldSimulateICloudSyncAvailable(arguments: unitTestLaunchArguments),
+        if UnitTestSeam.shouldSimulateICloudAvailable(arguments: arguments),
            UserDefaults.standard.bool(forKey: Preferences.iCloudOnKey) {
             return true
         }
@@ -314,9 +305,12 @@ class Preferences: ObservableObject {
         UserDefaults.standard.set(defaultIconIndex, forKey: iconIndexKey)
     }
     
-    static private func syncLocalAndCloud(localToCloud: Bool) {
+    static private func syncLocalAndCloud(
+        localToCloud: Bool,
+        arguments: [String] = ProcessInfo.processInfo.arguments
+    ) {
         // Only sync if available
-        if Preferences.iCloudAvailable() {
+        if Preferences.iCloudAvailable(arguments: arguments) {
             // Sync local to cloud
             if localToCloud {
                 for (i, k) in keys.enumerated() {
@@ -425,7 +419,7 @@ class Preferences: ObservableObject {
             // Check if iCloud has been setup
             let status = Preferences.havePreferencesBeenInitialized()
             if (status == 3 && value) {
-                Preferences.syncLocalAndCloud(localToCloud: false)
+                Preferences.syncLocalAndCloud(localToCloud: false, arguments: launchArguments)
                 self.writeToClassMembers()
             }
         default:
@@ -433,7 +427,7 @@ class Preferences: ObservableObject {
         }
         
         // Update iCloud data
-        Preferences.syncLocalAndCloud(localToCloud: true)
+        Preferences.syncLocalAndCloud(localToCloud: true, arguments: launchArguments)
     }
     
     public func updateStringPreference(preference: CustomizablePreferences, value: String) {
@@ -455,7 +449,7 @@ class Preferences: ObservableObject {
         }
 
         // Update iCloud data
-        Preferences.syncLocalAndCloud(localToCloud: true)
+        Preferences.syncLocalAndCloud(localToCloud: true, arguments: launchArguments)
     }
 
     public func updateIntPreference(preference: CustomizablePreferences, value: Int) {
@@ -471,7 +465,7 @@ class Preferences: ObservableObject {
     // For the reset to default settings button on the settings tab
     public func resetPreferences() {
         Preferences.writeDefaults(iCloud: false)
-        Preferences.syncLocalAndCloud(localToCloud: true)
+        Preferences.syncLocalAndCloud(localToCloud: true, arguments: launchArguments)
         self.writeToClassMembers()
     }
     
