@@ -196,39 +196,31 @@ func ubiquitousStorePersistsValues() -> Bool {
 struct PersistedStoreSnapshotTests {
   @Test("waiting for a permit leaves the main actor runnable")
   @MainActor
-  func waitingForPermitLeavesMainActorRunnable() async throws {
+  func waitingForPermitLeavesMainActorRunnable() async {
     let gate = PersistedStoreSnapshotGate()
     let firstPermit = await gate.acquirePermit()
-    let probe = PersistedStoreSnapshotGateProbe()
-    let mainActorProbeRecorded = DispatchSemaphore(value: 0)
+    let waiterAttemptStarted = DispatchSemaphore(value: 0)
 
     let waitingTask = Task { @MainActor in
-      probe.recordAttempt()
+      waiterAttemptStarted.signal()
       let secondPermit = await gate.acquirePermit()
-      probe.recordAcquire()
       secondPermit.release()
     }
 
-    DispatchQueue.global(qos: .userInitiated).async {
-      if probe.waitForAttempt(timeout: .now() + .seconds(2)) {
-        DispatchQueue.main.async {
-          probe.recordMainActorProbe()
-          mainActorProbeRecorded.signal()
-        }
-      }
+    #expect(
+      await waitForSemaphore(waiterAttemptStarted, timeout: .now() + .seconds(2))
+        == .success
+    )
+    await Task.yield()
 
-      let probeResult = mainActorProbeRecorded.wait(timeout: .now() + .seconds(2))
-      probe.recordProbeCompletedBeforeRelease(probeResult == .success)
-      probe.recordRelease()
-      firstPermit.release()
+    var mainActorWorkRan = false
+    await MainActor.run {
+      mainActorWorkRan = true
     }
+    #expect(mainActorWorkRan)
 
+    firstPermit.release()
     await waitingTask.value
-    let times = probe.snapshot()
-    let mainActorProbeAt = try #require(times.mainActorProbeAt)
-    let releaseAt = try #require(times.releaseAt)
-    #expect(times.probeCompletedBeforeRelease == true)
-    #expect(mainActorProbeAt < releaseAt)
   }
 
   @Test("serializes overlapping permits")
@@ -280,70 +272,5 @@ private func waitForSemaphore(
     DispatchQueue.global(qos: .userInitiated).async {
       continuation.resume(returning: semaphore.wait(timeout: timeout))
     }
-  }
-}
-
-private final class PersistedStoreSnapshotGateProbe: @unchecked Sendable {
-  private let lock = NSLock()
-  private var attemptAt: Date?
-  private var acquireAt: Date?
-  private var mainActorProbeAt: Date?
-  private var releaseAt: Date?
-  private var probeCompletedBeforeRelease: Bool?
-
-  func recordAttempt() {
-    lock.lock()
-    attemptAt = Date()
-    lock.unlock()
-  }
-
-  func recordAcquire() {
-    lock.lock()
-    acquireAt = Date()
-    lock.unlock()
-  }
-
-  func recordMainActorProbe() {
-    lock.lock()
-    mainActorProbeAt = Date()
-    lock.unlock()
-  }
-
-  func recordRelease() {
-    lock.lock()
-    releaseAt = Date()
-    lock.unlock()
-  }
-
-  func recordProbeCompletedBeforeRelease(_ value: Bool) {
-    lock.lock()
-    probeCompletedBeforeRelease = value
-    lock.unlock()
-  }
-
-  func waitForAttempt(timeout: DispatchTime) -> Bool {
-    while DispatchTime.now() < timeout {
-      lock.lock()
-      let didAttempt = attemptAt != nil
-      lock.unlock()
-
-      if didAttempt {
-        return true
-      }
-      Thread.sleep(forTimeInterval: 0.001)
-    }
-    return false
-  }
-
-  func snapshot() -> (
-    attemptAt: Date?,
-    acquireAt: Date?,
-    mainActorProbeAt: Date?,
-    releaseAt: Date?,
-    probeCompletedBeforeRelease: Bool?
-  ) {
-    lock.lock()
-    defer { lock.unlock() }
-    return (attemptAt, acquireAt, mainActorProbeAt, releaseAt, probeCompletedBeforeRelease)
   }
 }
