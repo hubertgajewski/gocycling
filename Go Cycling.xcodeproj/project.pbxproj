@@ -111,6 +111,7 @@
 		9D8169FA263FA4CE00DED7F8 /* IconNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8169F9263FA4CE00DED7F8 /* IconNames.swift */; };
 		9D816A0F263FBD0600DED7F8 /* CyclingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D816A0E263FBD0600DED7F8 /* CyclingStatus.swift */; };
 		AA0000032026061600000001 /* UITesting.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022026061600000001 /* UITesting.swift */; };
+		AA0000832026061900000001 /* UnitTestSeam.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000822026061900000001 /* UnitTestSeam.swift */; };
 		AA0000062026061700000001 /* MetricsFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000082026061700000001 /* MetricsFormattingTests.swift */; };
 		AA0000072026061700000001 /* RecordsFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000092026061700000001 /* RecordsFormattingTests.swift */; };
 		AA0000152026061700000001 /* PersistedStoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000122026061700000001 /* PersistedStoreSnapshot.swift */; };
@@ -132,6 +133,7 @@
 		AA0000512026061800000001 /* TimerViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000502026061800000001 /* TimerViewModelTests.swift */; };
 		AA0000602026061800000001 /* CompletedRouteSaveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000632026061800000001 /* CompletedRouteSaveTests.swift */; };
 		AA0000712026061900000001 /* PreferencesMutationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000702026061900000001 /* PreferencesMutationTests.swift */; };
+		AA0000812026061900000001 /* PreferencesICloudSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000802026061900000001 /* PreferencesICloudSyncTests.swift */; };
 		AA0000732026061900000001 /* CyclingStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000722026061900000001 /* CyclingStatusTests.swift */; };
 		AA0000752026061900000001 /* TelemetryManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000742026061900000001 /* TelemetryManagerTests.swift */; };
 		AA0000772026061900000001 /* BikeRideExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000762026061900000001 /* BikeRideExtensionsTests.swift */; };
@@ -328,6 +330,7 @@
 		9D8169F9263FA4CE00DED7F8 /* IconNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconNames.swift; sourceTree = "<group>"; };
 		9D816A0E263FBD0600DED7F8 /* CyclingStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CyclingStatus.swift; sourceTree = "<group>"; };
 		AA0000022026061600000001 /* UITesting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITesting.swift; sourceTree = "<group>"; };
+		AA0000822026061900000001 /* UnitTestSeam.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitTestSeam.swift; sourceTree = "<group>"; };
 		AA0000082026061700000001 /* MetricsFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsFormattingTests.swift; sourceTree = "<group>"; };
 		AA0000092026061700000001 /* RecordsFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsFormattingTests.swift; sourceTree = "<group>"; };
 		AA0000112026061700000001 /* CyclingRecordsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CyclingRecordsTests.swift; sourceTree = "<group>"; };
@@ -349,6 +352,7 @@
 		AA0000422026061800000001 /* LocationSettingsAlertPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSettingsAlertPolicy.swift; sourceTree = "<group>"; };
 		AA0000632026061800000001 /* CompletedRouteSaveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedRouteSaveTests.swift; sourceTree = "<group>"; };
 		AA0000702026061900000001 /* PreferencesMutationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesMutationTests.swift; sourceTree = "<group>"; };
+		AA0000802026061900000001 /* PreferencesICloudSyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesICloudSyncTests.swift; sourceTree = "<group>"; };
 		AA0000722026061900000001 /* CyclingStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CyclingStatusTests.swift; sourceTree = "<group>"; };
 		AA0000742026061900000001 /* TelemetryManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryManagerTests.swift; sourceTree = "<group>"; };
 		AA0000762026061900000001 /* BikeRideExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeRideExtensionsTests.swift; sourceTree = "<group>"; };
@@ -616,6 +620,7 @@
 			isa = PBXGroup;
 			children = (
 				AA0000022026061600000001 /* UITesting.swift */,
+				AA0000822026061900000001 /* UnitTestSeam.swift */,
 				AA0000652026061800000001 /* UITestingRouteSaveFixture.swift */,
 			);
 			path = Support;
@@ -787,6 +792,7 @@
 				AA0000082026061700000001 /* MetricsFormattingTests.swift */,
 				AA0000242026061700000001 /* PreferencesConversionTests.swift */,
 				AA0000702026061900000001 /* PreferencesMutationTests.swift */,
+				AA0000802026061900000001 /* PreferencesICloudSyncTests.swift */,
 				AA0000092026061700000001 /* RecordsFormattingTests.swift */,
 				AA0000332026061700000001 /* ReviewManagerTests.swift */,
 				AA0000742026061900000001 /* TelemetryManagerTests.swift */,
@@ -1186,6 +1192,7 @@
 				9D1ED54D2643CF5A005A97ED /* UIAppearViewController.swift in Sources */,
 				9D816A0F263FBD0600DED7F8 /* CyclingStatus.swift in Sources */,
 				AA0000032026061600000001 /* UITesting.swift in Sources */,
+				AA0000832026061900000001 /* UnitTestSeam.swift in Sources */,
 				9D55B9F726522D8D00B622E5 /* RouteRenameModalView.swift in Sources */,
 				9D6E5357262BB299008FD7C1 /* ColourView.swift in Sources */,
 				9D8169DC263F815600DED7F8 /* ChangeAppIconView.swift in Sources */,
@@ -1255,6 +1262,7 @@
 				AA0000512026061800000001 /* TimerViewModelTests.swift in Sources */,
 				AA0000602026061800000001 /* CompletedRouteSaveTests.swift in Sources */,
 				AA0000712026061900000001 /* PreferencesMutationTests.swift in Sources */,
+				AA0000812026061900000001 /* PreferencesICloudSyncTests.swift in Sources */,
 				AA0000732026061900000001 /* CyclingStatusTests.swift in Sources */,
 				AA0000752026061900000001 /* TelemetryManagerTests.swift in Sources */,
 				AA0000772026061900000001 /* BikeRideExtensionsTests.swift in Sources */,

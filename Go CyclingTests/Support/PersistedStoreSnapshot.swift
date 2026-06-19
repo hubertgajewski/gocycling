@@ -192,6 +192,21 @@ func ubiquitousStorePersistsValues() -> Bool {
   return persistsValues
 }
 
+/// Returns whether iCloud KVS sync tests can run in the current environment.
+/// Pass `[UnitTestSeam.simulateICloudAvailableLaunchArgument]` to
+/// `Preferences(arguments:)` so unit tests exercise sync paths without a
+/// signed-in iCloud account. Callers must seed `iCloudOn` before constructing
+/// `Preferences`.
+func iCloudKeyValueSyncAvailableForTests(
+  arguments: [String] = [UnitTestSeam.simulateICloudAvailableLaunchArgument]
+) -> Bool {
+  guard ubiquitousStorePersistsValues() else { return false }
+  if UnitTestSeam.shouldSimulateICloudAvailable(arguments: arguments) {
+    return true
+  }
+  return FileManager.default.ubiquityIdentityToken != nil
+}
+
 @Suite("PersistedStoreSnapshot", .serialized)
 struct PersistedStoreSnapshotTests {
   @Test("waiting for a permit leaves the main actor runnable")
