@@ -151,7 +151,7 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
     }
     
-    func startedCycling() {
+    func startedCycling(arguments: [String] = ProcessInfo.processInfo.arguments) {
         // Route-save tests need a new ride to invalidate any previous async save
         // cleanup/naming before this ride starts collecting samples.
         cyclingSessionToken += 1
@@ -172,7 +172,9 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         // Start writing health data if the setting is enabled
         lastHealthLocationTime = Date()
         distanceSinceLastHealthStore = 0.0
-        writeHealthData = Preferences.storedHealthSyncEnabled()
+        // HealthKit writes are real external side effects; isolated UI-test
+        // launches must not inherit the user's production Health sync default.
+        writeHealthData = Self.shouldWriteHealthData(arguments: arguments)
 
         locationManager.startUpdatingHeading()
         // The Cycle controls fixture suppresses staleness auto-pause so the UI
@@ -183,6 +185,12 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
             }
         }
         autoPauseState = .moving
+    }
+
+    // Kept separate so route-start tests can verify UI-test launches suppress
+    // real HealthKit writes without constructing CLLocationManager state.
+    static func shouldWriteHealthData(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        Preferences.storedHealthSyncEnabled(arguments: arguments)
     }
 
     var currentCyclingSessionToken: Int {

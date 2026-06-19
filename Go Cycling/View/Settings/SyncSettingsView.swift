@@ -33,6 +33,15 @@ struct SyncSettingsView: View {
         )
     }
 
+    static func shouldRequestHealthAuthorization(
+        whenEnabled value: Bool,
+        arguments: [String] = ProcessInfo.processInfo.arguments
+    ) -> Bool {
+        // Health authorization prompts are real system side effects; isolated
+        // UI-test launches only exercise selected preference state.
+        value && !UITesting.shouldUseIsolatedPersistence(arguments: arguments)
+    }
+
     var body: some View {
         // iCloud sync setting
         Toggle(isOn: iCloudBinding) {
@@ -70,7 +79,9 @@ struct SyncSettingsView: View {
             }
         }
         .onChange(of: preferences.healthSyncEnabled) { value in
-            if value { healthKitManager.requestAuthorization() }
+            if Self.shouldRequestHealthAuthorization(whenEnabled: value) {
+                healthKitManager.requestAuthorization()
+            }
             telemetryManager.sendSettingsSignal(section: telemetryTabSection, action: TelemetrySettingsAction.Health)
         }
     }

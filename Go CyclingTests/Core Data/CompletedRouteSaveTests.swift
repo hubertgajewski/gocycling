@@ -505,6 +505,40 @@ struct CompletedRouteSaveTests {
       #expect(try fetchRides(in: sharedLikePersistence.container.viewContext).isEmpty)
     }
 
+    @Test("context bike ride store completes asynchronously on selected context")
+    func contextBikeRideStoreCompletesAsynchronouslyOnSelectedContext() async throws {
+      let persistence = PersistenceController(inMemory: true)
+      let store = ManagedObjectContextBikeRideStore(
+        context: persistence.container.viewContext
+      )
+      var completionCalled = false
+      var saveResult: Result<BikeRide, Error>?
+
+      await withCheckedContinuation { continuation in
+        store.storeBikeRide(
+          locations: [CLLocation(latitude: 51.5, longitude: -0.12)],
+          speeds: [4.2],
+          distance: 1_500,
+          elevations: [15],
+          startTime: Date(timeIntervalSince1970: 1_800),
+          time: 300,
+          completion: { result in
+            saveResult = result
+            completionCalled = true
+            continuation.resume()
+          }
+        )
+        #expect(completionCalled == false)
+      }
+
+      guard case .success = saveResult else {
+        Issue.record("Expected selected context save to complete successfully")
+        return
+      }
+      #expect(completionCalled)
+      #expect(try fetchRides(in: persistence.container.viewContext).count == 1)
+    }
+
     @Test("route save fixture model initialization leaves stores unchanged")
     func routeSaveFixtureModelInitializationLeavesStoresUnchanged() async {
       let keys = routeSaveFixturePreferenceStoreKeys + cyclingRecordStoreKeys

@@ -420,25 +420,48 @@ struct ManagedObjectContextBikeRideStore: BikeRideStoring {
             startTime: startTime,
             time: time
         )
+        // MapView only receives launch-selected Core Data through the SwiftUI
+        // environment; save on a private context for that selected store and
+        // return the selected view-context object asynchronously so
+        // MapView.updateUIView never blocks or mutates records inline.
+        let complete: (Result<BikeRide, Error>) -> Void = { result in
+            DispatchQueue.main.async {
+                completion(result)
+            }
+        }
+        guard let persistentStoreCoordinator = context.persistentStoreCoordinator else {
+            complete(.failure(PersistenceController.BikeRideStoreError.savedRideUnavailable))
+            return
+        }
+        let selectedContext = context
+        let saveContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        saveContext.persistentStoreCoordinator = persistentStoreCoordinator
+        saveContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         let save = {
-            let newBikeRide = payload.insertBikeRide(in: context)
+            let newBikeRide = payload.insertBikeRide(in: saveContext)
 
             do {
-                try context.save()
+                try saveContext.save()
+                let objectID = newBikeRide.objectID
                 print("Bike ride saved")
-                completion(.success(newBikeRide))
+                selectedContext.perform {
+                    do {
+                        let savedRide = try selectedContext.existingObject(with: objectID)
+                        if let savedBikeRide = savedRide as? BikeRide {
+                            complete(.success(savedBikeRide))
+                        } else {
+                            complete(.failure(PersistenceController.BikeRideStoreError.savedRideUnavailable))
+                        }
+                    } catch {
+                        complete(.failure(error))
+                    }
+                }
             } catch {
                 print(error.localizedDescription)
-                completion(.failure(error))
+                complete(.failure(error))
             }
         }
 
-        // MapView only receives launch-selected Core Data through the SwiftUI
-        // environment; this store keeps completed-route saves on that context.
-        if context.concurrencyType == .mainQueueConcurrencyType && Thread.isMainThread {
-            save()
-        } else {
-            context.perform(save)
-        }
+        saveContext.perform(save)
     }
 }

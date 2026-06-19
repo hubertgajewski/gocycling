@@ -144,6 +144,29 @@ struct PreferencesMutationTests {
     #expect(Preferences.storedHealthSyncEnabled() == false)
   }
 
+  @Test("isolated UI tests suppress HealthKit side effects")
+  func isolatedUITestsSuppressHealthKitSideEffects() async {
+    let snapshot = await PersistedStoreSnapshot(keys: preferenceMutationStoreKeys)
+    defer { snapshot.restore() }
+    seedPreferenceMutationDefaults()
+
+    UserDefaults.standard.set(true, forKey: "healthSyncEnabled")
+
+    #expect(Preferences.storedHealthSyncEnabled(arguments: []) == true)
+    #expect(LocationViewModel.shouldWriteHealthData(arguments: []) == true)
+    #expect(SyncSettingsView.shouldRequestHealthAuthorization(whenEnabled: true, arguments: []))
+
+    let isolatedArguments = [UITesting.launchArgument]
+    #expect(Preferences.storedHealthSyncEnabled(arguments: isolatedArguments) == false)
+    #expect(LocationViewModel.shouldWriteHealthData(arguments: isolatedArguments) == false)
+    #expect(
+      SyncSettingsView.shouldRequestHealthAuthorization(
+        whenEnabled: true,
+        arguments: isolatedArguments
+      ) == false
+    )
+  }
+
   @Test("migrates legacy user preferences into defaults")
   func migratesLegacyUserPreferencesIntoDefaults() async {
     let snapshot = await PersistedStoreSnapshot(keys: preferenceMutationStoreKeys)

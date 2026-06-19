@@ -527,8 +527,15 @@ class Preferences: ObservableObject {
         return SortChoice(rawValue: stringValue) ?? SortChoice.dateDescending
     }
     
-    // Used in HealthKitViewModel where the environment object is not available
-    static func storedHealthSyncEnabled() -> Bool {
+    // Used in HealthKitViewModel where the environment object is not available.
+    // Isolated UI-test launches must not read the user's real HealthKit setting,
+    // because a saved test route could otherwise write production Health samples.
+    static func storedHealthSyncEnabled(
+        arguments: [String] = ProcessInfo.processInfo.arguments
+    ) -> Bool {
+        guard !UITesting.shouldUseIsolatedPersistence(arguments: arguments) else {
+            return false
+        }
         return UserDefaults.standard.bool(forKey: Preferences.keys[10])
     }
     
