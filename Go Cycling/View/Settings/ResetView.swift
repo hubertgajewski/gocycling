@@ -6,10 +6,9 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct ResetView: View {
-    let persistenceController = PersistenceController.shared
-    
     @EnvironmentObject var preferences: Preferences
     @EnvironmentObject var records: CyclingRecords
     @Environment(\.managedObjectContext) private var managedObjectContext
@@ -86,7 +85,9 @@ struct ResetView: View {
     }
     
     func deleteAllBikeRides() {
-        persistenceController.deleteAllBikeRides()
+        // Delete through the selected launch context so isolated UI-test stores
+        // cannot render one store while deleting PersistenceController.shared.
+        Self.deleteAllBikeRides(in: managedObjectContext)
         
         telemetryManager.sendSettingsSignal(
             section: telemetryTabSection,
@@ -103,6 +104,10 @@ struct ResetView: View {
             section: telemetryTabSection,
             action: TelemetrySettingsAction.DeleteStats
         )
+    }
+
+    static func deleteAllBikeRides(in context: NSManagedObjectContext) {
+        PersistenceController.deleteAllBikeRides(in: context)
     }
 }
 

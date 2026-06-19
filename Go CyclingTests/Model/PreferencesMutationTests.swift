@@ -91,6 +91,37 @@ struct PreferencesMutationTests {
     #expect(UserDefaults.standard.string(forKey: "colour") == ColourChoice.blue.rawValue)
   }
 
+  @Test("UI testing preference updates and reset stay in memory")
+  func uiTestingPreferenceUpdatesAndResetStayInMemory() async {
+    let snapshot = await PersistedStoreSnapshot(keys: preferenceMutationStoreKeys)
+    defer { snapshot.restore() }
+    seedPreferenceMutationDefaults()
+    UserDefaults.standard.set(false, forKey: "metric")
+    UserDefaults.standard.set(ColourChoice.red.rawValue, forKey: "colour")
+    UserDefaults.standard.set(7, forKey: "iconIndex")
+
+    let preferences = Preferences(arguments: [UITesting.launchArgument])
+    preferences.updateBoolPreference(preference: .metric, value: false)
+    preferences.updateStringPreference(preference: .colour, value: ColourChoice.orange.rawValue)
+    preferences.updateIntPreference(preference: .iconIndex, value: 5)
+
+    #expect(preferences.usingMetric == false)
+    #expect(preferences.colourChoiceConverted == .orange)
+    #expect(preferences.iconIndex == 5)
+    #expect(UserDefaults.standard.bool(forKey: "metric") == false)
+    #expect(UserDefaults.standard.string(forKey: "colour") == ColourChoice.red.rawValue)
+    #expect(UserDefaults.standard.integer(forKey: "iconIndex") == 7)
+
+    preferences.resetPreferences()
+
+    #expect(preferences.usingMetric == true)
+    #expect(preferences.colourChoiceConverted == .blue)
+    #expect(preferences.iconIndex == 0)
+    #expect(UserDefaults.standard.bool(forKey: "metric") == false)
+    #expect(UserDefaults.standard.string(forKey: "colour") == ColourChoice.red.rawValue)
+    #expect(UserDefaults.standard.integer(forKey: "iconIndex") == 7)
+  }
+
   @Test("reports iCloud unavailable when sync preference is off")
   func reportsICloudUnavailableWhenSyncPreferenceIsOff() async {
     let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])

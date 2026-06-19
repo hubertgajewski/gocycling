@@ -430,6 +430,47 @@ struct CompletedRouteSaveTests {
       #expect(storage.records.totalCyclingRoutes == 0)
     }
 
+    @Test("app launch storage seeds route fixture with selected arguments")
+    func appLaunchStorageSeedsRouteFixtureWithSelectedArguments() async throws {
+      let persistence = PersistenceController(arguments: UITesting.routeSaveFixtureLaunchArguments)
+      let storage = AppLaunchStorage.make(
+        arguments: UITesting.routeSaveFixtureLaunchArguments,
+        persistenceControllerFactory: { _ in persistence }
+      )
+      UITestingRouteSaveFixture.resetForTesting()
+      defer { UITestingRouteSaveFixture.resetForTesting() }
+
+      var saveResult: Result<Void, Error>?
+      await withCheckedContinuation { continuation in
+        storage.seedRouteSaveFixtureIfNeeded(
+          records: RecordingCyclingRecordsUpdater(),
+          completion: { result in
+            saveResult = result
+            continuation.resume()
+          }
+        )
+      }
+
+      guard case .success = saveResult else {
+        Issue.record("Expected launch storage to pass selected fixture arguments")
+        return
+      }
+      #expect(try fetchRides(in: persistence.container.viewContext).count == 1)
+    }
+
+    @Test("reset view deletes routes from selected context")
+    func resetViewDeletesRoutesFromSelectedContext() throws {
+      let selectedPersistence = PersistenceController(inMemory: true)
+      let sharedLikePersistence = PersistenceController(inMemory: true)
+      try insertRide(in: selectedPersistence.container.viewContext)
+      try insertRide(in: sharedLikePersistence.container.viewContext)
+
+      ResetView.deleteAllBikeRides(in: selectedPersistence.container.viewContext)
+
+      #expect(try fetchRides(in: selectedPersistence.container.viewContext).isEmpty)
+      #expect(try fetchRides(in: sharedLikePersistence.container.viewContext).count == 1)
+    }
+
     @Test("route save fixture model initialization leaves stores unchanged")
     func routeSaveFixtureModelInitializationLeavesStoresUnchanged() async {
       let keys = routeSaveFixturePreferenceStoreKeys + cyclingRecordStoreKeys
@@ -695,7 +736,11 @@ private func assertRouteSaveFixtureModelSentinelsUnchanged() {
 
 @discardableResult
 private func insertRide(in context: NSManagedObjectContext) throws -> BikeRide {
-  let ride = BikeRide(context: context)
+  let ride =
+    NSEntityDescription.insertNewObject(
+      forEntityName: "BikeRide",
+      into: context
+    ) as! BikeRide
   ride.cyclingLatitudes = [51.5]
   ride.cyclingLongitudes = [-0.12]
   ride.cyclingSpeeds = [4.2]

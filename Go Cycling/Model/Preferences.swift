@@ -50,6 +50,10 @@ class Preferences: ObservableObject {
     @Published var telemetryEnabled: Bool
     @Published var mapTypeChoice: String
 
+    // UI-test launches can exercise Settings controls; keep those selected
+    // preference changes in memory so they do not overwrite the user's defaults.
+    private let persistsPreferenceUpdates: Bool
+
 
     static private let initKey = "didSetupPreferences"
     static private let keys = ["metric", "displayingMetrics", "colour", "largeMetrics", "sortingChoice", "deletionConfirmation", "deletionEnabled", "namedRoutes", "selectedRoute", "autoLockDisabled", "healthSyncEnabled", "autoPauseEnabled", "mapType"]
@@ -80,7 +84,10 @@ class Preferences: ObservableObject {
     static private let defaultTelemetryEnabled = true
     
     init(arguments: [String] = ProcessInfo.processInfo.arguments) {
-        if UITesting.shouldUseIsolatedPersistence(arguments: arguments) {
+        let isUsingIsolatedPersistence = UITesting.shouldUseIsolatedPersistence(arguments: arguments)
+        self.persistsPreferenceUpdates = !isUsingIsolatedPersistence
+
+        if isUsingIsolatedPersistence {
             // UI-smoke tests need predictable defaults, but writing the normal
             // initialization keys would mutate the user's app preferences.
             self.usingMetric = Preferences.defaultUsingMetric
@@ -344,6 +351,10 @@ class Preferences: ObservableObject {
     
     // Should only ever be called once - used to migrate legacy UserPreferences to UserDefaults and NSUbiquitousKeyValueStore
     public func initialUserPreferencesMigration(existingPreferences: UserPreferences) {
+        // App launch skips migration for isolated UI-test storage, but keep the
+        // model guard here so direct calls cannot mark real preferences migrated.
+        guard persistsPreferenceUpdates else { return }
+
         UserDefaults.standard.set(existingPreferences.usingMetric, forKey: Preferences.keys[0])
         UserDefaults.standard.set(existingPreferences.displayingMetrics, forKey: Preferences.keys[1])
         UserDefaults.standard.set(existingPreferences.colourChoice, forKey: Preferences.keys[2])
@@ -366,83 +377,107 @@ class Preferences: ObservableObject {
         self.writeToClassMembers()
     }
     
+    // Isolated launch preferences still update published Settings state; only
+    // this helper writes the backing stores during persistent app launches.
+    private func setPersistentPreference(_ value: Bool, forKey key: String) {
+        guard persistsPreferenceUpdates else { return }
+        UserDefaults.standard.set(value, forKey: key)
+    }
+
+    private func setPersistentPreference(_ value: String, forKey key: String) {
+        guard persistsPreferenceUpdates else { return }
+        UserDefaults.standard.set(value, forKey: key)
+    }
+
+    private func setPersistentPreference(_ value: Int, forKey key: String) {
+        guard persistsPreferenceUpdates else { return }
+        UserDefaults.standard.set(value, forKey: key)
+    }
+
+    private func syncPersistentPreferencesIfNeeded() {
+        guard persistsPreferenceUpdates else { return }
+        Preferences.syncLocalAndCloud(localToCloud: true)
+    }
+
     // To be called when an update of a preference is needed
     public func updateBoolPreference(preference: CustomizablePreferences, value: Bool) {
         switch preference {
         case .metric:
-            UserDefaults.standard.set(value, forKey: Preferences.keys[0])
+            setPersistentPreference(value, forKey: Preferences.keys[0])
             self.usingMetric = value
         case .displayingMetrics:
-            UserDefaults.standard.set(value, forKey: Preferences.keys[1])
+            setPersistentPreference(value, forKey: Preferences.keys[1])
             self.displayingMetrics = value
         case .largeMetrics:
-            UserDefaults.standard.set(value, forKey: Preferences.keys[3])
+            setPersistentPreference(value, forKey: Preferences.keys[3])
             self.largeMetrics = value
         case .deletionConfirmation:
-            UserDefaults.standard.set(value, forKey: Preferences.keys[5])
+            setPersistentPreference(value, forKey: Preferences.keys[5])
             self.deletionConfirmation = value
         case .deletionEnabled:
-            UserDefaults.standard.set(value, forKey: Preferences.keys[6])
+            setPersistentPreference(value, forKey: Preferences.keys[6])
             self.deletionEnabled = value
         case .namedRoutes:
-            UserDefaults.standard.set(value, forKey: Preferences.keys[7])
+            setPersistentPreference(value, forKey: Preferences.keys[7])
             self.namedRoutes = value
         case .autoLockDisabled:
-            UserDefaults.standard.set(value, forKey: Preferences.keys[9])
+            setPersistentPreference(value, forKey: Preferences.keys[9])
             self.autoLockDisabled = value
         case .healthSyncEnabled:
-            UserDefaults.standard.set(value, forKey: Preferences.keys[10])
+            setPersistentPreference(value, forKey: Preferences.keys[10])
             self.healthSyncEnabled = value
         case .autoPauseEnabled:
-            UserDefaults.standard.set(value, forKey: Preferences.keys[11])
+            setPersistentPreference(value, forKey: Preferences.keys[11])
             self.autoPauseEnabled = value
         case .telemetryEnabled:
-            UserDefaults.standard.set(value, forKey: Preferences.telemetryEnabledKey)
+            setPersistentPreference(value, forKey: Preferences.telemetryEnabledKey)
             self.telemetryEnabled = value
         case .iCloudSync:
             // Special case for turning on iCloud
-            UserDefaults.standard.set(value, forKey: Preferences.iCloudOnKey)
+            setPersistentPreference(value, forKey: Preferences.iCloudOnKey)
             self.iCloudOn = value
             // Check if iCloud has been setup
-            let status = Preferences.havePreferencesBeenInitialized()
-            if (status == 3 && value) {
-                Preferences.syncLocalAndCloud(localToCloud: false)
-                self.writeToClassMembers()
+            if persistsPreferenceUpdates {
+                let status = Preferences.havePreferencesBeenInitialized()
+                if (status == 3 && value) {
+                    Preferences.syncLocalAndCloud(localToCloud: false)
+                    self.writeToClassMembers()
+                }
             }
         default:
             fatalError("Incorrect parameter for preference")
         }
         
         // Update iCloud data
-        Preferences.syncLocalAndCloud(localToCloud: true)
+        syncPersistentPreferencesIfNeeded()
     }
     
     public func updateStringPreference(preference: CustomizablePreferences, value: String) {
         switch preference {
         case .colour:
-            UserDefaults.standard.set(value, forKey: Preferences.keys[2])
+            setPersistentPreference(value, forKey: Preferences.keys[2])
             self.colourChoice = value
         case .sortingChoice:
-            UserDefaults.standard.set(value, forKey: Preferences.keys[4])
+            setPersistentPreference(value, forKey: Preferences.keys[4])
             self.sortingChoice = value
         case .selectedRoute:
-            UserDefaults.standard.set(value, forKey: Preferences.keys[8])
+            setPersistentPreference(value, forKey: Preferences.keys[8])
             self.selectedRoute = value
         case .mapTypeChoice:
-            UserDefaults.standard.set(value, forKey: Preferences.keys[12])
+            setPersistentPreference(value, forKey: Preferences.keys[12])
             self.mapTypeChoice = value
         default:
             fatalError("Incorrect parameter for preference")
         }
 
         // Update iCloud data
-        Preferences.syncLocalAndCloud(localToCloud: true)
+        syncPersistentPreferencesIfNeeded()
     }
 
     public func updateIntPreference(preference: CustomizablePreferences, value: Int) {
         switch preference {
         case .iconIndex:
-            UserDefaults.standard.set(value, forKey: Preferences.iconIndexKey)
+            setPersistentPreference(value, forKey: Preferences.iconIndexKey)
             self.iconIndex = value
         default:
             fatalError("Incorrect parameter for preference")
@@ -451,9 +486,35 @@ class Preferences: ObservableObject {
     
     // For the reset to default settings button on the settings tab
     public func resetPreferences() {
+        if !persistsPreferenceUpdates {
+            // Settings UI-smoke tests can tap reset; reset only the selected
+            // launch preferences object so production defaults stay untouched.
+            resetPreferencesInMemory()
+            return
+        }
+
         Preferences.writeDefaults(iCloud: false)
         Preferences.syncLocalAndCloud(localToCloud: true)
         self.writeToClassMembers()
+    }
+
+    private func resetPreferencesInMemory() {
+        usingMetric = Preferences.defaultUsingMetric
+        displayingMetrics = Preferences.defaultDisplayingMetrics
+        colourChoice = Preferences.defaultColourChoice
+        largeMetrics = Preferences.defaultLargeMetrics
+        sortingChoice = Preferences.defaultSortingChoice
+        deletionConfirmation = Preferences.defaultDeletionConfirmation
+        deletionEnabled = Preferences.defaultDeletionEnabled
+        iconIndex = Preferences.defaultIconIndex
+        namedRoutes = Preferences.defaultNamedRoutes
+        selectedRoute = Preferences.defaultSelectedRoute
+        iCloudOn = Preferences.defaultICloudOn
+        autoLockDisabled = Preferences.defaultAutoLockDisabled
+        healthSyncEnabled = Preferences.defaultHealthSyncEnabled
+        autoPauseEnabled = Preferences.defaultAutoPauseEnabled
+        telemetryEnabled = Preferences.defaultTelemetryEnabled
+        mapTypeChoice = Preferences.defaultMapTypeChoice
     }
     
     // Used in BikeRideViewModel where the environment object is not available

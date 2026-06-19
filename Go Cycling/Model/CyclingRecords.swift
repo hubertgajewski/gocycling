@@ -219,6 +219,12 @@ class CyclingRecords: ObservableObject {
         self.writeClassMembersToUserDefaults()
         CyclingRecords.syncLocalAndCloud(localToCloud: true)
     }
+
+    // Award-alert defaults must follow the selected records storage mode so
+    // isolated launches can update UI state without writing production flags.
+    var writesPersistentState: Bool {
+        persistsRecordUpdates
+    }
     
     static private func syncLocalAndCloud(localToCloud: Bool) {
         // Sync local to cloud

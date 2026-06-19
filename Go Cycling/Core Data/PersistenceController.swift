@@ -215,8 +215,14 @@ struct PersistenceController {
     }
     
     func deleteAllBikeRides() {
-        let context = container.viewContext
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "BikeRide")
+        Self.deleteAllBikeRides(in: container.viewContext)
+    }
+
+    // Settings receives the launch-selected context from SwiftUI; this overload
+    // lets deletion follow that context instead of always using the shared store.
+    static func deleteAllBikeRides(in context: NSManagedObjectContext) {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
+        fetchRequest.entity = NSEntityDescription.entity(forEntityName: "BikeRide", in: context)
         fetchRequest.returnsObjectsAsFaults = false
         do {
             let results = try context.fetch(fetchRequest)

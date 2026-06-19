@@ -23,7 +23,9 @@ struct ActivityAwardsViewModelTests {
     records.longestCyclingDistance = 5_000
     records.totalCyclingDistance = 50_000
     let subject = PassthroughSubject<Int, Never>()
-    let viewModel = ActivityAwardsViewModel(recordsPublisher: subject.eraseToAnyPublisher())
+    let viewModel = ActivityAwardsViewModel(
+      records: records,
+      recordsPublisher: subject.eraseToAnyPublisher())
 
     subject.send(1)
 
@@ -51,7 +53,9 @@ struct ActivityAwardsViewModelTests {
     records.longestCyclingDistance = 60_000
     records.totalCyclingDistance = 600_000
     let subject = PassthroughSubject<Int, Never>()
-    let viewModel = ActivityAwardsViewModel(recordsPublisher: subject.eraseToAnyPublisher())
+    let viewModel = ActivityAwardsViewModel(
+      records: records,
+      recordsPublisher: subject.eraseToAnyPublisher())
 
     subject.send(1)
 
@@ -67,7 +71,9 @@ struct ActivityAwardsViewModelTests {
     let records = CyclingRecords.shared
     records.unlockedIcons = [true, false, true, false, false, true]
     let subject = PassthroughSubject<Int, Never>()
-    let viewModel = ActivityAwardsViewModel(recordsPublisher: subject.eraseToAnyPublisher())
+    let viewModel = ActivityAwardsViewModel(
+      records: records,
+      recordsPublisher: subject.eraseToAnyPublisher())
 
     subject.send(1)
 
@@ -97,7 +103,9 @@ struct ActivityAwardsViewModelTests {
     let records = CyclingRecords.shared
     records.unlockedIcons = [true, true, true, true, true, true]
     let subject = PassthroughSubject<Int, Never>()
-    let viewModel = ActivityAwardsViewModel(recordsPublisher: subject.eraseToAnyPublisher())
+    let viewModel = ActivityAwardsViewModel(
+      records: records,
+      recordsPublisher: subject.eraseToAnyPublisher())
 
     subject.send(1)
 
@@ -156,12 +164,43 @@ struct ActivityAwardsViewModelTests {
     #expect(viewModel.progressValues.map(Double.init) == [0.5, 0.2, 0.1, 0.5, 0.2, 0.1])
   }
 
+  @Test("default initialization waits for selected records")
+  func defaultInitializationWaitsForSelectedRecords() async {
+    let snapshots = await makeAwardsSnapshots()
+    defer { snapshots.restore() }
+
+    let sharedRecords = CyclingRecords.shared
+    sharedRecords.unlockedIcons = [true, false, false, false, false, false]
+
+    let viewModel = ActivityAwardsViewModel()
+
+    #expect(viewModel.progressValues == [CGFloat](repeating: 0.0, count: 6))
+    #expect(!viewModel.alertForNewIcon)
+    #expect(!UserDefaults.standard.bool(forKey: "alertedBronze1"))
+  }
+
+  @Test("isolated records can alert without persisting award flags")
+  func isolatedRecordsCanAlertWithoutPersistingAwardFlags() async {
+    let snapshots = await makeAwardsSnapshots()
+    defer { snapshots.restore() }
+
+    let selectedRecords = CyclingRecords(arguments: [UITesting.launchArgument])
+    selectedRecords.unlockedIcons = [true, false, false, false, false, false]
+
+    let viewModel = ActivityAwardsViewModel()
+    viewModel.useRecords(selectedRecords)
+
+    #expect(viewModel.alertForNewIcon)
+    #expect(!UserDefaults.standard.bool(forKey: "alertedBronze1"))
+  }
+
   @Test("returns medal order and localized award names")
   func returnsMedalOrderAndAwardNames() async {
     let snapshots = await makeAwardsSnapshots()
     defer { snapshots.restore() }
 
     let viewModel = ActivityAwardsViewModel(
+      records: CyclingRecords.shared,
       recordsPublisher: Empty<Int, Never>().eraseToAnyPublisher())
 
     #expect(

@@ -113,6 +113,22 @@ struct AppLaunchStorage {
         UITesting.shouldSeedRouteSaveFixture(arguments: arguments)
     }
 
+    #if DEBUG
+    func seedRouteSaveFixtureIfNeeded(
+        records: CyclingRecordsUpdating? = nil,
+        completion: @escaping (Result<Void, Error>) -> Void = { _ in }
+    ) {
+        // Keep the fixture gate and fixture execution on the same selected
+        // arguments so injected launches cannot pass one check and skip the next.
+        UITestingRouteSaveFixture.runIfNeeded(
+            persistenceController: persistenceController,
+            records: records,
+            arguments: arguments,
+            completion: completion
+        )
+    }
+    #endif
+
     // UI-test launches must select the isolated Core Data store before any
     // storage-backed state object or legacy migration can touch production data.
     // Production still resolves to the existing shared app singletons.
@@ -207,9 +223,7 @@ struct GoCyclingApp: App {
                     // UI-smoke tests need a saved route from the real save path so
                     // History is verified without relying on live GPS/timer data.
                     if launchStorage.shouldSeedRouteSaveFixture {
-                        UITestingRouteSaveFixture.runIfNeeded(
-                            persistenceController: persistenceController
-                        )
+                        launchStorage.seedRouteSaveFixtureIfNeeded()
                         return
                     }
                     #endif

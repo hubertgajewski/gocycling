@@ -14,10 +14,16 @@ class ActivityAwardsViewModel: ObservableObject {
 
     // Awards used to read CyclingRecords.shared directly; holding the source
     // records lets isolated UI-test launches display their selected record state.
-    private var sourceRecords: CyclingRecords
+    private var sourceRecords: CyclingRecords?
+    // Award-alert flags are stored in UserDefaults for production records, but
+    // isolated launch records can only raise transient UI state.
+    private var persistAwardAlerts = false
 
     @Published var progressValues: [CGFloat] = [CGFloat].init(repeating: 0.0, count: 6)
-    @Published var unlockedIcons: [Bool]
+    @Published var unlockedIcons: [Bool] = [Bool].init(
+        repeating: false,
+        count: CyclingRecords.awardValues.count
+    )
     @Published var progressStrings: [String] = [String].init(repeating: "0% Complete", count: 6)
     
     // Boolean to display alert for newly unlocked icon
@@ -27,7 +33,7 @@ class ActivityAwardsViewModel: ObservableObject {
         willSet {
             // Recompute from the selected records object instead of the shared
             // singleton so injected launch storage drives every awards update.
-            let updatedRecords = newValue ?? sourceRecords
+            guard let updatedRecords = newValue ?? sourceRecords else { return }
             // Update published values when records change
             unlockedIcons = updatedRecords.unlockedIcons
             for index in 0..<CyclingRecords.awardValues.count {
@@ -36,41 +42,7 @@ class ActivityAwardsViewModel: ObservableObject {
                 if (unlockedIcons[index]) {
                     progressValues[index] = 1.0
                     progressStrings[index] = "100% Complete"
-                    // Check if user has been alerted of this unlocked icon
-                    switch index {
-                    case 0:
-                        if (!UserDefaults.standard.bool(forKey: "alertedBronze1")) {
-                            UserDefaults.standard.set(true, forKey: "alertedBronze1")
-                            alertForNewIcon = true
-                        }
-                    case 1:
-                        if (!UserDefaults.standard.bool(forKey: "alertedSilver1")) {
-                            UserDefaults.standard.set(true, forKey: "alertedSilver1")
-                            alertForNewIcon = true
-                        }
-                    case 2:
-                        if (!UserDefaults.standard.bool(forKey: "alertedGold1")) {
-                            UserDefaults.standard.set(true, forKey: "alertedGold1")
-                            alertForNewIcon = true
-                        }
-                    case 3:
-                        if (!UserDefaults.standard.bool(forKey: "alertedBronze2")) {
-                            UserDefaults.standard.set(true, forKey: "alertedBronze2")
-                            alertForNewIcon = true
-                        }
-                    case 4:
-                        if (!UserDefaults.standard.bool(forKey: "alertedSilver2")) {
-                            UserDefaults.standard.set(true, forKey: "alertedSilver2")
-                            alertForNewIcon = true
-                        }
-                    case 5:
-                        if (!UserDefaults.standard.bool(forKey: "alertedGold2")) {
-                            UserDefaults.standard.set(true, forKey: "alertedGold2")
-                            alertForNewIcon = true
-                        }
-                    default:
-                        fatalError("Index out of range")
-                    }
+                    handleUnlockedAward(at: index)
                 }
                 // Single route awards
                 else if (index < 3) {
@@ -99,15 +71,9 @@ class ActivityAwardsViewModel: ObservableObject {
 
     // Tests can inject a publisher, but production binds to the selected records
     // object so award progress follows launch storage after environment injection.
-    init(records: CyclingRecords = CyclingRecords.shared, recordsPublisher: AnyPublisher<Int, Never>? = nil) {
-        self.sourceRecords = records
-        self.unlockedIcons = records.unlockedIcons
-
-        let publisher = recordsPublisher ?? records.$totalCyclingRoutes.eraseToAnyPublisher()
-        cancellable = publisher.sink { [weak self] _ in
-            guard let self = self else { return }
-            print("Updating records")
-            self.records = self.sourceRecords
+    init(records: CyclingRecords? = nil, recordsPublisher: AnyPublisher<Int, Never>? = nil) {
+        if let records = records {
+            bindRecords(records, recordsPublisher: recordsPublisher)
         }
         
         // Launching statistics tab is a review worthy action
@@ -120,15 +86,43 @@ class ActivityAwardsViewModel: ObservableObject {
     // Statistics supplies the launch-selected records after environment
     // injection so awards cannot drift to CyclingRecords.shared during UI tests.
     func useRecords(_ records: CyclingRecords) {
+        alertForNewIcon = false
+        bindRecords(records)
+        self.records = records
+    }
+
+    private func bindRecords(
+        _ records: CyclingRecords,
+        recordsPublisher: AnyPublisher<Int, Never>? = nil
+    ) {
         sourceRecords = records
         unlockedIcons = records.unlockedIcons
-        alertForNewIcon = false
-        cancellable = records.$totalCyclingRoutes.sink { [weak self] _ in
+        persistAwardAlerts = records.writesPersistentState
+
+        let publisher = recordsPublisher ?? records.$totalCyclingRoutes.eraseToAnyPublisher()
+        cancellable = publisher.sink { [weak self] _ in
             guard let self = self else { return }
             print("Updating records")
             self.records = self.sourceRecords
         }
-        self.records = records
+    }
+
+    private static let awardAlertKeys = [
+        "alertedBronze1",
+        "alertedSilver1",
+        "alertedGold1",
+        "alertedBronze2",
+        "alertedSilver2",
+        "alertedGold2",
+    ]
+
+    private func handleUnlockedAward(at index: Int) {
+        let key = Self.awardAlertKeys[index]
+        if persistAwardAlerts {
+            guard !UserDefaults.standard.bool(forKey: key) else { return }
+            UserDefaults.standard.set(true, forKey: key)
+        }
+        alertForNewIcon = true
     }
     
     func getAwardName(index: Int, usingMetric: Bool) -> String {
