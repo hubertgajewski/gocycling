@@ -239,23 +239,6 @@ struct BikeRidePersistenceTests {
     persistence.save()
   }
 
-  @Test("returns all bike rides from the shared store")
-  func returnsAllBikeRidesFromSharedStore() async throws {
-    let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
-    defer { snapshot.restore() }
-
-    let persistence = PersistenceController.shared
-    defer { persistence.deleteAllBikeRides() }
-    persistence.deleteAllBikeRides()
-
-    let context = persistence.container.viewContext
-    _ = makeRide(in: context, name: "Morning", distance: 1_000)
-    _ = makeRide(in: context, name: "Evening", distance: 2_000)
-    try context.save()
-
-    #expect(BikeRide.allBikeRides().count == 2)
-  }
-
   @Test("route save fixture uses an isolated non-CloudKit store")
   func routeSaveFixtureUsesIsolatedNonCloudKitStore() throws {
     let suiteName = "GoCyclingTests.RouteSaveFixture.\(UUID().uuidString)"

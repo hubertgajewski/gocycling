@@ -18,31 +18,28 @@ struct RouteNamingViewModelTests {
     let snapshot = await PersistedStoreSnapshot(keys: [iCloudSyncPreferenceKey])
     defer { snapshot.restore() }
 
-    let persistence = PersistenceController.shared
-    defer { persistence.deleteAllBikeRides() }
-    persistence.deleteAllBikeRides()
+    let fixture = SharedStoreRideFixture()
+    defer { fixture.cleanup() }
 
-    let context = persistence.container.viewContext
-    _ = makeNamingRide(in: context, name: "Commute")
-    _ = makeNamingRide(in: context, name: "Training")
-    try context.save()
+    _ = fixture.insert(
+      name: "Issue41-Commute",
+      distance: 1_000,
+      start: fixtureDate(2026, 6, 15),
+      time: 300
+    )
+    _ = fixture.insert(
+      name: "Issue41-Training",
+      distance: 2_000,
+      start: fixtureDate(2026, 6, 16),
+      time: 600
+    )
+    try fixture.save()
 
     let viewModel = RouteNamingViewModel()
+    let insertedRouteNames = viewModel.routeNames.filter { $0.hasPrefix("Issue41-") }
 
-    #expect(viewModel.allBikeRides.count == 2)
-    #expect(viewModel.routeNames == ["Commute", "Training"])
+    #expect(viewModel.allBikeRides.contains { $0.cyclingRouteName == "Issue41-Commute" })
+    #expect(viewModel.allBikeRides.contains { $0.cyclingRouteName == "Issue41-Training" })
+    #expect(insertedRouteNames == ["Issue41-Commute", "Issue41-Training"])
   }
-}
-
-private func makeNamingRide(in context: NSManagedObjectContext, name: String) -> BikeRide {
-  let ride = BikeRide(context: context)
-  ride.cyclingRouteName = name
-  ride.cyclingDistance = 1_000
-  ride.cyclingStartTime = Date(timeIntervalSince1970: 1_000)
-  ride.cyclingTime = 300
-  ride.cyclingSpeeds = [5]
-  ride.cyclingLatitudes = [51.5]
-  ride.cyclingLongitudes = [-0.1]
-  ride.cyclingElevations = [10]
-  return ride
 }

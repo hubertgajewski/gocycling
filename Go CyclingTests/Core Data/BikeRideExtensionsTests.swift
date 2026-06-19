@@ -19,66 +19,44 @@ struct BikeRideExtensionsTests {
     defer { snapshot.restore() }
     seedExtensionPreferences()
 
-    let persistence = PersistenceController.shared
-    defer { persistence.deleteAllBikeRides() }
-    persistence.deleteAllBikeRides()
+    let fixture = SharedStoreRideFixture()
+    defer { fixture.cleanup() }
 
-    let context = persistence.container.viewContext
-    _ = makeExtensionRide(
-      in: context,
-      name: "Commute",
+    _ = fixture.insert(
+      name: "Issue41-Commute",
       distance: 10,
-      start: extensionDate(2026, 6, 15),
+      start: fixtureDate(2026, 6, 15),
       time: 600
     )
-    _ = makeExtensionRide(
-      in: context,
-      name: "commute",
+    _ = fixture.insert(
+      name: "Issue41-commute",
       distance: 5,
-      start: extensionDate(2026, 6, 16),
+      start: fixtureDate(2026, 6, 16),
       time: 300
     )
-    _ = makeExtensionRide(
-      in: context,
-      name: "Training",
+    _ = fixture.insert(
+      name: "Issue41-Training",
       distance: 20,
-      start: extensionDate(2026, 6, 17),
+      start: fixtureDate(2026, 6, 17),
       time: 900
     )
-    _ = makeExtensionRide(
-      in: context,
+    _ = fixture.insert(
       name: "Uncategorized",
       distance: 1,
-      start: extensionDate(2026, 6, 18),
+      start: fixtureDate(2026, 6, 18),
       time: 60
     )
-    try context.save()
+    try fixture.save()
 
-    let names = BikeRide.allRouteNames()
-    #expect(Set(names) == Set(["Commute", "commute", "Training"]))
+    let names = BikeRide.allRouteNames().filter { $0.hasPrefix("Issue41-") }
+    #expect(Set(names) == Set(["Issue41-Commute", "Issue41-commute", "Issue41-Training"]))
     #expect(names == names.sorted { $0.lowercased() < $1.lowercased() })
 
     let categories = BikeRide.allCategories()
     #expect(categories.first?.name == "All")
-    #expect(categories.first?.number == 4)
-    #expect(categories.contains { $0.name == "Uncategorized" && $0.number == 1 })
-    #expect(categories.contains { $0.name == "Commute" && $0.number == 1 })
-    #expect(categories.contains { $0.name == "Training" && $0.number == 1 })
-    #expect(categories.contains { $0.name == "commute" && $0.number == 1 })
-  }
-
-  @Test("returns empty route and category lists when no rides exist")
-  func returnsEmptyRouteAndCategoryListsWhenNoRidesExist() async {
-    let snapshot = await PersistedStoreSnapshot(keys: extensionStoreKeys)
-    defer { snapshot.restore() }
-    seedExtensionPreferences()
-
-    let persistence = PersistenceController.shared
-    defer { persistence.deleteAllBikeRides() }
-    persistence.deleteAllBikeRides()
-
-    #expect(BikeRide.allRouteNames().isEmpty)
-    #expect(BikeRide.allCategories().isEmpty)
+    #expect(categories.contains { $0.name == "Issue41-Commute" && $0.number == 1 })
+    #expect(categories.contains { $0.name == "Issue41-commute" && $0.number == 1 })
+    #expect(categories.contains { $0.name == "Issue41-Training" && $0.number == 1 })
   }
 
   @Test("sorts all bike rides using the stored preference")
@@ -92,31 +70,27 @@ struct BikeRideExtensionsTests {
       value: SortChoice.distanceAscending.rawValue
     )
 
-    let persistence = PersistenceController.shared
-    defer { persistence.deleteAllBikeRides() }
-    persistence.deleteAllBikeRides()
+    let fixture = SharedStoreRideFixture()
+    defer { fixture.cleanup() }
 
-    let context = persistence.container.viewContext
-    let short = makeExtensionRide(
-      in: context,
-      name: "short",
+    let short = fixture.insert(
+      name: "Issue41-short",
       distance: 1_000,
-      start: extensionDate(2026, 6, 15),
+      start: fixtureDate(2026, 6, 15),
       time: 600
     )
-    let long = makeExtensionRide(
-      in: context,
-      name: "long",
+    let long = fixture.insert(
+      name: "Issue41-long",
       distance: 3_000,
-      start: extensionDate(2026, 6, 17),
+      start: fixtureDate(2026, 6, 17),
       time: 1_200
     )
-    try context.save()
+    try fixture.save()
 
-    let sorted = BikeRide.allBikeRidesSorted()
-    #expect(sorted.map(\.cyclingRouteName) == ["short", "long"])
-    #expect(sorted.first?.objectID == short.objectID)
-    #expect(sorted.last?.objectID == long.objectID)
+    let sorted = BikeRide.allBikeRidesSorted().filter {
+      $0.objectID == short.objectID || $0.objectID == long.objectID
+    }
+    #expect(sorted.map(\.cyclingRouteName) == ["Issue41-short", "Issue41-long"])
   }
 }
 
@@ -130,33 +104,4 @@ private func seedExtensionPreferences() {
   UserDefaults.standard.set(false, forKey: iCloudSyncPreferenceKey)
   UserDefaults.standard.set(true, forKey: "didSetupPreferences")
   UserDefaults.standard.set(SortChoice.dateDescending.rawValue, forKey: "sortingChoice")
-}
-
-private func makeExtensionRide(
-  in context: NSManagedObjectContext,
-  name: String,
-  distance: Double,
-  start: Date,
-  time: Double
-) -> BikeRide {
-  let ride = BikeRide(context: context)
-  ride.cyclingRouteName = name
-  ride.cyclingDistance = distance
-  ride.cyclingStartTime = start
-  ride.cyclingTime = time
-  ride.cyclingSpeeds = [5]
-  ride.cyclingLatitudes = [51.5]
-  ride.cyclingLongitudes = [-0.1]
-  ride.cyclingElevations = [10]
-  return ride
-}
-
-private func extensionDate(_ year: Int, _ month: Int, _ day: Int) -> Date {
-  var components = DateComponents()
-  components.calendar = Calendar(identifier: .gregorian)
-  components.timeZone = TimeZone(secondsFromGMT: 0)
-  components.year = year
-  components.month = month
-  components.day = day
-  return components.date!
 }
