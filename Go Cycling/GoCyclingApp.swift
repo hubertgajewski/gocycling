@@ -105,6 +105,8 @@ struct AppLaunchStorage {
     // UI-test launches must select the isolated Core Data store before any
     // storage-backed state object or legacy migration can touch production data.
     // Production still resolves to the existing shared app singletons.
+    // The default factories keep production on shared singletons, but UI-test
+    // arguments must create argument-scoped state so they do not mutate defaults.
     static func make(
         arguments: [String] = ProcessInfo.processInfo.arguments,
         persistenceControllerFactory: ([String]) -> PersistenceController = { _ in
@@ -113,8 +115,18 @@ struct AppLaunchStorage {
         bikeRideStorageFactory: (NSManagedObjectContext) -> BikeRideStorage = {
             BikeRideStorage(managedObjectContext: $0)
         },
-        preferencesFactory: ([String]) -> Preferences = { _ in Preferences.shared },
-        recordsFactory: ([String]) -> CyclingRecords = { _ in CyclingRecords.shared }
+        preferencesFactory: ([String]) -> Preferences = { arguments in
+            if UITesting.shouldUseIsolatedPersistence(arguments: arguments) {
+                return Preferences(arguments: arguments)
+            }
+            return Preferences.shared
+        },
+        recordsFactory: ([String]) -> CyclingRecords = { arguments in
+            if UITesting.shouldUseIsolatedPersistence(arguments: arguments) {
+                return CyclingRecords(arguments: arguments)
+            }
+            return CyclingRecords.shared
+        }
     ) -> AppLaunchStorage {
         let persistenceController = persistenceControllerFactory(arguments)
         let bikeRides = bikeRideStorageFactory(persistenceController.container.viewContext)

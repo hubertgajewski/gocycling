@@ -426,6 +426,8 @@ struct CompletedRouteSaveTests {
       let legacyRecords = try #require(storage.storedRecords())
       #expect(legacyPreferences.selectedRoute == "Selected legacy route")
       #expect(legacyRecords.totalCyclingRoutes == 4)
+      #expect(storage.preferences.iCloudOn == false)
+      #expect(storage.records.totalCyclingRoutes == 0)
     }
 
     @Test("route save fixture model initialization leaves stores unchanged")
