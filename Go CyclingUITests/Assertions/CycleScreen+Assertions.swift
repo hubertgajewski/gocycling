@@ -36,20 +36,6 @@ extension CycleScreen {
     )
   }
 
-  func assertMapLocked(
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    ElementAssertions.assertExists(mapLockButton, file: file, line: line)
-  }
-
-  func assertMapUnlocked(
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    ElementAssertions.assertExists(mapUnlockButton, file: file, line: line)
-  }
-
   func assertLocationSettingsAlertPresented(
     file: StaticString = #filePath,
     line: UInt = #line
@@ -74,27 +60,6 @@ extension CycleScreen {
     )
   }
 
-  func assertRunning(
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    ElementAssertions.assertExists(
-      pauseButton,
-      timeout: Timeouts.short,
-      file: file,
-      line: line
-    )
-    ElementAssertions.assertExists(stopButton, file: file, line: line)
-  }
-
-  func assertPaused(
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    ElementAssertions.assertExists(resumeButton, file: file, line: line)
-    ElementAssertions.assertExists(stopButton, file: file, line: line)
-  }
-
   func assertStopConfirmationPresented(
     file: StaticString = #filePath,
     line: UInt = #line
@@ -108,18 +73,6 @@ extension CycleScreen {
     XCTAssertNotNil(
       stopConfirmationCancelButton(),
       "Expected the app-owned stop confirmation Cancel action",
-      file: file,
-      line: line
-    )
-  }
-
-  func assertAutoPausedBanner(
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    ElementAssertions.assertExists(
-      autoPausedBanner,
-      timeout: Timeouts.standard,
       file: file,
       line: line
     )

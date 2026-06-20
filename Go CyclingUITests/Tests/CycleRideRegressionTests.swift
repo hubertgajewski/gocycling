@@ -10,40 +10,46 @@ final class CycleRideRegressionTests: CycleRideUITestCase {
   func testIdleCycleChromeShowsMapMetricsAndLockToggle() throws {
     cycle.assertReadyToStart()
     cycle.assertDefaultMetricsDisplayed()
-    cycle.assertMapLocked()
+    ElementAssertions.assertExists(cycle.mapLockButton)
     cycle.unlockMap()
-    cycle.assertMapUnlocked()
+    ElementAssertions.assertExists(cycle.mapUnlockButton)
     cycle.lockMap()
-    cycle.assertMapLocked()
+    ElementAssertions.assertExists(cycle.mapLockButton)
   }
 
   func testPauseResumeAndCancelStopDoesNotSaveRide() throws {
     cycle.start()
     cycle.assertLocationSettingsAlertPresented()
     cycle.dismissLocationSettingsAlertIfPresent()
-    cycle.assertRunning()
+    ElementAssertions.assertExists(cycle.pauseButton, timeout: Timeouts.short)
+    ElementAssertions.assertExists(cycle.stopButton)
     cycle.pause()
-    cycle.assertPaused()
+    ElementAssertions.assertExists(cycle.resumeButton)
+    ElementAssertions.assertExists(cycle.stopButton)
     cycle.resume()
-    cycle.assertRunning()
+    ElementAssertions.assertExists(cycle.pauseButton, timeout: Timeouts.short)
+    ElementAssertions.assertExists(cycle.stopButton)
     cycle.requestStop()
     cycle.assertStopConfirmationPresented()
     cycle.cancelStopConfirmation()
-    cycle.assertPaused()
+    ElementAssertions.assertExists(cycle.resumeButton)
+    ElementAssertions.assertExists(cycle.stopButton)
 
     mainTabs.select(.history)
-    mainTabs.assertSelected(.history)
-    history.assertEmpty()
+    ElementAssertions.assertExists(mainTabs.tabContent(for: .history), timeout: Timeouts.standard)
+    ElementAssertions.assertExists(history.emptyState, timeout: Timeouts.short)
 
     mainTabs.select(.cycle)
-    mainTabs.assertSelected(.cycle)
-    cycle.assertPaused()
+    ElementAssertions.assertExists(mainTabs.tabContent(for: .cycle), timeout: Timeouts.standard)
+    ElementAssertions.assertExists(cycle.resumeButton)
+    ElementAssertions.assertExists(cycle.stopButton)
   }
 
   func testCategorizeYourRouteLabelsVisible() throws {
     cycle.start()
     cycle.dismissLocationSettingsAlertIfPresent()
-    cycle.assertRunning()
+    ElementAssertions.assertExists(cycle.pauseButton, timeout: Timeouts.short)
+    ElementAssertions.assertExists(cycle.stopButton)
     cycle.completeStop()
     categorization.assertLabels()
     categorization.saveWithoutCategory()
@@ -64,7 +70,6 @@ final class CycleRideRegressionTests: CycleRideUITestCase {
     cycle.start()
     cycle.dismissLocationSettingsAlertIfPresent()
     cycle.completeStop()
-    categorization.assertPresented()
     categorization.saveNewCategory(named: categoryName)
 
     mainTabs.select(.history)
@@ -102,7 +107,8 @@ final class CycleAutoPauseRegressionTests: CycleRideUITestCase {
   func testAutoPausedBannerAppearsWhenStopped() throws {
     cycle.start()
     cycle.dismissLocationSettingsAlertIfPresent()
-    cycle.assertAutoPausedBanner()
-    cycle.assertPaused()
+    ElementAssertions.assertExists(cycle.autoPausedBanner, timeout: Timeouts.short)
+    ElementAssertions.assertExists(cycle.resumeButton)
+    ElementAssertions.assertExists(cycle.stopButton)
   }
 }

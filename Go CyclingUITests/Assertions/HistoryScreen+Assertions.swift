@@ -6,37 +6,18 @@
 import XCTest
 
 extension HistoryScreen {
-  func assertHasRides(
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    ElementAssertions.assertExists(
-      rideRow,
-      timeout: Timeouts.standard,
-      file: file,
-      line: line
-    )
-  }
-
-  func assertEmpty(
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    ElementAssertions.assertExists(
-      emptyState,
-      timeout: Timeouts.short,
-      file: file,
-      line: line
-    )
-  }
-
   func assertRideCount(
     _ expectedCount: Int,
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
     if expectedCount == 0 {
-      assertEmpty(file: file, line: line)
+      ElementAssertions.assertExists(
+        emptyState,
+        timeout: Timeouts.short,
+        file: file,
+        line: line
+      )
       return
     }
     ElementAssertions.assertExists(

@@ -172,7 +172,6 @@
 		AA0001272026062000000001 /* ResetAppDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001282026062000000001 /* ResetAppDataFlow.swift */; };
 		AA0001292026062000000001 /* CycleScreen+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001302026062000000001 /* CycleScreen+Assertions.swift */; };
 		AA0001312026062000000001 /* HistoryScreen+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001322026062000000001 /* HistoryScreen+Assertions.swift */; };
-		AA0001332026062000000001 /* MainTabBarScreen+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001342026062000000001 /* MainTabBarScreen+Assertions.swift */; };
 		AA0001352026062000000001 /* RouteCategorizationScreen+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001362026062000000001 /* RouteCategorizationScreen+Assertions.swift */; };
 		AA0000972026061900000001 /* AccessibilityIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000982026061900000001 /* AccessibilityIDs.swift */; };
 		AA0001012026061900000001 /* GoCyclingUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001022026061900000001 /* GoCyclingUITestCase.swift */; };
@@ -408,7 +407,6 @@
 		AA0001282026062000000001 /* ResetAppDataFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetAppDataFlow.swift; sourceTree = "<group>"; };
 		AA0001302026062000000001 /* CycleScreen+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CycleScreen+Assertions.swift"; sourceTree = "<group>"; };
 		AA0001322026062000000001 /* HistoryScreen+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HistoryScreen+Assertions.swift"; sourceTree = "<group>"; };
-		AA0001342026062000000001 /* MainTabBarScreen+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainTabBarScreen+Assertions.swift"; sourceTree = "<group>"; };
 		AA0001362026062000000001 /* RouteCategorizationScreen+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RouteCategorizationScreen+Assertions.swift"; sourceTree = "<group>"; };
 		AA0000982026061900000001 /* AccessibilityIDs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityIDs.swift; sourceTree = "<group>"; };
 		AA0001022026061900000001 /* GoCyclingUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoCyclingUITestCase.swift; sourceTree = "<group>"; };
@@ -912,7 +910,6 @@
 			children = (
 				AA0001302026062000000001 /* CycleScreen+Assertions.swift */,
 				AA0001322026062000000001 /* HistoryScreen+Assertions.swift */,
-				AA0001342026062000000001 /* MainTabBarScreen+Assertions.swift */,
 				AA0001362026062000000001 /* RouteCategorizationScreen+Assertions.swift */,
 			);
 			path = Assertions;
@@ -1329,7 +1326,6 @@
 				AA0001272026062000000001 /* ResetAppDataFlow.swift in Sources */,
 				AA0001292026062000000001 /* CycleScreen+Assertions.swift in Sources */,
 				AA0001312026062000000001 /* HistoryScreen+Assertions.swift in Sources */,
-				AA0001332026062000000001 /* MainTabBarScreen+Assertions.swift in Sources */,
 				AA0001352026062000000001 /* RouteCategorizationScreen+Assertions.swift in Sources */,
 				AA0000972026061900000001 /* AccessibilityIDs.swift in Sources */,
 				AA0001012026061900000001 /* GoCyclingUITestCase.swift in Sources */,

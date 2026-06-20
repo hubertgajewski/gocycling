@@ -6,7 +6,7 @@
 import XCTest
 
 extension RouteCategorizationScreen {
-  func assertPresented(
+  func assertLabels(
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
@@ -24,13 +24,6 @@ extension RouteCategorizationScreen {
       file: file,
       line: line
     )
-  }
-
-  func assertLabels(
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    assertPresented(file: file, line: line)
     ElementAssertions.assertExists(
       useExistingCategorySegment,
       file: file,
