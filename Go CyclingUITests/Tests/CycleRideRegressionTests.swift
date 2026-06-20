@@ -8,44 +8,44 @@ import XCTest
 /// Deep Cycle GUI and route categorization coverage.
 final class CycleRideRegressionTests: CycleRideUITestCase {
   func testIdleCycleChromeShowsMapMetricsAndLockToggle() throws {
-    CycleScreenAssertions.assertReadyToStart(on: cycle)
-    CycleScreenAssertions.assertDefaultMetricsDisplayed(on: cycle)
-    CycleScreenAssertions.assertMapLocked(on: cycle)
+    cycle.assertReadyToStart()
+    cycle.assertDefaultMetricsDisplayed()
+    cycle.assertMapLocked()
     cycle.unlockMap()
-    CycleScreenAssertions.assertMapUnlocked(on: cycle)
+    cycle.assertMapUnlocked()
     cycle.lockMap()
-    CycleScreenAssertions.assertMapLocked(on: cycle)
+    cycle.assertMapLocked()
   }
 
   func testPauseResumeAndCancelStopDoesNotSaveRide() throws {
     cycle.start()
-    CycleScreenAssertions.assertLocationSettingsAlertPresented(on: cycle)
+    cycle.assertLocationSettingsAlertPresented()
     cycle.dismissLocationSettingsAlertIfPresent()
-    CycleScreenAssertions.assertRunning(on: cycle)
+    cycle.assertRunning()
     cycle.pause()
-    CycleScreenAssertions.assertPaused(on: cycle)
+    cycle.assertPaused()
     cycle.resume()
-    CycleScreenAssertions.assertRunning(on: cycle)
+    cycle.assertRunning()
     cycle.requestStop()
-    CycleScreenAssertions.assertStopConfirmationPresented(on: cycle)
+    cycle.assertStopConfirmationPresented()
     cycle.cancelStopConfirmation()
-    CycleScreenAssertions.assertPausedAfterStopCancellation(on: cycle)
+    cycle.assertPaused()
 
     mainTabs.select(.history)
-    MainTabBarScreenAssertions.assertSelected(.history, on: mainTabs)
-    HistoryScreenAssertions.assertEmpty(on: history)
+    mainTabs.assertSelected(.history)
+    history.assertEmpty()
 
     mainTabs.select(.cycle)
-    MainTabBarScreenAssertions.assertSelected(.cycle, on: mainTabs)
-    CycleScreenAssertions.assertPausedAfterStopCancellation(on: cycle)
+    mainTabs.assertSelected(.cycle)
+    cycle.assertPaused()
   }
 
   func testCategorizeYourRouteLabelsVisible() throws {
     cycle.start()
     cycle.dismissLocationSettingsAlertIfPresent()
-    CycleScreenAssertions.assertRunning(on: cycle)
+    cycle.assertRunning()
     cycle.completeStop()
-    RouteCategorizationScreenAssertions.assertLabels(on: categorization)
+    categorization.assertLabels()
     categorization.saveWithoutCategory()
   }
 
@@ -55,7 +55,7 @@ final class CycleRideRegressionTests: CycleRideUITestCase {
     cycle.completeStopAndSaveWithoutCategory(categorization: categorization)
 
     mainTabs.select(.history)
-    HistoryScreenAssertions.assertRideCount(1, on: history)
+    history.assertRideCount(1)
   }
 
   func testSaveRideToNewCategory() throws {
@@ -64,11 +64,11 @@ final class CycleRideRegressionTests: CycleRideUITestCase {
     cycle.start()
     cycle.dismissLocationSettingsAlertIfPresent()
     cycle.completeStop()
-    RouteCategorizationScreenAssertions.assertPresented(on: categorization)
+    categorization.assertPresented()
     categorization.saveNewCategory(named: categoryName)
 
     mainTabs.select(.history)
-    HistoryScreenAssertions.assertRideCount(1, on: history)
+    history.assertRideCount(1)
   }
 
   func testSaveRideToExistingCategory() throws {
@@ -86,7 +86,7 @@ final class CycleRideRegressionTests: CycleRideUITestCase {
     categorization.selectExistingCategory(named: categoryName, at: 0)
 
     mainTabs.select(.history)
-    HistoryScreenAssertions.assertRideCount(2, on: history)
+    history.assertRideCount(2)
   }
 }
 
@@ -102,7 +102,7 @@ final class CycleAutoPauseRegressionTests: CycleRideUITestCase {
   func testAutoPausedBannerAppearsWhenStopped() throws {
     cycle.start()
     cycle.dismissLocationSettingsAlertIfPresent()
-    CycleScreenAssertions.assertAutoPausedBanner(on: cycle)
-    CycleScreenAssertions.assertPaused(on: cycle)
+    cycle.assertAutoPausedBanner()
+    cycle.assertPaused()
   }
 }

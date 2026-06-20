@@ -26,11 +26,12 @@ class CycleRideUITestCase: GoCyclingUITestCase {
     let launchedApp = launchApp(extraArguments: launchExtraArguments)
     mainTabs = MainTabBarScreen(app: launchedApp)
     XCTAssertTrue(mainTabs.waitForMainChrome(), "Expected Cycle tab chrome after launch")
-    MainTabBarScreenAssertions.assertSelected(.cycle, on: mainTabs)
+    mainTabs.assertSelected(.cycle)
     ResetAppDataFlow(app: launchedApp, tabs: mainTabs).run()
 
     cycle = CycleScreen(app: launchedApp)
     history = HistoryScreen(app: launchedApp)
+    // Query object only; the categorization sheet appears after a completed ride.
     categorization = RouteCategorizationScreen(app: launchedApp)
   }
 }

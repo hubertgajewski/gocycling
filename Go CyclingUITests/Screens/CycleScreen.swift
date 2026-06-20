@@ -7,7 +7,8 @@ import XCTest
 
 /// Screen object for Cycle tab controls and app-owned Cycle alerts.
 final class CycleScreen {
-  private enum AlertLabel {
+  enum AlertLabel {
+    static let locationSettingsTitle = "Location settings may not be correct"
     static let openSettings = "Open Settings"
     static let ignore = "Ignore"
     static let stop = "Stop"
@@ -101,7 +102,14 @@ final class CycleScreen {
     line: UInt = #line
   ) {
     requestStop(file: file, line: line)
-    CycleScreenAssertions.assertStopConfirmationPresented(on: self, file: file, line: line)
+    guard stopConfirmationStopButton() != nil else {
+      XCTFail("Expected the app-owned stop confirmation Stop action", file: file, line: line)
+      return
+    }
+    guard stopConfirmationCancelButton() != nil else {
+      XCTFail("Expected the app-owned stop confirmation Cancel action", file: file, line: line)
+      return
+    }
     confirmStop(file: file, line: line)
   }
 

@@ -7,10 +7,12 @@ import XCTest
 
 /// Screen object for the post-ride Categorize Your Route sheet.
 final class RouteCategorizationScreen {
-  private enum Copy {
+  enum Copy {
+    static let title = "Categorize Your Route"
     static let categoryNamePlaceholder = "Category Name"
     static let noSavedCategories = "There are no saved categories."
     static let enterCategoryName = "Enter your new category name"
+    static let save = "Save"
   }
 
   let application: XCUIApplication
@@ -64,7 +66,7 @@ final class RouteCategorizationScreen {
     ensurePresented(file: file, line: line)
     selectUseExistingCategorySegment(file: file, line: line)
     ensureUseExistingCategorySelected(file: file, line: line)
-    ensureExistingCategoryPreselected(named: name, at: index, file: file, line: line)
+    tapExistingCategoryRow(named: name, at: index, file: file, line: line)
     tapSaveWhenEnabled(file: file, line: line)
     ensureDismissed(file: file, line: line)
   }
@@ -99,11 +101,12 @@ final class RouteCategorizationScreen {
     ]
   }
 
+  /// Action postcondition: reuse the assertion extension so tests and flows share one locator set.
   private func ensurePresented(
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
-    RouteCategorizationScreenAssertions.assertPresented(on: self, file: file, line: line)
+    assertPresented(file: file, line: line)
   }
 
   private func ensureCreateNewCategorySelected(
@@ -195,7 +198,7 @@ final class RouteCategorizationScreen {
     )
   }
 
-  private func ensureExistingCategoryPreselected(
+  private func tapExistingCategoryRow(
     named name: String,
     at index: Int,
     file: StaticString = #filePath,
@@ -210,7 +213,7 @@ final class RouteCategorizationScreen {
       line: line
     )
     ElementAssertions.assertContainsLabel(row, name, file: file, line: line)
-    ElementAssertions.assertSelected(row, file: file, line: line)
+    row.tap()
   }
 
   private func ensureDismissed(

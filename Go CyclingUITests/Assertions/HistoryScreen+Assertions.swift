@@ -5,40 +5,47 @@
 
 import XCTest
 
-enum HistoryScreenAssertions {
-  static func assertHasRides(
-    on history: HistoryScreen,
+extension HistoryScreen {
+  func assertHasRides(
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
     ElementAssertions.assertExists(
-      history.rideRow,
+      rideRow,
       timeout: Timeouts.standard,
       file: file,
       line: line
     )
   }
 
-  static func assertEmpty(
-    on history: HistoryScreen,
+  func assertEmpty(
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
     ElementAssertions.assertExists(
-      history.emptyState,
+      emptyState,
       timeout: Timeouts.short,
       file: file,
       line: line
     )
   }
 
-  static func assertRideCount(
+  func assertRideCount(
     _ expectedCount: Int,
-    on history: HistoryScreen,
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
-    let rides = history.rideRows()
+    if expectedCount == 0 {
+      assertEmpty(file: file, line: line)
+      return
+    }
+    ElementAssertions.assertExists(
+      rideRow,
+      timeout: Timeouts.standard,
+      file: file,
+      line: line
+    )
+    let rides = rideRows()
     XCTAssertEqual(
       rides.count,
       expectedCount,

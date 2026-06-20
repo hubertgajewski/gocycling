@@ -10,15 +10,15 @@ final class CycleRideSmokeTests: CycleRideUITestCase {
   func testStartPauseResumeStopSavesRideToHistory() throws {
     cycle.start()
     cycle.dismissLocationSettingsAlertIfPresent()
-    CycleScreenAssertions.assertRunning(on: cycle)
+    cycle.assertRunning()
     cycle.pause()
-    CycleScreenAssertions.assertPaused(on: cycle)
+    cycle.assertPaused()
     cycle.resume()
-    CycleScreenAssertions.assertRunning(on: cycle)
+    cycle.assertRunning()
     cycle.completeStopAndSaveWithoutCategory(categorization: categorization)
 
     mainTabs.select(.history)
-    MainTabBarScreenAssertions.assertSelected(.history, on: mainTabs)
-    HistoryScreenAssertions.assertHasRides(on: history)
+    mainTabs.assertSelected(.history)
+    history.assertHasRides()
   }
 }

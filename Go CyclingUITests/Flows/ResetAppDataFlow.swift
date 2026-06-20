@@ -15,13 +15,26 @@ struct ResetAppDataFlow {
     line: UInt = #line
   ) {
     tabs.select(.settings, file: file, line: line)
-    MainTabBarScreenAssertions.assertSelected(.settings, on: tabs, file: file, line: line)
+    waitForTabContent(.settings, file: file, line: line)
 
     let reset = SettingsResetScreen(app: app)
     reset.deleteAllStoredRoutes(file: file, line: line)
     reset.resetToDefaultSettings(file: file, line: line)
 
     tabs.select(.cycle, file: file, line: line)
-    MainTabBarScreenAssertions.assertSelected(.cycle, on: tabs, file: file, line: line)
+    waitForTabContent(.cycle, file: file, line: line)
+  }
+
+  private func waitForTabContent(
+    _ tab: MainTabBarScreen.Tab,
+    file: StaticString,
+    line: UInt
+  ) {
+    XCTAssertTrue(
+      tabs.tabContent(for: tab).waitForExistence(timeout: Timeouts.standard),
+      "Expected \(tab) tab content after navigation",
+      file: file,
+      line: line
+    )
   }
 }

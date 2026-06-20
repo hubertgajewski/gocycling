@@ -67,10 +67,13 @@ enum ElementAssertions {
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
-    assertExists(element, timeout: timeout, message, file: file, line: line)
-    XCTAssertTrue(
-      element.isEnabled,
-      message ?? "Expected \(element) to be enabled",
+    let predicate = NSPredicate(format: "exists == true AND enabled == true")
+    let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
+    let result = XCTWaiter().wait(for: [expectation], timeout: timeout)
+    XCTAssertEqual(
+      result,
+      XCTWaiter.Result.completed,
+      message ?? "Expected \(element) to be enabled within \(timeout) seconds",
       file: file,
       line: line
     )
@@ -83,10 +86,13 @@ enum ElementAssertions {
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
-    assertExists(element, timeout: timeout, message, file: file, line: line)
-    XCTAssertFalse(
-      element.isEnabled,
-      message ?? "Expected \(element) to be disabled",
+    let predicate = NSPredicate(format: "exists == true AND enabled == false")
+    let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
+    let result = XCTWaiter().wait(for: [expectation], timeout: timeout)
+    XCTAssertEqual(
+      result,
+      XCTWaiter.Result.completed,
+      message ?? "Expected \(element) to be disabled within \(timeout) seconds",
       file: file,
       line: line
     )
@@ -179,33 +185,17 @@ enum ElementAssertions {
     )
   }
 
-  static func assertSelected(
-    _ element: XCUIElement,
-    timeout: TimeInterval = Timeouts.short,
-    _ message: String? = nil,
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    assertExists(element, timeout: timeout, file: file, line: line)
-    XCTAssertTrue(
-      element.images["checkmark"].exists,
-      message ?? "Expected \(element) to show a selected checkmark",
-      file: file,
-      line: line
-    )
-  }
-
   static func assertAlertPresented(
     _ alert: XCUIElement,
-    title expectedTitle: String,
     timeout: TimeInterval = Timeouts.short,
+    _ message: String? = nil,
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
     assertExists(
       alert,
       timeout: timeout,
-      "Expected alert titled \(expectedTitle)",
+      message ?? "Expected alert to be presented",
       file: file,
       line: line
     )

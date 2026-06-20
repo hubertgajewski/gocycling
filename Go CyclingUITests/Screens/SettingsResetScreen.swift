@@ -30,18 +30,6 @@ final class SettingsResetScreen {
     )
   }
 
-  func resetStoredStatistics(
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    confirmDestructiveAction(
-      button: app.buttons[AccessibilityID.SettingsReset.resetStatisticsButton],
-      alertButtonLabel: AlertLabel.reset,
-      file: file,
-      line: line
-    )
-  }
-
   func resetToDefaultSettings(
     file: StaticString = #filePath,
     line: UInt = #line
@@ -52,15 +40,6 @@ final class SettingsResetScreen {
       file: file,
       line: line
     )
-  }
-
-  func performFullReset(
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    deleteAllStoredRoutes(file: file, line: line)
-    resetStoredStatistics(file: file, line: line)
-    resetToDefaultSettings(file: file, line: line)
   }
 
   private func confirmDestructiveAction(

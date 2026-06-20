@@ -5,16 +5,15 @@
 
 import XCTest
 
-enum MainTabBarScreenAssertions {
-  static func assertSelected(
-    _ tab: MainTabBarScreen.Tab,
-    on tabs: MainTabBarScreen,
+extension MainTabBarScreen {
+  func assertSelected(
+    _ tab: Tab,
     timeout: TimeInterval = Timeouts.standard,
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
     ElementAssertions.assertExists(
-      tabs.tabContent(for: tab),
+      tabContent(for: tab),
       timeout: timeout,
       file: file,
       line: line
