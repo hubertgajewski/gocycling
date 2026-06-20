@@ -7,7 +7,8 @@
 # ui-tests requires swift-format success; it accepts a skipped swift-unit-tests job only when
 # CI_RUN_UNIT_TESTS is "false" so UI-only runs remain possible without starting simulator work
 # after a format or SwiftPM failure.
-# coverage merges unit-test and ios26-iphone UI smoke coverage into one Go Cycling.app report.
+# coverage merges unit-test and ios26-iphone UI test coverage (Smoke by default;
+# Regression when CI_RUN_UI_REGRESSION is "true") into one Go Cycling.app report.
 name: Tests
 
 on:
@@ -252,7 +253,7 @@ jobs:
         env:
           NSUnbufferedIO: "YES"
 
-      - name: Upload UI smoke coverage result
+      - name: Upload UI test coverage result
         if: matrix.id == 'ios26-iphone'
         uses: actions/upload-artifact@v7
         with:
@@ -290,7 +291,7 @@ jobs:
           name: unit-test-coverage-result
           path: artifacts/unit-coverage
 
-      - name: Download UI smoke coverage result
+      - name: Download UI test coverage result
         uses: actions/download-artifact@v7
         with:
           name: ui-test-coverage-ios26-iphone

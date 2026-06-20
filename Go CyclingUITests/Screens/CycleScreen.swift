@@ -236,10 +236,6 @@ final class CycleScreen {
     app.staticTexts[AccessibilityID.Cycle.timerDisplay]
   }
 
-  private var mapView: XCUIElement {
-    identifiedElement(AccessibilityID.Cycle.mapView)
-  }
-
   private var metricsPill: XCUIElement {
     identifiedElement(AccessibilityID.Cycle.metricsPill)
   }

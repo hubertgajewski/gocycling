@@ -101,6 +101,7 @@ final class CycleAutoPauseRegressionTests: CycleRideUITestCase {
 
   func testAutoPausedBannerAppearsWhenStopped() throws {
     cycle.start()
+    cycle.dismissLocationSettingsAlertIfPresent()
     cycle.assertAutoPausedBanner()
     cycle.assertPaused()
   }

@@ -48,11 +48,19 @@ struct MetricsPillView: View {
                     .transition(.opacity)
                 } else {
                     HStack(spacing: 12) {
-                        Text("\(MetricsFormatting.formatSpeedWithoutUnits(speed: currentSpeed ?? 0.0, usingMetric: preferences.usingMetric)) \(MetricsFormatting.getSpeedUnits(usingMetric: preferences.usingMetric))")
+                        HStack(spacing: 4) {
+                            Text(MetricsFormatting.formatSpeedWithoutUnits(speed: currentSpeed ?? 0.0, usingMetric: preferences.usingMetric))
+                                .accessibilityIdentifier(AccessibilityIdentifier.Cycle.metricsSpeedValue)
+                            Text(MetricsFormatting.getSpeedUnits(usingMetric: preferences.usingMetric))
+                        }
                         Rectangle()
                             .fill(Color.secondary.opacity(0.6))
                             .frame(width: 1, height: 16)
-                        Text("\(MetricsFormatting.formatDistanceWithoutUnits(distance: cyclingStatus.isCycling ? currentDistance : 0.0, usingMetric: preferences.usingMetric)) \(MetricsFormatting.getDistanceUnits(usingMetric: preferences.usingMetric))")
+                        HStack(spacing: 4) {
+                            Text(MetricsFormatting.formatDistanceWithoutUnits(distance: cyclingStatus.isCycling ? currentDistance : 0.0, usingMetric: preferences.usingMetric))
+                                .accessibilityIdentifier(AccessibilityIdentifier.Cycle.metricsDistanceValue)
+                            Text(MetricsFormatting.getDistanceUnits(usingMetric: preferences.usingMetric))
+                        }
                     }
                     .font(.subheadline.bold())
                     .padding(.horizontal, 16)

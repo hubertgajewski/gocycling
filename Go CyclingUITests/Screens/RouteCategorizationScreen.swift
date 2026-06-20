@@ -115,7 +115,9 @@ final class RouteCategorizationScreen {
   }
 
   private var categoryNameField: XCUIElement {
-    app.textFields[Copy.categoryNamePlaceholder]
+    app.descendants(matching: .any)
+      .matching(identifier: AccessibilityID.RouteCategorization.categoryNameField)
+      .firstMatch
   }
 
   private var createNewCategorySegment: XCUIElement {
