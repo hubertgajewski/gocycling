@@ -12,8 +12,8 @@ import Testing
 @MainActor
 struct PreferencesICloudSyncTests {
 
-  @Test("uses predictable defaults for UI-testing isolated init")
-  func usesPredictableDefaultsForUITestingIsolatedInit() async {
+  @Test("uses predictable defaults for UI-testing init")
+  func usesPredictableDefaultsForUITestingInit() async {
     let snapshot = await PersistedStoreSnapshot(keys: preferenceICloudStoreKeys)
     defer { snapshot.restore() }
     clearPreferenceStores()

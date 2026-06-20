@@ -36,7 +36,7 @@ struct LocationSettingsAlertPolicyTests {
   @Test("cycle controls fixture requires a dedicated launch argument")
   func cycleControlsFixtureRequiresDedicatedLaunchArgument() {
     #expect(
-      !UITesting.shouldUseCycleControlsFixture(arguments: [
+      UITesting.shouldUseCycleControlsFixture(arguments: [
         UITesting.cycleControlsFixtureArgument
       ]))
     #expect(

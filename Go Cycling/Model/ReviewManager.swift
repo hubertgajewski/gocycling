@@ -22,7 +22,7 @@ class ReviewManager {
     static func incrementReviewWorthyCount(arguments: [String] = ProcessInfo.processInfo.arguments) {
         // UI-smoke tests visit app flows that normally count as review-worthy
         // actions; skip those writes so tests do not change the user's prompt cadence.
-        guard !UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return }
+        guard !UITesting.isEnabled(arguments: arguments) else { return }
 
         let defaults = UserDefaults.standard
 
@@ -38,7 +38,7 @@ class ReviewManager {
     static func completedRoute(arguments: [String] = ProcessInfo.processInfo.arguments) {
         // UI-smoke tests seed completed rides for History, but that should not
         // mark the real app as review-ready on the user's device.
-        guard !UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return }
+        guard !UITesting.isEnabled(arguments: arguments) else { return }
 
         let defaults = UserDefaults.standard
         
@@ -51,7 +51,7 @@ class ReviewManager {
     
     static func requestReviewIfAppropriate(arguments: [String] = ProcessInfo.processInfo.arguments) {
         // UI-smoke tests should never display or record app-review prompts.
-        guard !UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return }
+        guard !UITesting.isEnabled(arguments: arguments) else { return }
 
         let defaults = UserDefaults.standard
         let bundle = Bundle.main

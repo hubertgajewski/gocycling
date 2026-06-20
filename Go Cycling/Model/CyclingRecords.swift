@@ -47,10 +47,10 @@ class CyclingRecords: ObservableObject {
     static private let defaultTotalCyclingRoutes = 0
     
     init(arguments: [String] = ProcessInfo.processInfo.arguments) {
-        let isUsingIsolatedPersistence = UITesting.shouldUseIsolatedPersistence(arguments: arguments)
-        self.persistsRecordUpdates = !isUsingIsolatedPersistence
+        let isUITesting = UITesting.isEnabled(arguments: arguments)
+        self.persistsRecordUpdates = !isUITesting
 
-        if isUsingIsolatedPersistence {
+        if isUITesting {
             // UI-smoke tests open History/Statistics; keep records in memory so
             // those visits do not alter the user's defaults or iCloud record values.
             self.totalCyclingTime = CyclingRecords.defaultTotalCyclingTime
@@ -402,7 +402,7 @@ class CyclingRecords: ObservableObject {
     
     // Reset stored statistics (except unlocked app icons)
     static public func resetStatistics(arguments: [String] = ProcessInfo.processInfo.arguments) {
-        if UITesting.shouldUseIsolatedPersistence(arguments: arguments) {
+        if UITesting.isEnabled(arguments: arguments) {
             // Settings UI-smoke tests can exercise reset behavior; keep it in
             // memory so they cannot wipe the user's actual cycling statistics.
             CyclingRecords.shared.totalCyclingTime = defaultTotalCyclingTime

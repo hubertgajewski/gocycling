@@ -36,22 +36,8 @@ struct PersistenceController {
             // mirroring when the store is not backed by a normal SQLite URL.
             description.cloudKitContainerOptions = nil
         }
-        else {
-            #if DEBUG
-            // UI-smoke tests need persistence redirected before the store loads so
-            // seeded rides cannot be written into the user's CloudKit store.
-            let configuredForUITesting = PersistenceController.configureStoreForUITestingIfNeeded(
-                description,
-                arguments: arguments
-            )
-            if !configuredForUITesting && !Preferences.iCloudAvailable() {
-                description.cloudKitContainerOptions = nil
-            }
-            #else
-            if !Preferences.iCloudAvailable() {
-                description.cloudKitContainerOptions = nil
-            }
-            #endif
+        else if !Preferences.iCloudAvailable() {
+            description.cloudKitContainerOptions = nil
         }
 
         container.loadPersistentStores { description, error in
@@ -78,37 +64,6 @@ struct PersistenceController {
     }
     
     // MARK: Bike ride methods
-    #if DEBUG
-    @discardableResult
-    static func configureStoreForUITestingIfNeeded(
-        _ description: NSPersistentStoreDescription,
-        arguments: [String] = ProcessInfo.processInfo.arguments,
-        storeURL: URL = UITesting.isolatedPersistenceStoreURL
-    ) -> Bool {
-        guard UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return false }
-
-        // UI-smoke tests need SQLite because History fetches saved rides from Core
-        // Data, but CloudKit stays off so test rides cannot sync to the user.
-        description.url = storeURL
-        description.cloudKitContainerOptions = nil
-        return true
-    }
-
-    func isUsingPersistentStore(at expectedURL: URL) -> Bool {
-        // The UI fixture deletes/reseeds rides; tests need this guard so a
-        // misconfigured launch cannot erase the user's production ride store.
-        let expectedURL = Self.normalizedStoreURL(expectedURL)
-        return container.persistentStoreCoordinator.persistentStores.contains { store in
-            guard let storeURL = store.url else { return false }
-            return Self.normalizedStoreURL(storeURL) == expectedURL
-        }
-    }
-
-    private static func normalizedStoreURL(_ url: URL) -> URL {
-        url.standardizedFileURL.resolvingSymlinksInPath()
-    }
-    #endif
-
     enum BikeRideStoreError: Error {
         // Route-save tests need an explicit failure when Core Data does not return
         // a saved BikeRide; otherwise callers could update records or show naming

@@ -40,7 +40,7 @@ enum AppLaunchTelemetry {
     ) {
         // UI tests relaunch often on shared devices; skip telemetry setup so test
         // launches do not read or mutate the user's launch-time preferences.
-        guard !UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return }
+        guard !UITesting.isEnabled(arguments: arguments) else { return }
 
         let appID = appID ?? Bundle.main.object(forInfoDictionaryKey: "GoCyclingAppID")
         guard let appID = appID as? String else { return }
@@ -66,7 +66,7 @@ enum AppLaunchMigration {
     ) {
         // UI-smoke tests start from fixture state; running launch migrations there
         // would write real defaults/iCloud keys outside the isolated Core Data store.
-        guard !UITesting.shouldUseIsolatedPersistence(arguments: arguments) else { return }
+        guard !UITesting.isEnabled(arguments: arguments) else { return }
 
         let userDefaults = userDefaults ?? UserDefaults.standard
         let ubiquitousStore = ubiquitousStore ?? NSUbiquitousKeyValueStore.default
@@ -108,20 +108,7 @@ struct GoCyclingApp: App {
                 .environmentObject(cyclingStatus)
                 .environmentObject(preferences)
                 .onAppear(perform: {
-                    #if DEBUG
-                    // UI-smoke tests need a saved route from the real save path so
-                    // History is verified without relying on live GPS/timer data.
-                    if UITesting.shouldSeedRouteSaveFixture() {
-                        UITestingRouteSaveFixture.runIfNeeded(
-                            persistenceController: persistenceController
-                        )
-                        return
-                    }
-                    #endif
-
-                    // UI-smoke tests need to stop here because the remaining launch
-                    // work can mutate real preferences or telemetry state.
-                    guard !UITesting.shouldUseIsolatedPersistence() else { return }
+                    guard !UITesting.isEnabled() else { return }
 
                     AppLaunchMigration.runIfNeeded(
                         migratePreferences: {

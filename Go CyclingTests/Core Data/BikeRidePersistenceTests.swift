@@ -238,37 +238,6 @@ struct BikeRidePersistenceTests {
     let persistence = makeInMemoryPersistenceController()
     persistence.save()
   }
-
-  @Test("route save fixture uses an isolated non-CloudKit store")
-  func routeSaveFixtureUsesIsolatedNonCloudKitStore() throws {
-    let suiteName = "GoCyclingTests.RouteSaveFixture.\(UUID().uuidString)"
-    let defaults = try #require(UserDefaults(suiteName: suiteName))
-    defer { defaults.removePersistentDomain(forName: suiteName) }
-    defaults.set(true, forKey: iCloudSyncPreferenceKey)
-    let description = NSPersistentStoreDescription()
-    description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(
-      containerIdentifier: "iCloud.test.GoCycling"
-    )
-    let isolatedURL = FileManager.default.temporaryDirectory
-      .appendingPathComponent("GoCyclingTests-\(UUID().uuidString).sqlite")
-
-    #if DEBUG
-      let configured = PersistenceController.configureStoreForUITestingIfNeeded(
-        description,
-        arguments: UITesting.routeSaveFixtureLaunchArguments,
-        storeURL: isolatedURL
-      )
-
-      #expect(configured)
-      #expect(description.url == isolatedURL)
-      #expect(description.cloudKitContainerOptions == nil)
-      #expect(defaults.bool(forKey: iCloudSyncPreferenceKey) == true)
-      #expect(
-        defaults.persistentDomain(forName: suiteName)?[iCloudSyncPreferenceKey] as? Bool == true)
-    #else
-      #expect(Bool(true))
-    #endif
-  }
 }
 
 private func makeInMemoryPersistenceController() -> PersistenceController {

@@ -9,55 +9,28 @@ enum UITesting {
     // UI tests stay black-box so they cannot link app-only helper code; raw
     // launch strings are the stable contract between test target and app.
     static let launchArgument = "-ui-testing"
-    static let routeSaveFixtureArgument = "-ui-testing-route-save-fixture"
     // Cycle controls UI tests need deterministic alerts and timer behavior
     // without applying those fixtures to every UI-testing launch.
     static let cycleControlsFixtureArgument = "-ui-testing-cycle-controls-fixture"
-    static let routeSaveFixtureLaunchArguments = [
-        launchArgument,
-        routeSaveFixtureArgument,
-    ]
 
     #if DEBUG
-    // UI-smoke tests need SQLite because History fetches saved rides from Core
-    // Data; the process-id suffix keeps parallel smoke jobs from deleting each
-    // other's data.
-    static let isolatedPersistenceStoreURL = FileManager.default.temporaryDirectory
-        .appendingPathComponent("GoCycling-\(ProcessInfo.processInfo.processIdentifier)-UITesting.sqlite")
-
-    static var isEnabled: Bool {
-        ProcessInfo.processInfo.arguments.contains(launchArgument)
-    }
-
-    static func shouldUseIsolatedPersistence(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+    static func isEnabled(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
         arguments.contains(launchArgument)
     }
 
-    static func shouldSeedRouteSaveFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
-        shouldUseIsolatedPersistence(arguments: arguments) && arguments.contains(routeSaveFixtureArgument)
-    }
-
     static func shouldUseCycleControlsFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
-        shouldUseIsolatedPersistence(arguments: arguments) && arguments.contains(cycleControlsFixtureArgument)
+        arguments.contains(cycleControlsFixtureArgument)
     }
 
     static var shouldRequestLocationAuthorization: Bool {
-        !isEnabled
+        !isEnabled()
     }
 
     static var shouldShowUserLocation: Bool {
-        !isEnabled
+        !isEnabled()
     }
     #else
-    static let isolatedPersistenceStoreURL = URL(fileURLWithPath: "/dev/null")
-
-    static var isEnabled: Bool { false }
-
-    static func shouldUseIsolatedPersistence(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
-        false
-    }
-
-    static func shouldSeedRouteSaveFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+    static func isEnabled(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
         false
     }
 

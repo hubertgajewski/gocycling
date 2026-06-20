@@ -83,7 +83,7 @@ class Preferences: ObservableObject {
     
     init(arguments: [String] = ProcessInfo.processInfo.arguments) {
         self.launchArguments = arguments
-        if UITesting.shouldUseIsolatedPersistence(arguments: arguments) {
+        if UITesting.isEnabled(arguments: arguments) {
             // UI-smoke tests need predictable defaults, but writing the normal
             // initialization keys would mutate the user's app preferences.
             self.usingMetric = Preferences.defaultUsingMetric
