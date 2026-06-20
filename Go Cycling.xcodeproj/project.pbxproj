@@ -167,7 +167,12 @@
 		AA0001172026062000000001 /* HistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001182026062000000001 /* HistoryScreen.swift */; };
 		AA0001192026062000000001 /* RouteCategorizationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001202026062000000001 /* RouteCategorizationScreen.swift */; };
 		AA0000932026061900000001 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000942026061900000001 /* AppLauncher.swift */; };
-		AA0000952026061900000001 /* WaitHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000962026061900000001 /* WaitHelpers.swift */; };
+		AA0000952026061900000001 /* Timeouts.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000962026061900000001 /* Timeouts.swift */; };
+		AA0001252026062000000001 /* ElementAssertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001262026062000000001 /* ElementAssertions.swift */; };
+		AA0001272026062000000001 /* ResetAppDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001282026062000000001 /* ResetAppDataFlow.swift */; };
+		AA0001292026062000000001 /* CycleScreen+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001302026062000000001 /* CycleScreen+Assertions.swift */; };
+		AA0001312026062000000001 /* HistoryScreen+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001322026062000000001 /* HistoryScreen+Assertions.swift */; };
+		AA0001352026062000000001 /* RouteCategorizationScreen+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001362026062000000001 /* RouteCategorizationScreen+Assertions.swift */; };
 		AA0000972026061900000001 /* AccessibilityIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000982026061900000001 /* AccessibilityIDs.swift */; };
 		AA0001012026061900000001 /* GoCyclingUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001022026061900000001 /* GoCyclingUITestCase.swift */; };
 		AA0001232026062000000001 /* CycleRideUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001242026062000000001 /* CycleRideUITestCase.swift */; };
@@ -397,7 +402,12 @@
 		AA0001212026062000000001 /* Smoke.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Smoke.xctestplan; sourceTree = "<group>"; };
 		AA0001222026062000000001 /* Regression.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Regression.xctestplan; sourceTree = "<group>"; };
 		AA0000942026061900000001 /* AppLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLauncher.swift; sourceTree = "<group>"; };
-		AA0000962026061900000001 /* WaitHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitHelpers.swift; sourceTree = "<group>"; };
+		AA0000962026061900000001 /* Timeouts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timeouts.swift; sourceTree = "<group>"; };
+		AA0001262026062000000001 /* ElementAssertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElementAssertions.swift; sourceTree = "<group>"; };
+		AA0001282026062000000001 /* ResetAppDataFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetAppDataFlow.swift; sourceTree = "<group>"; };
+		AA0001302026062000000001 /* CycleScreen+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CycleScreen+Assertions.swift"; sourceTree = "<group>"; };
+		AA0001322026062000000001 /* HistoryScreen+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HistoryScreen+Assertions.swift"; sourceTree = "<group>"; };
+		AA0001362026062000000001 /* RouteCategorizationScreen+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RouteCategorizationScreen+Assertions.swift"; sourceTree = "<group>"; };
 		AA0000982026061900000001 /* AccessibilityIDs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityIDs.swift; sourceTree = "<group>"; };
 		AA0001022026061900000001 /* GoCyclingUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoCyclingUITestCase.swift; sourceTree = "<group>"; };
 		AA0001242026062000000001 /* CycleRideUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleRideUITestCase.swift; sourceTree = "<group>"; };
@@ -864,6 +874,8 @@
 			children = (
 				AA0001052026061900000001 /* Support */,
 				AA0001062026061900000001 /* Screens */,
+				AA0001372026062000000001 /* Flows */,
+				AA0001382026062000000001 /* Assertions */,
 				AA0000922026061900000001 /* Tests */,
 				AA0001212026062000000001 /* Smoke.xctestplan */,
 				AA0001222026062000000001 /* Regression.xctestplan */,
@@ -879,9 +891,28 @@
 				AA0000942026061900000001 /* AppLauncher.swift */,
 				AA0001022026061900000001 /* GoCyclingUITestCase.swift */,
 				AA0001242026062000000001 /* CycleRideUITestCase.swift */,
-				AA0000962026061900000001 /* WaitHelpers.swift */,
+				AA0000962026061900000001 /* Timeouts.swift */,
+				AA0001262026062000000001 /* ElementAssertions.swift */,
 			);
 			path = Support;
+			sourceTree = "<group>";
+		};
+		AA0001372026062000000001 /* Flows */ = {
+			isa = PBXGroup;
+			children = (
+				AA0001282026062000000001 /* ResetAppDataFlow.swift */,
+			);
+			path = Flows;
+			sourceTree = "<group>";
+		};
+		AA0001382026062000000001 /* Assertions */ = {
+			isa = PBXGroup;
+			children = (
+				AA0001302026062000000001 /* CycleScreen+Assertions.swift */,
+				AA0001322026062000000001 /* HistoryScreen+Assertions.swift */,
+				AA0001362026062000000001 /* RouteCategorizationScreen+Assertions.swift */,
+			);
+			path = Assertions;
 			sourceTree = "<group>";
 		};
 		AA0001062026061900000001 /* Screens */ = {
@@ -1290,7 +1321,12 @@
 				AA0001072026061900000001 /* CycleRideSmokeTests.swift in Sources */,
 				AA0001152026062000000001 /* CycleRideRegressionTests.swift in Sources */,
 				AA0000932026061900000001 /* AppLauncher.swift in Sources */,
-				AA0000952026061900000001 /* WaitHelpers.swift in Sources */,
+				AA0000952026061900000001 /* Timeouts.swift in Sources */,
+				AA0001252026062000000001 /* ElementAssertions.swift in Sources */,
+				AA0001272026062000000001 /* ResetAppDataFlow.swift in Sources */,
+				AA0001292026062000000001 /* CycleScreen+Assertions.swift in Sources */,
+				AA0001312026062000000001 /* HistoryScreen+Assertions.swift in Sources */,
+				AA0001352026062000000001 /* RouteCategorizationScreen+Assertions.swift in Sources */,
 				AA0000972026061900000001 /* AccessibilityIDs.swift in Sources */,
 				AA0001012026061900000001 /* GoCyclingUITestCase.swift in Sources */,
 				AA0001232026062000000001 /* CycleRideUITestCase.swift in Sources */,

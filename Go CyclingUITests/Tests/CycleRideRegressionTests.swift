@@ -10,11 +10,11 @@ final class CycleRideRegressionTests: CycleRideUITestCase {
   func testIdleCycleChromeShowsMapMetricsAndLockToggle() throws {
     cycle.assertReadyToStart()
     cycle.assertDefaultMetricsDisplayed()
-    cycle.assertMapLocked()
+    ElementAssertions.assertExists(cycle.mapLockButton)
     cycle.unlockMap()
-    cycle.assertMapUnlocked()
+    ElementAssertions.assertExists(cycle.mapUnlockButton)
     cycle.lockMap()
-    cycle.assertMapLocked()
+    ElementAssertions.assertExists(cycle.mapLockButton)
   }
 
   func testPauseResumeAndCancelStopDoesNotSaveRide() throws {
@@ -29,15 +29,21 @@ final class CycleRideRegressionTests: CycleRideUITestCase {
     cycle.requestStop()
     cycle.assertStopConfirmationPresented()
     cycle.cancelStopConfirmation()
-    cycle.assertPausedAfterStopCancellation()
+    cycle.assertPaused()
 
     mainTabs.select(.history)
-    mainTabs.assertSelected(.history)
-    history.assertEmpty()
+    ElementAssertions.assertExists(
+      mainTabs.tabContent(for: .history),
+      timeout: Timeouts.standard
+    )
+    ElementAssertions.assertExists(history.emptyState, timeout: Timeouts.short)
 
     mainTabs.select(.cycle)
-    mainTabs.assertSelected(.cycle)
-    cycle.assertPausedAfterStopCancellation()
+    ElementAssertions.assertExists(
+      mainTabs.tabContent(for: .cycle),
+      timeout: Timeouts.standard
+    )
+    cycle.assertPaused()
   }
 
   func testCategorizeYourRouteLabelsVisible() throws {
@@ -64,7 +70,6 @@ final class CycleRideRegressionTests: CycleRideUITestCase {
     cycle.start()
     cycle.dismissLocationSettingsAlertIfPresent()
     cycle.completeStop()
-    categorization.assertPresented()
     categorization.saveNewCategory(named: categoryName)
 
     mainTabs.select(.history)
@@ -102,7 +107,6 @@ final class CycleAutoPauseRegressionTests: CycleRideUITestCase {
   func testAutoPausedBannerAppearsWhenStopped() throws {
     cycle.start()
     cycle.dismissLocationSettingsAlertIfPresent()
-    cycle.assertAutoPausedBanner()
-    cycle.assertPaused()
+    cycle.assertAutoPaused()
   }
 }

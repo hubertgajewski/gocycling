@@ -30,18 +30,6 @@ final class SettingsResetScreen {
     )
   }
 
-  func resetStoredStatistics(
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    confirmDestructiveAction(
-      button: app.buttons[AccessibilityID.SettingsReset.resetStatisticsButton],
-      alertButtonLabel: AlertLabel.reset,
-      file: file,
-      line: line
-    )
-  }
-
   func resetToDefaultSettings(
     file: StaticString = #filePath,
     line: UInt = #line
@@ -54,15 +42,6 @@ final class SettingsResetScreen {
     )
   }
 
-  func performFullReset(
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    deleteAllStoredRoutes(file: file, line: line)
-    resetStoredStatistics(file: file, line: line)
-    resetToDefaultSettings(file: file, line: line)
-  }
-
   private func confirmDestructiveAction(
     button: XCUIElement,
     alertButtonLabel: String,
@@ -73,7 +52,7 @@ final class SettingsResetScreen {
     button.tap()
 
     let alertButton = app.alerts.buttons[alertButtonLabel]
-    Wait.assertExists(alertButton, file: file, line: line)
+    ElementAssertions.assertExists(alertButton, file: file, line: line)
     alertButton.tap()
   }
 
@@ -83,7 +62,7 @@ final class SettingsResetScreen {
     file: StaticString,
     line: UInt
   ) {
-    if Wait.exists(element, timeout: Wait.Timeout.brief) {
+    if element.waitForExistence(timeout: Timeouts.brief) {
       return
     }
 
@@ -91,11 +70,11 @@ final class SettingsResetScreen {
     while swipes < maxSwipes {
       app.swipeUp()
       swipes += 1
-      if Wait.exists(element, timeout: Wait.Timeout.poll) {
+      if element.waitForExistence(timeout: Timeouts.poll) {
         return
       }
     }
 
-    Wait.assertExists(element, file: file, line: line)
+    ElementAssertions.assertExists(element, file: file, line: line)
   }
 }

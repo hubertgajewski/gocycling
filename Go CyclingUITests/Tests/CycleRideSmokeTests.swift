@@ -18,7 +18,10 @@ final class CycleRideSmokeTests: CycleRideUITestCase {
     cycle.completeStopAndSaveWithoutCategory(categorization: categorization)
 
     mainTabs.select(.history)
-    mainTabs.assertSelected(.history)
-    history.assertHasRides()
+    ElementAssertions.assertExists(
+      mainTabs.tabContent(for: .history),
+      timeout: Timeouts.standard
+    )
+    history.assertRideCount(1)
   }
 }
