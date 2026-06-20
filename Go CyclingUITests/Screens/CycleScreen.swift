@@ -42,12 +42,20 @@ final class CycleScreen {
     Wait.assertExists(mapUnlockButton, file: file, line: line)
   }
 
-  func lockMap(
+  func unlockMap(
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
     Wait.assertExists(mapLockButton, file: file, line: line)
     mapLockButton.tap()
+  }
+
+  func lockMap(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    Wait.assertExists(mapUnlockButton, file: file, line: line)
+    mapUnlockButton.tap()
   }
 
   func start(

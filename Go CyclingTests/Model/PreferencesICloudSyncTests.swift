@@ -12,35 +12,6 @@ import Testing
 @MainActor
 struct PreferencesICloudSyncTests {
 
-  @Test("uses predictable defaults for UI-testing isolated init")
-  func usesPredictableDefaultsForUITestingIsolatedInit() async {
-    let snapshot = await PersistedStoreSnapshot(keys: preferenceICloudStoreKeys)
-    defer { snapshot.restore() }
-    clearPreferenceStores()
-
-    let preferences = Preferences(arguments: [UITesting.launchArgument])
-
-    #expect(preferences.usingMetric == true)
-    #expect(preferences.displayingMetrics == true)
-    #expect(preferences.colourChoiceConverted == .blue)
-    #expect(preferences.largeMetrics == true)
-    #expect(preferences.sortingChoiceConverted == .dateDescending)
-    #expect(preferences.deletionConfirmation == true)
-    #expect(preferences.deletionEnabled == true)
-    #expect(preferences.iconIndex == 0)
-    #expect(preferences.namedRoutes == true)
-    #expect(preferences.selectedRoute == "")
-    #expect(preferences.iCloudOn == false)
-    #expect(preferences.autoLockDisabled == false)
-    #expect(preferences.healthSyncEnabled == false)
-    #expect(preferences.autoPauseEnabled == true)
-    #expect(preferences.telemetryEnabled == true)
-    #expect(preferences.mapTypeChoiceConverted == .standard)
-    #expect(UserDefaults.standard.object(forKey: "didSetupPreferences") == nil)
-    #expect(UserDefaults.standard.object(forKey: "metric") == nil)
-    #expect(UserDefaults.standard.object(forKey: Preferences.telemetryEnabledKey) == nil)
-  }
-
   @Test("reports iCloud unavailable when sync is on but ubiquity token is missing")
   func reportsICloudUnavailableWhenSyncIsOnButUbiquityTokenIsMissing() async {
     guard FileManager.default.ubiquityIdentityToken == nil else {

@@ -8,7 +8,6 @@ import XCTest
 /// Launch arguments understood by the app's DEBUG-only UI-testing seams.
 enum LaunchArgument {
   static let uiTesting = "-ui-testing"
-  static let routeSaveFixture = "-ui-testing-route-save-fixture"
   static let cycleControlsFixture = "-ui-testing-cycle-controls-fixture"
   static let appleLanguages = "-AppleLanguages"
   static let appleLocale = "-AppleLocale"

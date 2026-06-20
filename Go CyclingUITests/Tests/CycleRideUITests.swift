@@ -1,21 +1,28 @@
 //
-//  CycleTimerStopCancelTests.swift
+//  CycleRideUITests.swift
 //  Go CyclingUITests
 //
 
 import XCTest
 
-/// Focused Cycle timer coverage that does not save a route.
-final class CycleTimerStopCancelTests: GoCyclingUITestCase {
-  func testCycleTimerStopsAndCancelsWithoutSavingRide() throws {
+/// End-to-end Cycle ride session: map lock toggle, start, pause/resume, stop/cancel, no save.
+final class CycleRideUITests: GoCyclingUITestCase {
+  func testPauseResumeAndCancelStopDoesNotSaveRide() throws {
     let app = launchApp(extraArguments: [LaunchArgument.cycleControlsFixture])
     let mainTabs = MainTabBarScreen(app: app)
     let cycle = CycleScreen(app: app)
 
     XCTAssertTrue(mainTabs.waitForMainChrome(), "Expected Cycle tab chrome after launch")
     mainTabs.assertSelected(.cycle)
+    resetAllStoredAppData(app: app, mainTabs: mainTabs)
 
     cycle.assertReadyToStart()
+    cycle.assertMapLocked()
+    cycle.unlockMap()
+    cycle.assertMapUnlocked()
+    cycle.lockMap()
+    cycle.assertMapLocked()
+
     cycle.start()
     cycle.assertLocationSettingsAlertPresented()
     cycle.dismissLocationSettingsAlertIfPresent()
@@ -34,8 +41,9 @@ final class CycleTimerStopCancelTests: GoCyclingUITestCase {
 
     mainTabs.select(.history)
     mainTabs.assertSelected(.history)
-    XCTAssertFalse(
-      app.staticTexts["Distance Cycled"].waitForExistence(timeout: 1),
+    Wait.assertExists(
+      app.staticTexts[AccessibilityID.History.emptyState],
+      timeout: Wait.Timeout.short,
       "Canceling stop confirmation should not save a ride"
     )
 

@@ -23,8 +23,8 @@ struct RouteNameModalView: View {
     @ObservedObject var routeNamingViewModel = RouteNamingViewModel()
     
     private var bikeRideToEdit: BikeRide?
-    // Route-naming UI tests pass the Cycle-tab saved ride directly so a delayed
-    // sheet cannot rename another recently saved route.
+    // Route naming passes the Cycle-tab saved ride directly so a delayed sheet
+    // cannot rename another recently saved route.
     private var bikeRideToName: BikeRide?
     
     let telemetryManager = TelemetryManager.sharedTelemetryManager
@@ -172,15 +172,15 @@ struct RouteNameModalView: View {
             )
         }
         
-        // Route-naming UI tests need the exact Cycle-tab saved ride; the
-        // latest-History fallback is kept only for older presentations.
+        // Route naming needs the exact Cycle-tab saved ride; the latest-History
+        // fallback is kept only for older presentations.
         if let ride = self.bikeRideToName {
             updateBikeRideRouteName(ride: ride, routeName: routeName)
             presentationMode.wrappedValue.dismiss()
             self.showEditModal = false
         }
         else if (self.bikeRideToEdit == nil) {
-            // UI tests can open the legacy path before History has rows, so fail
+            // Naming can open before History has rows, so fail closed instead of
             // closed instead of crashing or guessing a different route.
             guard let ride = self.routeNamingViewModel.allBikeRides.last else {
                 presentationMode.wrappedValue.dismiss()
@@ -209,7 +209,7 @@ struct RouteNameModalView: View {
         self.showEditModal = false
     }
 
-    // Route-naming tests need one update path so a naming flow cannot copy a
+    // Route naming needs one update path so a naming flow cannot copy a
     // different field set while only the category should change.
     private func updateBikeRideRouteName(ride: BikeRide, routeName: String) {
         persistenceController.updateBikeRideRouteName(

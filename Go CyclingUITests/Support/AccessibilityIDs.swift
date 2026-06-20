@@ -1,8 +1,8 @@
 /// UI-test mirror of app-owned accessibility identifiers.
 ///
 /// UI tests are black-box and cannot import the app target's helpers. Cycle
-/// values mirror `Go Cycling/Support/UITesting.swift`; main-tab values mirror
-/// the root tab identifiers set in the tab views.
+/// and Settings reset values mirror `Go Cycling/Support/UITesting.swift`;
+/// main-tab values mirror the root tab identifiers set in the tab views.
 enum AccessibilityID {
   enum MainTab {
     static let cycleContent = "main-tab-cycle"
@@ -24,5 +24,15 @@ enum AccessibilityID {
     static let locationSettingsIgnoreButton = "cycle-location-settings-ignore-button"
     static let stopConfirmationStopButton = "cycle-stop-confirmation-stop-button"
     static let stopConfirmationCancelButton = "cycle-stop-confirmation-cancel-button"
+  }
+
+  enum SettingsReset {
+    static let deleteAllRoutesButton = "settings-reset-delete-all-routes-button"
+    static let resetStatisticsButton = "settings-reset-stored-statistics-button"
+    static let resetDefaultSettingsButton = "settings-reset-default-settings-button"
+  }
+
+  enum History {
+    static let emptyState = "history-empty-state"
   }
 }

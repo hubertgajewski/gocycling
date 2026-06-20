@@ -11,10 +11,13 @@ import XCTest
 /// future tuning explicit when simulator timing changes.
 enum Wait {
   enum Timeout {
+    /// Quick re-check while scrolling or polling for an element to appear.
+    static let poll: TimeInterval = 0.5
+    /// Fast first-pass check before falling back to scroll or longer waits.
+    static let brief: TimeInterval = 1
     static let short: TimeInterval = 3
     static let standard: TimeInterval = 5
     static let appChrome: TimeInterval = 8
-    static let fixture: TimeInterval = 8
   }
 
   static func assertExists(
