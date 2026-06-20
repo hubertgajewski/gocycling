@@ -188,102 +188,54 @@ struct CompletedRouteSaveTests {
     #expect(error == .saveFailed)
   }
 
-  #if DEBUG
-    @Test("UI testing skips app launch migration stores")
-    func uiTestingSkipsAppLaunchMigrationStores() {
-      let userDefaults = RecordingAppLaunchKeyValueStore()
-      let ubiquitousStore = RecordingAppLaunchKeyValueStore()
-      var preferenceMigrationCount = 0
-      var recordsMigrationCount = 0
+  @Test("normal app launch migration still runs")
+  func normalAppLaunchMigrationStillRuns() {
+    let userDefaults = RecordingAppLaunchKeyValueStore()
+    let ubiquitousStore = RecordingAppLaunchKeyValueStore()
+    var preferenceMigrationCount = 0
+    var recordsMigrationCount = 0
 
-      AppLaunchMigration.runIfNeeded(
-        arguments: [UITesting.launchArgument],
-        userDefaults: userDefaults,
-        ubiquitousStore: ubiquitousStore,
-        migratePreferences: {
-          preferenceMigrationCount += 1
-        },
-        migrateRecords: {
-          recordsMigrationCount += 1
-        }
-      )
+    AppLaunchMigration.runIfNeeded(
+      arguments: [],
+      userDefaults: userDefaults,
+      ubiquitousStore: ubiquitousStore,
+      migratePreferences: {
+        preferenceMigrationCount += 1
+      },
+      migrateRecords: {
+        recordsMigrationCount += 1
+      }
+    )
 
-      #expect(userDefaults.boolReads.isEmpty)
-      #expect(userDefaults.boolWrites.isEmpty)
-      #expect(ubiquitousStore.boolReads.isEmpty)
-      #expect(ubiquitousStore.boolWrites.isEmpty)
-      #expect(preferenceMigrationCount == 0)
-      #expect(recordsMigrationCount == 0)
-    }
+    #expect(userDefaults.boolWrites.count == 1)
+    #expect(ubiquitousStore.boolWrites.count == 1)
+    #expect(preferenceMigrationCount == 1)
+    #expect(recordsMigrationCount == 1)
+  }
 
-    @Test("UI testing skips app launch telemetry")
-    func uiTestingSkipsAppLaunchTelemetry() {
-      let userDefaults = RecordingAppLaunchPreferenceStore()
-      var setupCalls: [(appID: String, enabled: Bool)] = []
+  @Test("normal app launch telemetry uses stored preference")
+  func normalAppLaunchTelemetryUsesStoredPreference() {
+    let userDefaults = RecordingAppLaunchPreferenceStore(
+      objectValues: [Preferences.telemetryEnabledKey: false],
+      boolValues: [Preferences.telemetryEnabledKey: false]
+    )
+    var setupCalls: [(appID: String, enabled: Bool)] = []
 
-      AppLaunchTelemetry.configureIfNeeded(
-        arguments: [UITesting.launchArgument],
-        appID: "test-app",
-        userDefaults: userDefaults,
-        setup: { appID, enabled in
-          setupCalls.append((appID, enabled))
-        }
-      )
+    AppLaunchTelemetry.configureIfNeeded(
+      arguments: [],
+      appID: "test-app",
+      userDefaults: userDefaults,
+      setup: { appID, enabled in
+        setupCalls.append((appID, enabled))
+      }
+    )
 
-      #expect(userDefaults.objectReads.isEmpty)
-      #expect(userDefaults.boolReads.isEmpty)
-      #expect(setupCalls.isEmpty)
-    }
-
-    @Test("normal app launch migration still runs")
-    func normalAppLaunchMigrationStillRuns() {
-      let userDefaults = RecordingAppLaunchKeyValueStore()
-      let ubiquitousStore = RecordingAppLaunchKeyValueStore()
-      var preferenceMigrationCount = 0
-      var recordsMigrationCount = 0
-
-      AppLaunchMigration.runIfNeeded(
-        arguments: [],
-        userDefaults: userDefaults,
-        ubiquitousStore: ubiquitousStore,
-        migratePreferences: {
-          preferenceMigrationCount += 1
-        },
-        migrateRecords: {
-          recordsMigrationCount += 1
-        }
-      )
-
-      #expect(userDefaults.boolWrites.count == 1)
-      #expect(ubiquitousStore.boolWrites.count == 1)
-      #expect(preferenceMigrationCount == 1)
-      #expect(recordsMigrationCount == 1)
-    }
-
-    @Test("normal app launch telemetry uses stored preference")
-    func normalAppLaunchTelemetryUsesStoredPreference() {
-      let userDefaults = RecordingAppLaunchPreferenceStore(
-        objectValues: [Preferences.telemetryEnabledKey: false],
-        boolValues: [Preferences.telemetryEnabledKey: false]
-      )
-      var setupCalls: [(appID: String, enabled: Bool)] = []
-
-      AppLaunchTelemetry.configureIfNeeded(
-        arguments: [],
-        appID: "test-app",
-        userDefaults: userDefaults,
-        setup: { appID, enabled in
-          setupCalls.append((appID, enabled))
-        }
-      )
-
-      #expect(userDefaults.objectReads == [Preferences.telemetryEnabledKey])
-      #expect(userDefaults.boolReads == [Preferences.telemetryEnabledKey])
-      #expect(setupCalls.count == 1)
-      #expect(setupCalls.first?.appID == "test-app")
-      #expect(setupCalls.first?.enabled == false)
-    }
-  #endif
+    #expect(userDefaults.objectReads == [Preferences.telemetryEnabledKey])
+    #expect(userDefaults.boolReads == [Preferences.telemetryEnabledKey])
+    #expect(setupCalls.count == 1)
+    #expect(setupCalls.first?.appID == "test-app")
+    #expect(setupCalls.first?.enabled == false)
+  }
 }
 
 private enum RouteSaveTestError: Error, Equatable {

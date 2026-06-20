@@ -25,8 +25,6 @@ extension UserDefaults: AppLaunchKeyValueStore {}
 extension UserDefaults: AppLaunchPreferenceStore {}
 
 enum AppLaunchTelemetry {
-    // UI-smoke tests need telemetry skipped before TelemetryManager reads
-    // preferences or starts network work, so setup is testable outside App.init.
     static func configureIfNeeded(
         arguments: [String] = ProcessInfo.processInfo.arguments,
         appID: Any? = nil,
@@ -38,10 +36,6 @@ enum AppLaunchTelemetry {
             )
         }
     ) {
-        // UI tests relaunch often on shared devices; skip telemetry setup so test
-        // launches do not read or mutate the user's launch-time preferences.
-        guard !UITesting.isEnabled(arguments: arguments) else { return }
-
         let appID = appID ?? Bundle.main.object(forInfoDictionaryKey: "GoCyclingAppID")
         guard let appID = appID as? String else { return }
         let userDefaults = userDefaults ?? UserDefaults.standard
@@ -55,8 +49,6 @@ enum AppLaunchTelemetry {
 enum AppLaunchMigration {
     static let didLaunchBeforeKey = "didLaunch1.4.0Before"
 
-    // UI-smoke tests need migrations bypassed because they write first-run
-    // sentinels and can migrate legacy data in the user's real defaults/iCloud stores.
     static func runIfNeeded(
         arguments: [String] = ProcessInfo.processInfo.arguments,
         userDefaults: AppLaunchKeyValueStore? = nil,
@@ -64,10 +56,6 @@ enum AppLaunchMigration {
         migratePreferences: () -> Void,
         migrateRecords: () -> Void
     ) {
-        // UI-smoke tests start from fixture state; running launch migrations there
-        // would write real defaults/iCloud keys outside the isolated Core Data store.
-        guard !UITesting.isEnabled(arguments: arguments) else { return }
-
         let userDefaults = userDefaults ?? UserDefaults.standard
         let ubiquitousStore = ubiquitousStore ?? NSUbiquitousKeyValueStore.default
         if !ubiquitousStore.bool(forKey: didLaunchBeforeKey) || !userDefaults.bool(forKey: didLaunchBeforeKey) {
@@ -108,8 +96,6 @@ struct GoCyclingApp: App {
                 .environmentObject(cyclingStatus)
                 .environmentObject(preferences)
                 .onAppear(perform: {
-                    guard !UITesting.isEnabled() else { return }
-
                     AppLaunchMigration.runIfNeeded(
                         migratePreferences: {
                             if let oldPreferences = UserPreferences.savedPreferences() {

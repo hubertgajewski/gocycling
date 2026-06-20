@@ -169,6 +169,7 @@
 		AA0001012026061900000001 /* GoCyclingUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001022026061900000001 /* GoCyclingUITestCase.swift */; };
 		AA0001032026061900000001 /* MainTabBarScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001042026061900000001 /* MainTabBarScreen.swift */; };
 		AA0001092026061900000001 /* CycleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001102026061900000001 /* CycleScreen.swift */; };
+		AA0001112026062000000001 /* SettingsResetScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001122026062000000001 /* SettingsResetScreen.swift */; };
 		9DAB835E25FECCB000F5C42E /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAB835D25FECCB000F5C42E /* MainView.swift */; };
 		9DAB837025FED0A300F5C42E /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAB836F25FED0A300F5C42E /* HistoryView.swift */; };
 		9DAB837525FED2F800F5C42E /* TimerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAB837425FED2F800F5C42E /* TimerButton.swift */; };
@@ -392,6 +393,7 @@
 		AA0001022026061900000001 /* GoCyclingUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoCyclingUITestCase.swift; sourceTree = "<group>"; };
 		AA0001042026061900000001 /* MainTabBarScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarScreen.swift; sourceTree = "<group>"; };
 		AA0001102026061900000001 /* CycleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleScreen.swift; sourceTree = "<group>"; };
+		AA0001122026062000000001 /* SettingsResetScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsResetScreen.swift; sourceTree = "<group>"; };
 		9DAB835D25FECCB000F5C42E /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		9DAB836F25FED0A300F5C42E /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		9DAB837425FED2F800F5C42E /* TimerButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerButton.swift; sourceTree = "<group>"; };
@@ -873,6 +875,7 @@
 			isa = PBXGroup;
 			children = (
 				AA0001102026061900000001 /* CycleScreen.swift */,
+				AA0001122026062000000001 /* SettingsResetScreen.swift */,
 				AA0001042026061900000001 /* MainTabBarScreen.swift */,
 			);
 			path = Screens;
@@ -1275,6 +1278,7 @@
 				AA0001012026061900000001 /* GoCyclingUITestCase.swift in Sources */,
 				AA0001032026061900000001 /* MainTabBarScreen.swift in Sources */,
 				AA0001092026061900000001 /* CycleScreen.swift in Sources */,
+				AA0001112026062000000001 /* SettingsResetScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

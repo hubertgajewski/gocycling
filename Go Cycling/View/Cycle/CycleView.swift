@@ -17,8 +17,8 @@ struct CycleView: View {
     @State private var cyclingStartTime = Date()
     @State private var timeCycling = 0.0
     @State private var showingRouteNamingPopover = false
-    // Route-naming UI tests need the exact saved ride from the async save so the
-    // sheet does not have to guess via the current History ordering.
+    // Route naming needs the exact saved ride from the async save so the sheet
+    // does not have to guess via the current History ordering.
     @State private var savedRouteForNaming: BikeRide?
     @State private var isAutoPaused: Bool = false
     
@@ -138,7 +138,7 @@ struct CycleView: View {
     func startCycling() {
         // Send an alert about location settings if it is necessary
         locationManager.setLocationAlertStatus()
-        // Route-save tests need a fresh session to ignore any prior saved ride if
+        // Completed route save tests need a fresh session to ignore any prior saved ride if
         // the old naming sheet was dismissed or a late callback arrives.
         savedRouteForNaming = nil
         cyclingStatus.startedCycling()
@@ -215,8 +215,8 @@ struct CycleView: View {
     }
 
     func routeSaved(_ bikeRide: BikeRide) {
-        // Route-naming UI tests need the sheet shown only after Core Data returns
-        // this saved ride; presenting earlier can rename the wrong route.
+        // Route naming needs the sheet shown only after Core Data returns this
+        // saved ride; presenting earlier can rename the wrong route.
         guard preferences.namedRoutes else { return }
         savedRouteForNaming = bikeRide
         showingRouteNamingPopover = true

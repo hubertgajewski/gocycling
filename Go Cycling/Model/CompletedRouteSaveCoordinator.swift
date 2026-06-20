@@ -6,7 +6,7 @@
 import CoreLocation
 import Foundation
 
-// Route-save tests need deterministic completed-route data after live cleanup;
+// Completed route save tests need deterministic completed-route data after live cleanup;
 // the save path keeps an immutable copy that cleanup cannot mutate underneath it.
 struct CompletedRouteSnapshot {
     let locations: [CLLocation?]
@@ -40,7 +40,7 @@ protocol CyclingRecordsUpdating {
     )
 }
 
-// Route-save tests need records and cleanup to wait for persistence; the old stop
+// Completed route save tests need records and cleanup to wait for persistence; the old stop
 // path updated records and cleared samples even after save failure.
 struct CompletedRouteSaveCoordinator {
     let persistenceController: BikeRideStoring
@@ -70,7 +70,7 @@ struct CompletedRouteSaveCoordinator {
         ) { result in
             let finish = {
                 if case .success = result {
-                    // Route-save tests cover this failure path: records and UI
+                    // Completed route save tests cover this failure path: records and naming
                     // cleanup happen only after persistence succeeds so a failed
                     // save cannot count or discard a ride.
                     records.updateCyclingRecords(

@@ -14,6 +14,7 @@ enum UITesting {
     static let cycleControlsFixtureArgument = "-ui-testing-cycle-controls-fixture"
 
     #if DEBUG
+    /// True when the app was launched with `-ui-testing` (location/map seams only).
     static func isEnabled(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
         arguments.contains(launchArgument)
     }
@@ -59,5 +60,11 @@ enum AccessibilityIdentifier {
         static let locationSettingsIgnoreButton = "cycle-location-settings-ignore-button"
         static let stopConfirmationStopButton = "cycle-stop-confirmation-stop-button"
         static let stopConfirmationCancelButton = "cycle-stop-confirmation-cancel-button"
+    }
+
+    enum SettingsReset {
+        static let deleteAllRoutesButton = "settings-reset-delete-all-routes-button"
+        static let resetStatisticsButton = "settings-reset-stored-statistics-button"
+        static let resetDefaultSettingsButton = "settings-reset-default-settings-button"
     }
 }

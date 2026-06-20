@@ -83,27 +83,6 @@ class Preferences: ObservableObject {
     
     init(arguments: [String] = ProcessInfo.processInfo.arguments) {
         self.launchArguments = arguments
-        if UITesting.isEnabled(arguments: arguments) {
-            // UI-smoke tests need predictable defaults, but writing the normal
-            // initialization keys would mutate the user's app preferences.
-            self.usingMetric = Preferences.defaultUsingMetric
-            self.displayingMetrics = Preferences.defaultDisplayingMetrics
-            self.colourChoice = Preferences.defaultColourChoice
-            self.largeMetrics = Preferences.defaultLargeMetrics
-            self.sortingChoice = Preferences.defaultSortingChoice
-            self.deletionConfirmation = Preferences.defaultDeletionConfirmation
-            self.deletionEnabled = Preferences.defaultDeletionEnabled
-            self.iconIndex = Preferences.defaultIconIndex
-            self.namedRoutes = Preferences.defaultNamedRoutes
-            self.selectedRoute = Preferences.defaultSelectedRoute
-            self.iCloudOn = Preferences.defaultICloudOn
-            self.autoLockDisabled = Preferences.defaultAutoLockDisabled
-            self.healthSyncEnabled = Preferences.defaultHealthSyncEnabled
-            self.autoPauseEnabled = Preferences.defaultAutoPauseEnabled
-            self.telemetryEnabled = Preferences.defaultTelemetryEnabled
-            self.mapTypeChoice = Preferences.defaultMapTypeChoice
-            return
-        }
 
         // First check if iCloud is available
         let iCloudStatus = Preferences.iCloudAvailable(arguments: arguments)
@@ -472,8 +451,6 @@ class Preferences: ObservableObject {
     // Used in BikeRideViewModel where the environment object is not available
     static func storedSortingChoice() -> SortChoice {
         guard let stringValue = UserDefaults.standard.string(forKey: Preferences.keys[4]) else {
-            // UI-smoke tests avoid writing normal defaults; callers still need a
-            // stable sort preference when reading outside the environment object.
             return SortChoice.dateDescending
         }
         return SortChoice(rawValue: stringValue) ?? SortChoice.dateDescending
@@ -485,8 +462,6 @@ class Preferences: ObservableObject {
     }
     
     static func storedSelectedRoute() -> String {
-        // UI-smoke tests avoid writing normal defaults, so missing route selection
-        // should mean "all routes" instead of crashing on a force unwrap.
         return UserDefaults.standard.string(forKey: Preferences.keys[8]) ?? ""
     }
 }

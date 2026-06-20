@@ -14,6 +14,7 @@ final class CycleTimerStopCancelTests: GoCyclingUITestCase {
 
     XCTAssertTrue(mainTabs.waitForMainChrome(), "Expected Cycle tab chrome after launch")
     mainTabs.assertSelected(.cycle)
+    resetAllStoredAppData(app: app, mainTabs: mainTabs)
 
     cycle.assertReadyToStart()
     cycle.start()
@@ -34,8 +35,8 @@ final class CycleTimerStopCancelTests: GoCyclingUITestCase {
 
     mainTabs.select(.history)
     mainTabs.assertSelected(.history)
-    XCTAssertFalse(
-      app.staticTexts["Distance Cycled"].waitForExistence(timeout: 1),
+    XCTAssertTrue(
+      app.staticTexts["No completed routes to display!"].waitForExistence(timeout: 1),
       "Canceling stop confirmation should not save a ride"
     )
 

@@ -44,4 +44,18 @@ class GoCyclingUITestCase: XCTestCase {
     app = launchedApp
     return launchedApp
   }
+
+  /// Settings → Reset cleanup so History and statistics start from a known empty state.
+  func resetAllStoredAppData(
+    app: XCUIApplication,
+    mainTabs: MainTabBarScreen,
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    mainTabs.select(.settings)
+    mainTabs.assertSelected(.settings, file: file, line: line)
+    SettingsResetScreen(app: app).performFullReset(file: file, line: line)
+    mainTabs.select(.cycle)
+    mainTabs.assertSelected(.cycle, file: file, line: line)
+  }
 }

@@ -36,7 +36,7 @@ struct PersistenceController {
             // mirroring when the store is not backed by a normal SQLite URL.
             description.cloudKitContainerOptions = nil
         }
-        else if !Preferences.iCloudAvailable() {
+        else if !Preferences.iCloudAvailable(arguments: arguments) {
             description.cloudKitContainerOptions = nil
         }
 
@@ -65,7 +65,7 @@ struct PersistenceController {
     
     // MARK: Bike ride methods
     enum BikeRideStoreError: Error {
-        // Route-save tests need an explicit failure when Core Data does not return
+        // Completed route save tests need an explicit failure when Core Data does not return
         // a saved BikeRide; otherwise callers could update records or show naming
         // even though there is no concrete saved route to edit.
         case savedRideUnavailable
@@ -120,9 +120,8 @@ struct PersistenceController {
 
             do {
                 try context.save()
-                // Route-naming UI tests need the exact saved object in the view
-                // context so naming targets this ride instead of racing a
-                // "latest ride" fetch.
+                // Route save tests need the exact saved object in the view context
+                // so naming targets this ride instead of racing a "latest ride" fetch.
                 let objectID = newBikeRide.objectID
                 print("Bike ride saved")
                 DispatchQueue.main.async {

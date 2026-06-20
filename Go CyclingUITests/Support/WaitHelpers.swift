@@ -14,7 +14,6 @@ enum Wait {
     static let short: TimeInterval = 3
     static let standard: TimeInterval = 5
     static let appChrome: TimeInterval = 8
-    static let fixture: TimeInterval = 8
   }
 
   static func assertExists(
