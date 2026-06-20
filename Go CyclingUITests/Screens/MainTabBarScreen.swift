@@ -56,12 +56,12 @@ final class MainTabBarScreen {
   }
 
   /// iPhone uses a bottom `TabBar`; iPad uses nested floating tab item buttons.
-  func waitForMainChrome(timeout: TimeInterval = Wait.Timeout.appChrome) -> Bool {
-    if Wait.exists(app.tabBars.firstMatch, timeout: Wait.Timeout.short) {
+  func waitForMainChrome(timeout: TimeInterval = Timeouts.appChrome) -> Bool {
+    if app.tabBars.firstMatch.waitForExistence(timeout: Timeouts.short) {
       return true
     }
 
-    return Wait.exists(tabButton(.cycle), timeout: timeout)
+    return tabButton(.cycle).waitForExistence(timeout: timeout)
   }
 
   func select(
@@ -70,17 +70,12 @@ final class MainTabBarScreen {
     line: UInt = #line
   ) {
     let button = tabButton(tab)
-    Wait.assertExists(button, timeout: Wait.Timeout.short, file: file, line: line)
+    ElementAssertions.assertExists(button, timeout: Timeouts.short, file: file, line: line)
     button.tap()
   }
 
-  func assertSelected(
-    _ tab: Tab,
-    timeout: TimeInterval = Wait.Timeout.standard,
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    Wait.assertExists(tabContent(tab), timeout: timeout, file: file, line: line)
+  func tabContent(for tab: Tab) -> XCUIElement {
+    app.descendants(matching: .any).matching(identifier: tab.contentIdentifier).firstMatch
   }
 
   private func tabButton(_ tab: Tab) -> XCUIElement {
@@ -95,9 +90,5 @@ final class MainTabBarScreen {
     }
 
     return app.buttons.matching(identifier: tab.imageIdentifier).firstMatch
-  }
-
-  private func tabContent(_ tab: Tab) -> XCUIElement {
-    app.descendants(matching: .any).matching(identifier: tab.contentIdentifier).firstMatch
   }
 }

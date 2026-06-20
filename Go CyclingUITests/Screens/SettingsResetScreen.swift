@@ -73,7 +73,7 @@ final class SettingsResetScreen {
     button.tap()
 
     let alertButton = app.alerts.buttons[alertButtonLabel]
-    Wait.assertExists(alertButton, file: file, line: line)
+    ElementAssertions.assertExists(alertButton, file: file, line: line)
     alertButton.tap()
   }
 
@@ -83,7 +83,7 @@ final class SettingsResetScreen {
     file: StaticString,
     line: UInt
   ) {
-    if Wait.exists(element, timeout: Wait.Timeout.brief) {
+    if element.waitForExistence(timeout: Timeouts.brief) {
       return
     }
 
@@ -91,11 +91,11 @@ final class SettingsResetScreen {
     while swipes < maxSwipes {
       app.swipeUp()
       swipes += 1
-      if Wait.exists(element, timeout: Wait.Timeout.poll) {
+      if element.waitForExistence(timeout: Timeouts.poll) {
         return
       }
     }
 
-    Wait.assertExists(element, file: file, line: line)
+    ElementAssertions.assertExists(element, file: file, line: line)
   }
 }

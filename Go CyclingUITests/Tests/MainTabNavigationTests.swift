@@ -15,16 +15,16 @@ final class MainTabNavigationTests: GoCyclingUITestCase {
     let mainTabs = MainTabBarScreen(app: app)
 
     XCTAssertTrue(mainTabs.waitForMainChrome(), "Expected Cycle tab chrome after launch")
-    mainTabs.assertSelected(.cycle)
-    Wait.assertExists(app.buttons[AccessibilityID.Cycle.startButton])
+    MainTabBarScreenAssertions.assertSelected(.cycle, on: mainTabs)
+    ElementAssertions.assertExists(app.buttons[AccessibilityID.Cycle.startButton])
 
     mainTabs.select(.history)
-    mainTabs.assertSelected(.history)
+    MainTabBarScreenAssertions.assertSelected(.history, on: mainTabs)
 
     mainTabs.select(.statistics)
-    mainTabs.assertSelected(.statistics)
+    MainTabBarScreenAssertions.assertSelected(.statistics, on: mainTabs)
 
     mainTabs.select(.settings)
-    mainTabs.assertSelected(.settings)
+    MainTabBarScreenAssertions.assertSelected(.settings, on: mainTabs)
   }
 }

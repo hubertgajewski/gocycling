@@ -9,9 +9,6 @@ import XCTest
 ///
 /// Owns fail-fast behavior, app launch tracking, failure screenshots, and app
 /// termination so individual tests can focus on their workflow assertions.
-///
-/// UI tests use the real simulator store (rides, defaults, review counters).
-/// Call `resetAllStoredAppData` when a test needs a clean History or settings.
 class GoCyclingUITestCase: XCTestCase {
   private let appLauncher = AppLauncher()
   private(set) var app: XCUIApplication?
@@ -46,21 +43,5 @@ class GoCyclingUITestCase: XCTestCase {
     )
     app = launchedApp
     return launchedApp
-  }
-
-  /// Settings → Reset cleanup so History and preferences start from a known state.
-  func resetAllStoredAppData(
-    app: XCUIApplication,
-    mainTabs: MainTabBarScreen,
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    mainTabs.select(.settings)
-    mainTabs.assertSelected(.settings, file: file, line: line)
-    let reset = SettingsResetScreen(app: app)
-    reset.deleteAllStoredRoutes(file: file, line: line)
-    reset.resetToDefaultSettings(file: file, line: line)
-    mainTabs.select(.cycle)
-    mainTabs.assertSelected(.cycle, file: file, line: line)
   }
 }

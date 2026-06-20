@@ -8,70 +8,26 @@ import XCTest
 /// Screen object for the post-ride Categorize Your Route sheet.
 final class RouteCategorizationScreen {
   private enum Copy {
-    static let title = "Categorize Your Route"
-    static let createNewCategory = "Create a New Category"
-    static let useExistingCategory = "Use an Existing Category"
-    static let enterCategoryName = "Enter your new category name"
-    static let save = "Save"
-    static let saveWithoutCategory = "Save Without a Category"
     static let categoryNamePlaceholder = "Category Name"
     static let noSavedCategories = "There are no saved categories."
+    static let enterCategoryName = "Enter your new category name"
   }
 
-  private let app: XCUIApplication
+  let application: XCUIApplication
 
   init(app: XCUIApplication) {
-    self.app = app
-  }
-
-  func assertPresented(
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    let titleByIdentifier = app.descendants(matching: .any)
-      .matching(identifier: AccessibilityID.RouteCategorization.title)
-      .firstMatch
-    Wait.assertExists(
-      titleByIdentifier,
-      timeout: Wait.Timeout.standard,
-      "Expected the Categorize Your Route sheet identifier",
-      file: file,
-      line: line
-    )
-    Wait.assertExists(
-      app.staticTexts[Copy.title],
-      timeout: Wait.Timeout.short,
-      "Expected the Categorize Your Route sheet title",
-      file: file,
-      line: line
-    )
-  }
-
-  func assertLabels(
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    assertPresented(file: file, line: line)
-    Wait.assertExists(useExistingCategorySegment, file: file, line: line)
-    Wait.assertExists(createNewCategorySegment, file: file, line: line)
-    Wait.assertExists(app.staticTexts[Copy.enterCategoryName], file: file, line: line)
-    Wait.assertExists(app.buttons[Copy.save], file: file, line: line)
-    Wait.assertExists(
-      app.buttons[AccessibilityID.RouteCategorization.saveWithoutCategoryButton],
-      file: file,
-      line: line
-    )
+    self.application = app
   }
 
   func saveWithoutCategory(
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
-    assertPresented(file: file, line: line)
-    let button = app.buttons[AccessibilityID.RouteCategorization.saveWithoutCategoryButton]
-    Wait.assertExists(button, timeout: Wait.Timeout.short, file: file, line: line)
+    ensurePresented(file: file, line: line)
+    let button = application.buttons[AccessibilityID.RouteCategorization.saveWithoutCategoryButton]
+    ElementAssertions.assertExists(button, timeout: Timeouts.short, file: file, line: line)
     button.tap()
-    assertDismissed(file: file, line: line)
+    ensureDismissed(file: file, line: line)
   }
 
   func saveNewCategory(
@@ -79,25 +35,24 @@ final class RouteCategorizationScreen {
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
-    assertPresented(file: file, line: line)
-    assertCreateNewCategorySelected(file: file, line: line)
-    assertCategoryNameFieldReady(file: file, line: line)
+    ensurePresented(file: file, line: line)
+    ensureCreateNewCategorySelected(file: file, line: line)
+    ensureCategoryNameFieldReady(file: file, line: line)
 
     let field = categoryNameField
     field.tap()
-    assertCategoryNameFieldFocused(file: file, line: line)
+    ensureCategoryNameFieldFocused(file: file, line: line)
     field.typeText(name)
-    XCTAssertEqual(
-      field.value as? String,
-      name,
-      "Expected the category name field to contain the entered text",
+    ElementAssertions.assertValue(
+      field,
+      equals: name,
       file: file,
       line: line
     )
 
     dismissKeyboardIfPresent()
     tapSaveWhenEnabled(file: file, line: line)
-    assertDismissed(file: file, line: line)
+    ensureDismissed(file: file, line: line)
   }
 
   func selectExistingCategory(
@@ -106,44 +61,57 @@ final class RouteCategorizationScreen {
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
-    assertPresented(file: file, line: line)
+    ensurePresented(file: file, line: line)
     selectUseExistingCategorySegment(file: file, line: line)
-    assertUseExistingCategorySelected(file: file, line: line)
-    assertExistingCategoryPreselected(named: name, at: index, file: file, line: line)
+    ensureUseExistingCategorySelected(file: file, line: line)
+    ensureExistingCategoryPreselected(named: name, at: index, file: file, line: line)
     tapSaveWhenEnabled(file: file, line: line)
-    assertDismissed(file: file, line: line)
+    ensureDismissed(file: file, line: line)
   }
 
-  private var categoryNameField: XCUIElement {
-    app.descendants(matching: .any)
+  var titleElement: XCUIElement {
+    application.descendants(matching: .any)
+      .matching(identifier: AccessibilityID.RouteCategorization.title)
+      .firstMatch
+  }
+
+  var categoryNameField: XCUIElement {
+    application.descendants(matching: .any)
       .matching(identifier: AccessibilityID.RouteCategorization.categoryNameField)
       .firstMatch
   }
 
-  private var createNewCategorySegment: XCUIElement {
-    app.descendants(matching: .any)
+  var createNewCategorySegment: XCUIElement {
+    application.descendants(matching: .any)
       .matching(identifier: AccessibilityID.RouteCategorization.createNewCategorySegment)
       .firstMatch
   }
 
-  private var useExistingCategorySegment: XCUIElement {
-    app.descendants(matching: .any)
+  var useExistingCategorySegment: XCUIElement {
+    application.descendants(matching: .any)
       .matching(identifier: AccessibilityID.RouteCategorization.useExistingCategorySegment)
       .firstMatch
   }
 
   private func existingCategoryRow(at index: Int) -> XCUIElement {
-    app.buttons[
+    application.buttons[
       AccessibilityID.RouteCategorization.existingCategoryRowPrefix + "\(index)"
     ]
   }
 
-  private func assertCreateNewCategorySelected(
+  private func ensurePresented(
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
-    Wait.assertExists(createNewCategorySegment, file: file, line: line)
-    Wait.assertExists(categoryNameField, file: file, line: line)
+    RouteCategorizationScreenAssertions.assertPresented(on: self, file: file, line: line)
+  }
+
+  private func ensureCreateNewCategorySelected(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    ElementAssertions.assertExists(createNewCategorySegment, file: file, line: line)
+    ElementAssertions.assertExists(categoryNameField, file: file, line: line)
   }
 
   private func selectUseExistingCategorySegment(
@@ -151,59 +119,58 @@ final class RouteCategorizationScreen {
     line: UInt = #line
   ) {
     let segment = useExistingCategorySegment
-    Wait.assertExists(segment, file: file, line: line)
+    ElementAssertions.assertExists(segment, file: file, line: line)
     segment.tap()
   }
 
-  private func assertUseExistingCategorySelected(
+  private func ensureUseExistingCategorySelected(
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
-    Wait.assertNotExists(
+    ElementAssertions.assertNotExists(
       categoryNameField,
-      timeout: Wait.Timeout.short,
+      timeout: Timeouts.short,
       "Expected the new-category name field to disappear after selecting Use an Existing Category",
       file: file,
       line: line
     )
-    Wait.assertNotExists(
-      app.staticTexts[Copy.enterCategoryName],
-      timeout: Wait.Timeout.short,
+    ElementAssertions.assertNotExists(
+      application.staticTexts[Copy.enterCategoryName],
+      timeout: Timeouts.short,
       file: file,
       line: line
     )
-    Wait.assertNotExists(
-      app.staticTexts[Copy.noSavedCategories],
-      timeout: Wait.Timeout.short,
+    ElementAssertions.assertNotExists(
+      application.staticTexts[Copy.noSavedCategories],
+      timeout: Timeouts.short,
       "Expected at least one saved category in the existing-category list",
       file: file,
       line: line
     )
-    Wait.assertExists(
+    ElementAssertions.assertExists(
       existingCategoryRow(at: 0),
-      timeout: Wait.Timeout.short,
+      timeout: Timeouts.short,
       "Expected the existing-category list to show at least one row",
       file: file,
       line: line
     )
   }
 
-  private func assertCategoryNameFieldReady(
+  private func ensureCategoryNameFieldReady(
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
     let field = categoryNameField
-    Wait.assertExists(
+    ElementAssertions.assertExists(
       field,
-      timeout: Wait.Timeout.short,
+      timeout: Timeouts.short,
       "Expected the empty category name field with placeholder",
       file: file,
       line: line
     )
-    XCTAssertEqual(
-      field.placeholderValue,
-      Copy.categoryNamePlaceholder,
-      "Expected the Category Name placeholder on the category name field",
+    ElementAssertions.assertPlaceholder(
+      field,
+      equals: Copy.categoryNamePlaceholder,
       file: file,
       line: line
     )
@@ -217,56 +184,42 @@ final class RouteCategorizationScreen {
     )
   }
 
-  private func assertCategoryNameFieldFocused(
+  private func ensureCategoryNameFieldFocused(
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
-    Wait.assertExists(
-      app.keyboards.firstMatch,
-      timeout: Wait.Timeout.short,
-      "Expected the software keyboard after tapping the category name field",
+    ElementAssertions.assertKeyboardVisible(
+      application.keyboards.firstMatch,
       file: file,
       line: line
     )
   }
 
-  private func assertExistingCategoryPreselected(
+  private func ensureExistingCategoryPreselected(
     named name: String,
     at index: Int,
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
     let row = existingCategoryRow(at: index)
-    Wait.assertExists(
+    ElementAssertions.assertExists(
       row,
-      timeout: Wait.Timeout.short,
+      timeout: Timeouts.short,
       "Expected existing category row at index \(index)",
       file: file,
       line: line
     )
-    XCTAssertTrue(
-      row.label.contains(name),
-      "Expected existing category row \(index) to be \(name), got: \(row.label)",
-      file: file,
-      line: line
-    )
-    XCTAssertTrue(
-      row.images["checkmark"].exists,
-      "Expected \(name) to already be selected in the existing category list",
-      file: file,
-      line: line
-    )
+    ElementAssertions.assertContainsLabel(row, name, file: file, line: line)
+    ElementAssertions.assertSelected(row, file: file, line: line)
   }
 
-  private func assertDismissed(
+  private func ensureDismissed(
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
-    Wait.assertNotExists(
-      app.descendants(matching: .any)
-        .matching(identifier: AccessibilityID.RouteCategorization.title)
-        .firstMatch,
-      timeout: Wait.Timeout.standard,
+    ElementAssertions.assertNotExists(
+      titleElement,
+      timeout: Timeouts.standard,
       "Expected the categorization sheet to dismiss after saving",
       file: file,
       line: line
@@ -274,13 +227,13 @@ final class RouteCategorizationScreen {
   }
 
   private func dismissKeyboardIfPresent() {
-    let keyboard = app.keyboards.firstMatch
+    let keyboard = application.keyboards.firstMatch
     guard keyboard.exists else { return }
 
-    if app.keyboards.buttons["Return"].exists {
-      app.keyboards.buttons["Return"].tap()
-    } else if app.toolbars.buttons["Done"].exists {
-      app.toolbars.buttons["Done"].tap()
+    if application.keyboards.buttons["Return"].exists {
+      application.keyboards.buttons["Return"].tap()
+    } else if application.toolbars.buttons["Done"].exists {
+      application.toolbars.buttons["Done"].tap()
     }
   }
 
@@ -288,10 +241,10 @@ final class RouteCategorizationScreen {
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
-    let saveButton = app.buttons[AccessibilityID.RouteCategorization.saveButton]
-    Wait.assertExists(saveButton, file: file, line: line)
-    XCTAssertTrue(
-      saveButton.isEnabled,
+    let saveButton = application.buttons[AccessibilityID.RouteCategorization.saveButton]
+    ElementAssertions.assertEnabled(
+      saveButton,
+      timeout: Timeouts.standard,
       "Expected Save to enable before saving the category",
       file: file,
       line: line
