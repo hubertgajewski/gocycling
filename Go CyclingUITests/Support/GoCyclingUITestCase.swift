@@ -9,6 +9,9 @@ import XCTest
 ///
 /// Owns fail-fast behavior, app launch tracking, failure screenshots, and app
 /// termination so individual tests can focus on their workflow assertions.
+///
+/// UI tests use the real simulator store (rides, defaults, review counters).
+/// Call `resetAllStoredAppData` when a test needs a clean History or settings.
 class GoCyclingUITestCase: XCTestCase {
   private let appLauncher = AppLauncher()
   private(set) var app: XCUIApplication?

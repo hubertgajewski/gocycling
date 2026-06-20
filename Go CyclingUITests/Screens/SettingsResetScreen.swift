@@ -62,7 +62,7 @@ final class SettingsResetScreen {
     file: StaticString,
     line: UInt
   ) {
-    if element.waitForExistence(timeout: 1) {
+    if Wait.exists(element, timeout: Wait.Timeout.brief) {
       return
     }
 
@@ -70,7 +70,7 @@ final class SettingsResetScreen {
     while swipes < maxSwipes {
       app.swipeUp()
       swipes += 1
-      if element.waitForExistence(timeout: 0.5) {
+      if Wait.exists(element, timeout: Wait.Timeout.poll) {
         return
       }
     }

@@ -19,7 +19,7 @@ class ReviewManager {
     
     static let productURLString = "https://apps.apple.com/app/id1565861313"
 
-    static func incrementReviewWorthyCount(arguments: [String] = ProcessInfo.processInfo.arguments) {
+    static func incrementReviewWorthyCount() {
         let defaults = UserDefaults.standard
 
         var actionCount = defaults.integer(forKey: reviewCountKey)
@@ -31,7 +31,7 @@ class ReviewManager {
         }
     }
     
-    static func completedRoute(arguments: [String] = ProcessInfo.processInfo.arguments) {
+    static func completedRoute() {
         let defaults = UserDefaults.standard
         
         let completedRoute = defaults.bool(forKey: completedRouteKey)
@@ -41,7 +41,7 @@ class ReviewManager {
         }
     }
     
-    static func requestReviewIfAppropriate(arguments: [String] = ProcessInfo.processInfo.arguments) {
+    static func requestReviewIfAppropriate() {
         let defaults = UserDefaults.standard
         let bundle = Bundle.main
 

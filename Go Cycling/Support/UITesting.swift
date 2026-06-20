@@ -67,4 +67,8 @@ enum AccessibilityIdentifier {
         static let resetStatisticsButton = "settings-reset-stored-statistics-button"
         static let resetDefaultSettingsButton = "settings-reset-default-settings-button"
     }
+
+    enum History {
+        static let emptyState = "history-empty-state"
+    }
 }

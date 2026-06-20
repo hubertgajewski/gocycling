@@ -223,6 +223,7 @@ struct ListView: View {
                 HStack {
                     Spacer()
                     Text("No completed routes to display!")
+                        .accessibilityIdentifier(AccessibilityIdentifier.History.emptyState)
                     Spacer()
                 }
                 Spacer()

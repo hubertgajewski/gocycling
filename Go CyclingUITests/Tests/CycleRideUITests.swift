@@ -5,7 +5,7 @@
 
 import XCTest
 
-/// End-to-end Cycle ride session: map unlock, start, pause/resume, stop/cancel, no save.
+/// End-to-end Cycle ride session: map lock toggle, start, pause/resume, stop/cancel, no save.
 final class CycleRideUITests: GoCyclingUITestCase {
   func testPauseResumeAndCancelStopDoesNotSaveRide() throws {
     let app = launchApp(extraArguments: [LaunchArgument.cycleControlsFixture])
@@ -20,6 +20,8 @@ final class CycleRideUITests: GoCyclingUITestCase {
     cycle.assertMapLocked()
     cycle.unlockMap()
     cycle.assertMapUnlocked()
+    cycle.lockMap()
+    cycle.assertMapLocked()
 
     cycle.start()
     cycle.assertLocationSettingsAlertPresented()
@@ -39,8 +41,9 @@ final class CycleRideUITests: GoCyclingUITestCase {
 
     mainTabs.select(.history)
     mainTabs.assertSelected(.history)
-    XCTAssertTrue(
-      app.staticTexts["No completed routes to display!"].waitForExistence(timeout: 1),
+    Wait.assertExists(
+      app.staticTexts[AccessibilityID.History.emptyState],
+      timeout: Wait.Timeout.short,
       "Canceling stop confirmation should not save a ride"
     )
 
