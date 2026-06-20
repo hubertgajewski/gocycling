@@ -162,7 +162,7 @@
 		9DAB831C25FECAD400F5C42E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9DAB831B25FECAD400F5C42E /* Assets.xcassets */; };
 		9DAB831F25FECAD400F5C42E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9DAB831E25FECAD400F5C42E /* Preview Assets.xcassets */; };
 		AA0000902026061900000001 /* MainTabNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000912026061900000001 /* MainTabNavigationTests.swift */; };
-		AA0001072026061900000001 /* CycleTimerStopCancelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001082026061900000001 /* CycleTimerStopCancelTests.swift */; };
+		AA0001072026061900000001 /* CycleRideUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001082026061900000001 /* CycleRideUITests.swift */; };
 		AA0000932026061900000001 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000942026061900000001 /* AppLauncher.swift */; };
 		AA0000952026061900000001 /* WaitHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000962026061900000001 /* WaitHelpers.swift */; };
 		AA0000972026061900000001 /* AccessibilityIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000982026061900000001 /* AccessibilityIDs.swift */; };
@@ -386,7 +386,7 @@
 		9DAB833025FECAD400F5C42E /* Go CyclingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Go CyclingUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DAB833625FECAD400F5C42E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA0000912026061900000001 /* MainTabNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabNavigationTests.swift; sourceTree = "<group>"; };
-		AA0001082026061900000001 /* CycleTimerStopCancelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleTimerStopCancelTests.swift; sourceTree = "<group>"; };
+		AA0001082026061900000001 /* CycleRideUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleRideUITests.swift; sourceTree = "<group>"; };
 		AA0000942026061900000001 /* AppLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLauncher.swift; sourceTree = "<group>"; };
 		AA0000962026061900000001 /* WaitHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitHelpers.swift; sourceTree = "<group>"; };
 		AA0000982026061900000001 /* AccessibilityIDs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityIDs.swift; sourceTree = "<group>"; };
@@ -884,7 +884,7 @@
 		AA0000922026061900000001 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				AA0001082026061900000001 /* CycleTimerStopCancelTests.swift */,
+				AA0001082026061900000001 /* CycleRideUITests.swift */,
 				AA0000912026061900000001 /* MainTabNavigationTests.swift */,
 			);
 			path = Tests;
@@ -1271,7 +1271,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA0000902026061900000001 /* MainTabNavigationTests.swift in Sources */,
-				AA0001072026061900000001 /* CycleTimerStopCancelTests.swift in Sources */,
+				AA0001072026061900000001 /* CycleRideUITests.swift in Sources */,
 				AA0000932026061900000001 /* AppLauncher.swift in Sources */,
 				AA0000952026061900000001 /* WaitHelpers.swift in Sources */,
 				AA0000972026061900000001 /* AccessibilityIDs.swift in Sources */,

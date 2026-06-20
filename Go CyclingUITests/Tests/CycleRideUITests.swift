@@ -1,13 +1,13 @@
 //
-//  CycleTimerStopCancelTests.swift
+//  CycleRideUITests.swift
 //  Go CyclingUITests
 //
 
 import XCTest
 
-/// Focused Cycle timer coverage that does not save a route.
-final class CycleTimerStopCancelTests: GoCyclingUITestCase {
-  func testCycleTimerStopsAndCancelsWithoutSavingRide() throws {
+/// End-to-end Cycle ride session: map unlock, start, pause/resume, stop/cancel, no save.
+final class CycleRideUITests: GoCyclingUITestCase {
+  func testPauseResumeAndCancelStopDoesNotSaveRide() throws {
     let app = launchApp(extraArguments: [LaunchArgument.cycleControlsFixture])
     let mainTabs = MainTabBarScreen(app: app)
     let cycle = CycleScreen(app: app)
@@ -17,6 +17,10 @@ final class CycleTimerStopCancelTests: GoCyclingUITestCase {
     resetAllStoredAppData(app: app, mainTabs: mainTabs)
 
     cycle.assertReadyToStart()
+    cycle.assertMapLocked()
+    cycle.unlockMap()
+    cycle.assertMapUnlocked()
+
     cycle.start()
     cycle.assertLocationSettingsAlertPresented()
     cycle.dismissLocationSettingsAlertIfPresent()

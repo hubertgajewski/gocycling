@@ -28,6 +28,28 @@ final class CycleScreen {
     Wait.assertExists(startButton, file: file, line: line)
   }
 
+  func assertMapLocked(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    Wait.assertExists(mapLockButton, file: file, line: line)
+  }
+
+  func assertMapUnlocked(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    Wait.assertExists(mapUnlockButton, file: file, line: line)
+  }
+
+  func unlockMap(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    Wait.assertExists(mapLockButton, file: file, line: line)
+    mapLockButton.tap()
+  }
+
   func start(
     file: StaticString = #filePath,
     line: UInt = #line
@@ -137,6 +159,14 @@ final class CycleScreen {
 
   private var timerDisplay: XCUIElement {
     app.staticTexts[AccessibilityID.Cycle.timerDisplay]
+  }
+
+  private var mapLockButton: XCUIElement {
+    app.buttons[AccessibilityID.Cycle.mapLockButton]
+  }
+
+  private var mapUnlockButton: XCUIElement {
+    app.buttons[AccessibilityID.Cycle.mapUnlockButton]
   }
 
   private var startButton: XCUIElement {
