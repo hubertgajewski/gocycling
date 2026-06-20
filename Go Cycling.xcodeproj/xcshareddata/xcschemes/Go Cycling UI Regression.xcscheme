@@ -44,7 +44,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:Go CyclingUITests/Smoke.xctestplan"
+            reference = "container:Go CyclingUITests/Regression.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>

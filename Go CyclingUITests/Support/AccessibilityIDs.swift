@@ -13,6 +13,7 @@ enum AccessibilityID {
 
   enum Cycle {
     static let timerDisplay = "cycle-timer-display"
+    static let mapView = "cycle-map-view"
     static let mapLockButton = "cycle-map-lock-button"
     static let mapUnlockButton = "cycle-map-unlock-button"
     static let startButton = "cycle-start-button"
@@ -24,6 +25,21 @@ enum AccessibilityID {
     static let locationSettingsIgnoreButton = "cycle-location-settings-ignore-button"
     static let stopConfirmationStopButton = "cycle-stop-confirmation-stop-button"
     static let stopConfirmationCancelButton = "cycle-stop-confirmation-cancel-button"
+    static let autoPausedBanner = "cycle-auto-paused-banner"
+    static let metricsPill = "cycle-metrics-pill"
+    static let metricsSpeedValue = "cycle-metrics-speed-value"
+    static let metricsDistanceValue = "cycle-metrics-distance-value"
+    static let metricsAltitudeValue = "cycle-metrics-altitude-value"
+  }
+
+  enum RouteCategorization {
+    static let title = "route-categorization-title"
+    static let createNewCategorySegment = "route-categorization-create-new-segment"
+    static let useExistingCategorySegment = "route-categorization-use-existing-segment"
+    static let categoryNameField = "route-categorization-category-name-field"
+    static let saveButton = "route-categorization-save-button"
+    static let saveWithoutCategoryButton = "route-categorization-save-without-category-button"
+    static let existingCategoryRowPrefix = "route-categorization-existing-row-"
   }
 
   enum SettingsReset {
@@ -34,5 +50,6 @@ enum AccessibilityID {
 
   enum History {
     static let emptyState = "history-empty-state"
+    static let rideRow = "history-ride-row"
   }
 }

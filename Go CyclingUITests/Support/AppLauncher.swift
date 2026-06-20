@@ -9,6 +9,7 @@ import XCTest
 enum LaunchArgument {
   static let uiTesting = "-ui-testing"
   static let cycleControlsFixture = "-ui-testing-cycle-controls-fixture"
+  static let autoPauseFixture = "-ui-testing-auto-pause-fixture"
   static let appleLanguages = "-AppleLanguages"
   static let appleLocale = "-AppleLocale"
   static let applePersistenceIgnoreState = "-ApplePersistenceIgnoreState"

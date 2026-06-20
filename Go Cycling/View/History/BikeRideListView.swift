@@ -207,6 +207,7 @@ struct ListView: View {
                             }
                         }
                     }
+                    .accessibilityIdentifier(AccessibilityIdentifier.History.rideRow)
                 }
                 .onDelete(perform: preferences.deletionEnabled ?  self.showDeleteAlert : nil)
                 .onChange(of: shouldBeDeleted, perform: { _ in

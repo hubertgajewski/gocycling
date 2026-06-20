@@ -39,7 +39,6 @@ struct MapWithSpeedView: View {
                     currentDistance: $locationManager.cyclingTotalDistance,
                     pillColor: Color(UserPreferences.convertColourChoiceToUIColor(colour: preferences.colourChoiceConverted))
                 )
-                .accessibilityIdentifier("main-tab-cycle")
                 Spacer()
                 HStack {
                     Spacer()
@@ -63,6 +62,10 @@ struct MapWithSpeedView: View {
                 }
             }
         }
+        // Container identifier for tab readiness; .contain keeps child control IDs
+        // (metrics pill, map lock) visible to XCUITest and VoiceOver.
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("main-tab-cycle")
     }
 
     func toggleMapCentered() {

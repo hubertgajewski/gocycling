@@ -12,6 +12,7 @@ final class CycleScreen {
     static let ignore = "Ignore"
     static let stop = "Stop"
     static let cancel = "Cancel"
+    static let locationSettingsTitle = "Location settings may not be correct"
   }
 
   private let app: XCUIApplication
@@ -26,6 +27,28 @@ final class CycleScreen {
   ) {
     Wait.assertExists(timerDisplay, file: file, line: line)
     Wait.assertExists(startButton, file: file, line: line)
+    Wait.assertExists(metricsPill, file: file, line: line)
+    // MKMapView accessibility identifiers are not reliably exposed to XCUITest;
+    // the map lock control sits on the map overlay and proves map chrome loaded.
+    Wait.assertExists(mapLockButton, file: file, line: line)
+  }
+
+  func assertDefaultMetricsDisplayed(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    Wait.assertExists(metricsSpeedValue, file: file, line: line)
+    Wait.assertExists(metricsDistanceValue, file: file, line: line)
+    Wait.assertExists(metricsAltitudeValue, file: file, line: line)
+    XCTAssertEqual(metricsSpeedValue.label, "0.0", file: file, line: line)
+    XCTAssertEqual(metricsDistanceValue.label, "0.0", file: file, line: line)
+    XCTAssertEqual(metricsAltitudeValue.label, "0.0", file: file, line: line)
+    XCTAssertTrue(
+      app.staticTexts["km/h"].exists || app.staticTexts["mph"].exists,
+      "Expected speed units to be visible in the metrics pill",
+      file: file,
+      line: line
+    )
   }
 
   func assertMapLocked(
@@ -70,6 +93,13 @@ final class CycleScreen {
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
+    Wait.assertExists(
+      app.alerts[AlertLabel.locationSettingsTitle],
+      timeout: Wait.Timeout.short,
+      "Expected the location settings alert title",
+      file: file,
+      line: line
+    )
     XCTAssertNotNil(
       locationSettingsOpenSettingsButton(),
       "Expected the app-owned location settings alert Open Settings action",
@@ -158,6 +188,43 @@ final class CycleScreen {
     cancelButton.tap()
   }
 
+  func confirmStop(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    guard let stopButton = stopConfirmationStopButton() else {
+      XCTFail("Expected the app-owned stop confirmation Stop action", file: file, line: line)
+      return
+    }
+
+    stopButton.tap()
+  }
+
+  func assertAutoPausedBanner(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    Wait.assertExists(autoPausedBanner, timeout: Wait.Timeout.standard, file: file, line: line)
+  }
+
+  func completeStop(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    requestStop(file: file, line: line)
+    assertStopConfirmationPresented(file: file, line: line)
+    confirmStop(file: file, line: line)
+  }
+
+  func completeStopAndSaveWithoutCategory(
+    categorization: RouteCategorizationScreen,
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    completeStop(file: file, line: line)
+    categorization.saveWithoutCategory(file: file, line: line)
+  }
+
   func assertPausedAfterStopCancellation(
     file: StaticString = #filePath,
     line: UInt = #line
@@ -167,6 +234,26 @@ final class CycleScreen {
 
   private var timerDisplay: XCUIElement {
     app.staticTexts[AccessibilityID.Cycle.timerDisplay]
+  }
+
+  private var metricsPill: XCUIElement {
+    identifiedElement(AccessibilityID.Cycle.metricsPill)
+  }
+
+  private var metricsSpeedValue: XCUIElement {
+    identifiedElement(AccessibilityID.Cycle.metricsSpeedValue)
+  }
+
+  private var metricsDistanceValue: XCUIElement {
+    identifiedElement(AccessibilityID.Cycle.metricsDistanceValue)
+  }
+
+  private var metricsAltitudeValue: XCUIElement {
+    identifiedElement(AccessibilityID.Cycle.metricsAltitudeValue)
+  }
+
+  private var autoPausedBanner: XCUIElement {
+    identifiedElement(AccessibilityID.Cycle.autoPausedBanner)
   }
 
   private var mapLockButton: XCUIElement {
@@ -235,5 +322,9 @@ final class CycleScreen {
 
     let labeledButton = app.buttons[label].firstMatch
     return Wait.exists(labeledButton, timeout: timeout) ? labeledButton : nil
+  }
+
+  private func identifiedElement(_ identifier: String) -> XCUIElement {
+    app.descendants(matching: .any).matching(identifier: identifier).firstMatch
   }
 }

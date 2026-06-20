@@ -64,6 +64,7 @@ struct CycleView: View {
                         .clipShape(Capsule())
                         .overlay(Capsule().stroke(Color(.systemYellow), lineWidth: 1.5))
                         .padding(.horizontal, 24)
+                        .accessibilityIdentifier(AccessibilityIdentifier.Cycle.autoPausedBanner)
                     }
                 }
                 Spacer()

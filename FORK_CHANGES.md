@@ -112,9 +112,22 @@ xcodebuild \
   -scheme "Go Cycling UI Smoke" \
   -configuration Debug \
   -destination "$DEST" \
-  -only-testing:"Go CyclingUITests" \
   -enableCodeCoverage YES \
   -resultBundlePath TestResults/ui-ios26-iphone.xcresult \
+  -retry-tests-on-failure \
+  DEVELOPMENT_TEAM= \
+  test
+```
+
+Reproduce a UI regression run, substituting the device name as needed:
+
+```bash
+DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17')
+xcodebuild \
+  -project "Go Cycling.xcodeproj" \
+  -scheme "Go Cycling UI Regression" \
+  -configuration Debug \
+  -destination "$DEST" \
   -retry-tests-on-failure \
   DEVELOPMENT_TEAM= \
   test
@@ -141,18 +154,20 @@ xcodebuild \
   -scheme "Go Cycling UI Smoke" \
   -configuration Debug \
   -destination "$DEST" \
-  -only-testing:"Go CyclingUITests" \
   -retry-tests-on-failure \
   DEVELOPMENT_TEAM= \
   test
 ```
+
+Set the `CI_RUN_UI_REGRESSION` repository variable to `true`, or dispatch the Tests workflow with `run_regression: true`, to run the Regression test plan in CI instead of Smoke.
 
 ## Feature and Maintenance Differences
 
 Current fork-specific differences include:
 
 - Local build fixes for fork owners: `TelemetryDeck.xcconfig.example`, in-repository default alternate icon paths, generic signing guidance, and explicit `NSUbiquitousKeyValueStore` integer writes.
-- Focused Swift Testing unit coverage for cycling record sorting, aggregation, unlocked-icon, and reset-statistics behavior, plus UI smoke coverage for the main Cycle, History, Statistics, and Settings tabs and the Cycle timer stop-cancel flow.
+- Focused Swift Testing unit coverage for cycling record sorting, aggregation, unlocked-icon, and reset-statistics behavior, plus UI smoke coverage for the main Cycle, History, Statistics, and Settings tabs and a Cycle start-pause-resume-stop-save smoke path.
+- UI smoke and regression test plans (`Smoke.xctestplan`, `Regression.xctestplan`) under `Go CyclingUITests`, with `Go Cycling UI Smoke` and `Go Cycling UI Regression` schemes selecting the tier in CI and locally.
 - UI smoke tests use a lightweight harness under `Go CyclingUITests/Support`, `Go CyclingUITests/Screens`, and `Go CyclingUITests/Tests` for shared launch arguments, waits, accessibility IDs, main-tab navigation queries, and Cycle control workflows.
 - UI testing support through the `-ui-testing` launch argument to avoid location authorization prompts during automated tests.
 - A shared `Go Cycling` Xcode scheme for command-line and CI testing.
