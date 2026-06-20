@@ -15,7 +15,8 @@
     {
       "selectedTests" : [
         "MainTabNavigationTests",
-        "CycleRideSmokeTests"
+        "CycleRideSmokeTests",
+        "HistorySmokeTests"
       ],
       "target" : {
         "containerPath" : "container:Go Cycling.xcodeproj",

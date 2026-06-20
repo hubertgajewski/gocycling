@@ -35,4 +35,39 @@ extension HistoryScreen {
       line: line
     )
   }
+
+  func assertEmptyStateLabel(
+    _ expectedLabel: String,
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    ElementAssertions.assertLabel(
+      emptyState,
+      equals: expectedLabel,
+      timeout: Timeouts.short,
+      file: file,
+      line: line
+    )
+  }
+
+  func assertFirstRideRowLabels(
+    _ expectedLabels: [String],
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    ElementAssertions.assertExists(
+      rideRow,
+      timeout: Timeouts.standard,
+      file: file,
+      line: line
+    )
+    for label in expectedLabels {
+      ElementAssertions.assertContainsLabel(
+        rideRow,
+        label,
+        file: file,
+        line: line
+      )
+    }
+  }
 }
