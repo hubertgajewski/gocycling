@@ -72,17 +72,24 @@ struct MapView: UIViewRepresentable {
         mapView.showsUserLocation = UITesting.shouldShowUserLocation
         mapView.showsCompass = false
         mapView.mapType = preferences.mapTypeChoiceConverted.mkMapType
+        mapView.accessibilityIdentifier = AccessibilityIdentifier.Cycle.mapView
+        mapView.isAccessibilityElement = true
         return mapView
     }
 
     func updateUIView(_ view: MKMapView, context: Context) {
+        view.accessibilityIdentifier = AccessibilityIdentifier.Cycle.mapView
+        view.isAccessibilityElement = true
+
         let preferredMapType = preferences.mapTypeChoiceConverted.mkMapType
         if view.mapType != preferredMapType {
             view.mapType = preferredMapType
         }
 
         let authStatus = locationManager.statusString
-        let isLocationAuthorized = authStatus == "authorizedAlways" || authStatus == "authorizedWhenInUse"
+        let isLocationAuthorized = UITesting.shouldTreatLocationAsAuthorized
+            || authStatus == "authorizedAlways"
+            || authStatus == "authorizedWhenInUse"
 
         if UITesting.shouldShowUserLocation && isLocationAuthorized {
             if centerMapOnLocation {

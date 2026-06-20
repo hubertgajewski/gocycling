@@ -182,6 +182,12 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
                 self?.handleStalenessTick()
             }
         }
+        if UITesting.shouldUseAutoPauseFixture() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                guard let self, self.isTrackingCyclingSession else { return }
+                self.autoPauseState = .stopped
+            }
+        }
         autoPauseState = .moving
     }
 

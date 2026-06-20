@@ -24,17 +24,26 @@ struct MetricsPillView: View {
             VStack(spacing: 0) {
                 if preferences.largeMetrics {
                     HStack(spacing: 0) {
-                        metricColumn(label: "Speed",
-                                     value: MetricsFormatting.formatSpeedWithoutUnits(speed: currentSpeed ?? 0.0, usingMetric: preferences.usingMetric),
-                                     units: MetricsFormatting.getSpeedUnits(usingMetric: preferences.usingMetric))
+                        metricColumn(
+                            label: "Speed",
+                            value: MetricsFormatting.formatSpeedWithoutUnits(speed: currentSpeed ?? 0.0, usingMetric: preferences.usingMetric),
+                            units: MetricsFormatting.getSpeedUnits(usingMetric: preferences.usingMetric),
+                            valueIdentifier: AccessibilityIdentifier.Cycle.metricsSpeedValue
+                        )
                         Divider().frame(height: 50)
-                        metricColumn(label: "Distance",
-                                     value: MetricsFormatting.formatDistanceWithoutUnits(distance: cyclingStatus.isCycling ? currentDistance : 0.0, usingMetric: preferences.usingMetric),
-                                     units: MetricsFormatting.getDistanceUnits(usingMetric: preferences.usingMetric))
+                        metricColumn(
+                            label: "Distance",
+                            value: MetricsFormatting.formatDistanceWithoutUnits(distance: cyclingStatus.isCycling ? currentDistance : 0.0, usingMetric: preferences.usingMetric),
+                            units: MetricsFormatting.getDistanceUnits(usingMetric: preferences.usingMetric),
+                            valueIdentifier: AccessibilityIdentifier.Cycle.metricsDistanceValue
+                        )
                         Divider().frame(height: 50)
-                        metricColumn(label: "Altitude",
-                                     value: MetricsFormatting.formatElevationWithoutUnits(elevation: currentAltitude ?? 0.0, usingMetric: preferences.usingMetric),
-                                     units: MetricsFormatting.getElevationUnits(usingMetric: preferences.usingMetric))
+                        metricColumn(
+                            label: "Altitude",
+                            value: MetricsFormatting.formatElevationWithoutUnits(elevation: currentAltitude ?? 0.0, usingMetric: preferences.usingMetric),
+                            units: MetricsFormatting.getElevationUnits(usingMetric: preferences.usingMetric),
+                            valueIdentifier: AccessibilityIdentifier.Cycle.metricsAltitudeValue
+                        )
                     }
                     .transition(.opacity)
                 } else {
@@ -56,6 +65,8 @@ struct MetricsPillView: View {
                     .frame(width: 28, height: 4)
                     .padding(.bottom, 8)
             }
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier(AccessibilityIdentifier.Cycle.metricsPill)
             .background(pillColor.opacity(0.4))
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
             .padding(.horizontal, 12)
@@ -70,7 +81,7 @@ struct MetricsPillView: View {
     }
 
     @ViewBuilder
-    private func metricColumn(label: String, value: String, units: String) -> some View {
+    private func metricColumn(label: String, value: String, units: String, valueIdentifier: String) -> some View {
         VStack(spacing: 2) {
             Text(label)
                 .font(.caption)
@@ -81,6 +92,7 @@ struct MetricsPillView: View {
                 .bold()
                 .minimumScaleFactor(0.3)
                 .lineLimit(1)
+                .accessibilityIdentifier(valueIdentifier)
             Text(units)
                 .font(.caption)
                 .minimumScaleFactor(0.5)

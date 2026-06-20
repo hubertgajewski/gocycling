@@ -1,6 +1,7 @@
 # Repository variables (Settings → Secrets and variables → Actions → Variables):
 # RUNNER — set to "self-hosted" to route jobs to local Mac runners; unset defaults to macos-26.
 # CI_RUN_UNIT_TESTS, CI_RUN_UI_TESTS — set to "false" to skip; unset or any other value runs the job.
+# CI_RUN_UI_REGRESSION — set to "true" to run the UI Regression test plan instead of Smoke.
 #
 # Job order (fail-fast): swift-format → swift-unit-tests → unit-tests and ui-tests in parallel → coverage.
 # ui-tests requires swift-format success; it accepts a skipped swift-unit-tests job only when
@@ -14,6 +15,11 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      run_regression:
+        description: Run UI Regression test plan instead of Smoke
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -26,7 +32,8 @@ env:
   DEVELOPMENT_TEAM: ""
   XCODE_PROJECT: Go Cycling.xcodeproj
   XCODE_SCHEME: Go Cycling
-  XCODE_UI_SCHEME: Go Cycling UI Smoke
+  XCODE_UI_SMOKE_SCHEME: Go Cycling UI Smoke
+  XCODE_UI_REGRESSION_SCHEME: Go Cycling UI Regression
 
 jobs:
   swift-format:
@@ -151,7 +158,7 @@ jobs:
         (needs.swift-unit-tests.result == 'skipped' && vars.CI_RUN_UNIT_TESTS == 'false')) &&
       github.repository == 'hubertgajewski/gocycling' &&
       vars.CI_RUN_UI_TESTS != 'false'
-    name: UI smoke (${{ matrix.runtime }} / ${{ matrix.device_label }})
+    name: UI ${{ ((github.event_name == 'workflow_dispatch' && github.event.inputs.run_regression == 'true') || vars.CI_RUN_UI_REGRESSION == 'true') && 'regression' || 'smoke' }} (${{ matrix.runtime }} / ${{ matrix.device_label }})
     runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && matrix.os || vars.RUNNER || matrix.os }}
     timeout-minutes: 20
     strategy:
@@ -222,16 +229,21 @@ jobs:
         run: |
           mkdir -p TestResults
           rm -rf TestResults/ui-${{ matrix.id }}.xcresult
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.run_regression }}" == "true" ]] \
+            || [[ "${{ vars.CI_RUN_UI_REGRESSION }}" == "true" ]]; then
+            ui_scheme="$XCODE_UI_REGRESSION_SCHEME"
+          else
+            ui_scheme="$XCODE_UI_SMOKE_SCHEME"
+          fi
           coverage_flag=()
           if [[ "${{ matrix.id }}" == "ios26-iphone" ]]; then
             coverage_flag=(-enableCodeCoverage YES)
           fi
           xcodebuild \
             -project "$XCODE_PROJECT" \
-            -scheme "$XCODE_UI_SCHEME" \
+            -scheme "$ui_scheme" \
             -configuration Debug \
             -destination "${{ steps.destination.outputs.value }}" \
-            -only-testing:"Go CyclingUITests" \
             "${coverage_flag[@]}" \
             -resultBundlePath TestResults/ui-${{ matrix.id }}.xcresult \
             -retry-tests-on-failure \

@@ -42,4 +42,23 @@ enum Wait {
   ) -> Bool {
     element.waitForExistence(timeout: timeout)
   }
+
+  static func assertNotExists(
+    _ element: XCUIElement,
+    timeout: TimeInterval = Timeout.short,
+    _ message: String? = nil,
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    let predicate = NSPredicate(format: "exists == false")
+    let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
+    let result = XCTWaiter().wait(for: [expectation], timeout: timeout)
+    XCTAssertEqual(
+      result,
+      XCTWaiter.Result.completed,
+      message ?? "Expected \(element) to disappear within \(timeout) seconds",
+      file: file,
+      line: line
+    )
+  }
 }

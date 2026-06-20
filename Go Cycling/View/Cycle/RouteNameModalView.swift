@@ -43,10 +43,15 @@ struct RouteNameModalView: View {
             Text("Categorize Your Route")
                 .font(.headline)
                 .padding()
+                .accessibilityIdentifier(AccessibilityIdentifier.RouteCategorization.title)
             
             Picker("Selected Category", selection: $namedRoutesViewSelection) {
-                Text("Create a New Category").tag(NamedRoutesViewSelection.new)
-                Text("Use an Existing Category").tag(NamedRoutesViewSelection.existing)
+                Text("Create a New Category")
+                    .tag(NamedRoutesViewSelection.new)
+                    .accessibilityIdentifier(AccessibilityIdentifier.RouteCategorization.createNewCategorySegment)
+                Text("Use an Existing Category")
+                    .tag(NamedRoutesViewSelection.existing)
+                    .accessibilityIdentifier(AccessibilityIdentifier.RouteCategorization.useExistingCategorySegment)
             }
             .pickerStyle(.segmented)
             .padding(EdgeInsets.init(top: 0, leading: 10, bottom: 10, trailing: 10))
@@ -59,6 +64,7 @@ struct RouteNameModalView: View {
                     .border(Color(UIColor.separator))
                     .padding()
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .accessibilityIdentifier(AccessibilityIdentifier.RouteCategorization.categoryNameField)
                 Spacer()
                 // Extra option for existing routes where the category can be removed
                 if (self.bikeRideToEdit != nil) {
@@ -75,6 +81,7 @@ struct RouteNameModalView: View {
                 }
                 .disabled(!((self.typedRouteName.count > 0)))
                 .padding()
+                .accessibilityIdentifier(AccessibilityIdentifier.RouteCategorization.saveButton)
                 Divider()
                 Button (action: {
                     presentationMode.wrappedValue.dismiss()
@@ -90,6 +97,7 @@ struct RouteNameModalView: View {
                         .bold()
                 }
                 .padding()
+                .accessibilityIdentifier(AccessibilityIdentifier.RouteCategorization.saveWithoutCategoryButton)
                 Divider()
             case .existing:
                 if (routeNamingViewModel.routeNames.count > 0) {
@@ -109,6 +117,10 @@ struct RouteNameModalView: View {
                             .contentShape(Rectangle())
                             .foregroundColor(.primary)
                         }
+                        .accessibilityIdentifier(
+                            AccessibilityIdentifier.RouteCategorization.existingCategoryRowPrefix
+                                + "\(index)"
+                        )
                         }
                     }
                     .listStyle(.plain)
@@ -132,6 +144,7 @@ struct RouteNameModalView: View {
                 }
                 .padding()
                 .disabled(!(self.routeNamingViewModel.routeNames.count > 0))
+                .accessibilityIdentifier(AccessibilityIdentifier.RouteCategorization.saveButton)
                 Divider()
                 if (self.bikeRideToEdit != nil) {
                     Button (action: { presentationMode.wrappedValue.dismiss() }) {

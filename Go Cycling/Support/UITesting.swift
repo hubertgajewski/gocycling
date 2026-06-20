@@ -12,6 +12,7 @@ enum UITesting {
     // Cycle controls UI tests need deterministic alerts and timer behavior
     // without applying those fixtures to every UI-testing launch.
     static let cycleControlsFixtureArgument = "-ui-testing-cycle-controls-fixture"
+    static let autoPauseFixtureArgument = "-ui-testing-auto-pause-fixture"
 
     #if DEBUG
     /// True when the app was launched with `-ui-testing` (location/map seams only).
@@ -21,6 +22,16 @@ enum UITesting {
 
     static func shouldUseCycleControlsFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
         arguments.contains(cycleControlsFixtureArgument)
+    }
+
+    static func shouldUseAutoPauseFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        arguments.contains(autoPauseFixtureArgument)
+    }
+
+    /// UI tests skip real location authorization; treat location as authorized so
+    /// completed rides can persist through the normal MapView save path.
+    static var shouldTreatLocationAsAuthorized: Bool {
+        isEnabled()
     }
 
     static var shouldRequestLocationAuthorization: Bool {
@@ -38,6 +49,12 @@ enum UITesting {
     static func shouldUseCycleControlsFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
         false
     }
+
+    static func shouldUseAutoPauseFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        false
+    }
+
+    static var shouldTreatLocationAsAuthorized: Bool { false }
 
     static var shouldRequestLocationAuthorization: Bool { true }
 
@@ -60,6 +77,22 @@ enum AccessibilityIdentifier {
         static let locationSettingsIgnoreButton = "cycle-location-settings-ignore-button"
         static let stopConfirmationStopButton = "cycle-stop-confirmation-stop-button"
         static let stopConfirmationCancelButton = "cycle-stop-confirmation-cancel-button"
+        static let autoPausedBanner = "cycle-auto-paused-banner"
+        static let metricsPill = "cycle-metrics-pill"
+        static let metricsSpeedValue = "cycle-metrics-speed-value"
+        static let metricsDistanceValue = "cycle-metrics-distance-value"
+        static let metricsAltitudeValue = "cycle-metrics-altitude-value"
+        static let mapView = "cycle-map-view"
+    }
+
+    enum RouteCategorization {
+        static let title = "route-categorization-title"
+        static let createNewCategorySegment = "route-categorization-create-new-segment"
+        static let useExistingCategorySegment = "route-categorization-use-existing-segment"
+        static let categoryNameField = "route-categorization-category-name-field"
+        static let saveButton = "route-categorization-save-button"
+        static let saveWithoutCategoryButton = "route-categorization-save-without-category-button"
+        static let existingCategoryRowPrefix = "route-categorization-existing-row-"
     }
 
     enum SettingsReset {
@@ -70,5 +103,6 @@ enum AccessibilityIdentifier {
 
     enum History {
         static let emptyState = "history-empty-state"
+        static let rideRow = "history-ride-row"
     }
 }
