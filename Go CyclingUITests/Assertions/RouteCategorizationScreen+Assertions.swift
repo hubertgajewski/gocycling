@@ -6,7 +6,7 @@
 import XCTest
 
 extension RouteCategorizationScreen {
-  func assertLabels(
+  func assertPresented(
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
@@ -24,6 +24,26 @@ extension RouteCategorizationScreen {
       file: file,
       line: line
     )
+  }
+
+  func assertDismissed(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    ElementAssertions.assertNotExists(
+      titleElement,
+      timeout: Timeouts.standard,
+      "Expected the categorization sheet to dismiss after saving",
+      file: file,
+      line: line
+    )
+  }
+
+  func assertLabels(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    assertPresented(file: file, line: line)
     ElementAssertions.assertExists(
       useExistingCategorySegment,
       file: file,

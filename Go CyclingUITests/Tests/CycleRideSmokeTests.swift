@@ -10,18 +10,18 @@ final class CycleRideSmokeTests: CycleRideUITestCase {
   func testStartPauseResumeStopSavesRideToHistory() throws {
     cycle.start()
     cycle.dismissLocationSettingsAlertIfPresent()
-    ElementAssertions.assertExists(cycle.pauseButton, timeout: Timeouts.short)
-    ElementAssertions.assertExists(cycle.stopButton)
+    cycle.assertRunning()
     cycle.pause()
-    ElementAssertions.assertExists(cycle.resumeButton)
-    ElementAssertions.assertExists(cycle.stopButton)
+    cycle.assertPaused()
     cycle.resume()
-    ElementAssertions.assertExists(cycle.pauseButton, timeout: Timeouts.short)
-    ElementAssertions.assertExists(cycle.stopButton)
+    cycle.assertRunning()
     cycle.completeStopAndSaveWithoutCategory(categorization: categorization)
 
     mainTabs.select(.history)
-    ElementAssertions.assertExists(mainTabs.tabContent(for: .history), timeout: Timeouts.standard)
+    ElementAssertions.assertExists(
+      mainTabs.tabContent(for: .history),
+      timeout: Timeouts.standard
+    )
     history.assertRideCount(1)
   }
 }

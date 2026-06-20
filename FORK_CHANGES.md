@@ -168,7 +168,7 @@ Current fork-specific differences include:
 - Local build fixes for fork owners: `TelemetryDeck.xcconfig.example`, in-repository default alternate icon paths, generic signing guidance, and explicit `NSUbiquitousKeyValueStore` integer writes.
 - Focused Swift Testing unit coverage for cycling record sorting, aggregation, unlocked-icon, and reset-statistics behavior, plus UI smoke coverage for the main Cycle, History, Statistics, and Settings tabs and a Cycle start-pause-resume-stop-save smoke path.
 - UI smoke and regression test plans (`Smoke.xctestplan`, `Regression.xctestplan`) under `Go CyclingUITests`, with `Go Cycling UI Smoke` and `Go Cycling UI Regression` schemes selecting the tier in CI and locally.
-- UI smoke tests use a lightweight harness under `Go CyclingUITests/Support`, `Go CyclingUITests/Screens`, and `Go CyclingUITests/Tests` for shared launch arguments, waits, accessibility IDs, main-tab navigation queries, and Cycle control workflows.
+- UI smoke tests use a layered harness under `Go CyclingUITests/`: `Support/` (`Timeouts`, `ElementAssertions`, `GoCyclingUITestCase`), `Screens/` (queries and actions), `Flows/` (`ResetAppDataFlow`), `Assertions/` (`Screen+Assertions.swift` composite expectations), and `Tests/`.
 - UI testing support through the `-ui-testing` launch argument to avoid location authorization prompts during automated tests.
 - A shared `Go Cycling` Xcode scheme for command-line and CI testing.
 - A focused SwiftPM package slice for package-compatible formatting logic, declared over the existing Xcode-owned source and test directories so `swift test` complements the Xcode test action.

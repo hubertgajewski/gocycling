@@ -102,14 +102,7 @@ final class CycleScreen {
     line: UInt = #line
   ) {
     requestStop(file: file, line: line)
-    guard stopConfirmationStopButton() != nil else {
-      XCTFail("Expected the app-owned stop confirmation Stop action", file: file, line: line)
-      return
-    }
-    guard stopConfirmationCancelButton() != nil else {
-      XCTFail("Expected the app-owned stop confirmation Cancel action", file: file, line: line)
-      return
-    }
+    assertStopConfirmationPresented(file: file, line: line)
     confirmStop(file: file, line: line)
   }
 
@@ -122,7 +115,7 @@ final class CycleScreen {
     categorization.saveWithoutCategory(file: file, line: line)
   }
 
-  // MARK: - Internal queries for Assertions
+  // MARK: - Queries
 
   var timerDisplay: XCUIElement {
     application.staticTexts[AccessibilityID.Cycle.timerDisplay]

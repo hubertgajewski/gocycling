@@ -28,12 +28,50 @@ extension CycleScreen {
     ElementAssertions.assertLabel(metricsSpeedValue, equals: "0.0", file: file, line: line)
     ElementAssertions.assertLabel(metricsDistanceValue, equals: "0.0", file: file, line: line)
     ElementAssertions.assertLabel(metricsAltitudeValue, equals: "0.0", file: file, line: line)
-    XCTAssertTrue(
-      application.staticTexts["km/h"].exists || application.staticTexts["mph"].exists,
-      "Expected speed units to be visible in the metrics pill",
+    let metricUnits = application.staticTexts["km/h"]
+    if !metricUnits.waitForExistence(timeout: Timeouts.short) {
+      ElementAssertions.assertExists(
+        application.staticTexts["mph"],
+        timeout: Timeouts.short,
+        "Expected speed units to be visible in the metrics pill",
+        file: file,
+        line: line
+      )
+    }
+  }
+
+  func assertRunning(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    ElementAssertions.assertExists(
+      pauseButton,
+      timeout: Timeouts.short,
       file: file,
       line: line
     )
+    ElementAssertions.assertExists(stopButton, file: file, line: line)
+  }
+
+  func assertPaused(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    ElementAssertions.assertExists(resumeButton, file: file, line: line)
+    ElementAssertions.assertExists(stopButton, file: file, line: line)
+  }
+
+  func assertAutoPaused(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    ElementAssertions.assertExists(
+      autoPausedBanner,
+      timeout: Timeouts.short,
+      file: file,
+      line: line
+    )
+    assertPaused(file: file, line: line)
   }
 
   func assertLocationSettingsAlertPresented(

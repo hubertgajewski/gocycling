@@ -21,35 +21,35 @@ final class CycleRideRegressionTests: CycleRideUITestCase {
     cycle.start()
     cycle.assertLocationSettingsAlertPresented()
     cycle.dismissLocationSettingsAlertIfPresent()
-    ElementAssertions.assertExists(cycle.pauseButton, timeout: Timeouts.short)
-    ElementAssertions.assertExists(cycle.stopButton)
+    cycle.assertRunning()
     cycle.pause()
-    ElementAssertions.assertExists(cycle.resumeButton)
-    ElementAssertions.assertExists(cycle.stopButton)
+    cycle.assertPaused()
     cycle.resume()
-    ElementAssertions.assertExists(cycle.pauseButton, timeout: Timeouts.short)
-    ElementAssertions.assertExists(cycle.stopButton)
+    cycle.assertRunning()
     cycle.requestStop()
     cycle.assertStopConfirmationPresented()
     cycle.cancelStopConfirmation()
-    ElementAssertions.assertExists(cycle.resumeButton)
-    ElementAssertions.assertExists(cycle.stopButton)
+    cycle.assertPaused()
 
     mainTabs.select(.history)
-    ElementAssertions.assertExists(mainTabs.tabContent(for: .history), timeout: Timeouts.standard)
+    ElementAssertions.assertExists(
+      mainTabs.tabContent(for: .history),
+      timeout: Timeouts.standard
+    )
     ElementAssertions.assertExists(history.emptyState, timeout: Timeouts.short)
 
     mainTabs.select(.cycle)
-    ElementAssertions.assertExists(mainTabs.tabContent(for: .cycle), timeout: Timeouts.standard)
-    ElementAssertions.assertExists(cycle.resumeButton)
-    ElementAssertions.assertExists(cycle.stopButton)
+    ElementAssertions.assertExists(
+      mainTabs.tabContent(for: .cycle),
+      timeout: Timeouts.standard
+    )
+    cycle.assertPaused()
   }
 
   func testCategorizeYourRouteLabelsVisible() throws {
     cycle.start()
     cycle.dismissLocationSettingsAlertIfPresent()
-    ElementAssertions.assertExists(cycle.pauseButton, timeout: Timeouts.short)
-    ElementAssertions.assertExists(cycle.stopButton)
+    cycle.assertRunning()
     cycle.completeStop()
     categorization.assertLabels()
     categorization.saveWithoutCategory()
@@ -107,8 +107,6 @@ final class CycleAutoPauseRegressionTests: CycleRideUITestCase {
   func testAutoPausedBannerAppearsWhenStopped() throws {
     cycle.start()
     cycle.dismissLocationSettingsAlertIfPresent()
-    ElementAssertions.assertExists(cycle.autoPausedBanner, timeout: Timeouts.short)
-    ElementAssertions.assertExists(cycle.resumeButton)
-    ElementAssertions.assertExists(cycle.stopButton)
+    cycle.assertAutoPaused()
   }
 }

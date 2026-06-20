@@ -26,7 +26,10 @@ class CycleRideUITestCase: GoCyclingUITestCase {
     let launchedApp = launchApp(extraArguments: launchExtraArguments)
     mainTabs = MainTabBarScreen(app: launchedApp)
     XCTAssertTrue(mainTabs.waitForMainChrome(), "Expected Cycle tab chrome after launch")
-    ElementAssertions.assertExists(mainTabs.tabContent(for: .cycle), timeout: Timeouts.standard)
+    ElementAssertions.assertExists(
+      mainTabs.tabContent(for: .cycle),
+      timeout: Timeouts.standard
+    )
     ResetAppDataFlow(app: launchedApp, tabs: mainTabs).run()
 
     cycle = CycleScreen(app: launchedApp)

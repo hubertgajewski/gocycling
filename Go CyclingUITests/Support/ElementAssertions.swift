@@ -41,6 +41,7 @@ enum ElementAssertions {
     )
   }
 
+  /// Reserved for scroll-revealed or overlay targets where existence is insufficient.
   static func assertHittable(
     _ element: XCUIElement,
     timeout: TimeInterval = Timeouts.standard,
@@ -79,6 +80,7 @@ enum ElementAssertions {
     )
   }
 
+  /// Reserved for form controls whose enabled state is part of the workflow under test.
   static func assertDisabled(
     _ element: XCUIElement,
     timeout: TimeInterval = Timeouts.standard,
