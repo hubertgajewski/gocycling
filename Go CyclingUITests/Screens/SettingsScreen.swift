@@ -8,8 +8,6 @@ import XCTest
 /// Screen object for Settings tab queries and actions.
 final class SettingsScreen {
   enum Copy {
-    static let navigationTitle = "Settings"
-
     static let customizationHeader = "Customization"
     static let colourPicker = "Colour"
     static let appIconPicker = "App Icon"
@@ -187,14 +185,6 @@ final class SettingsScreen {
       return String(parts[1]).trimmingCharacters(in: .whitespaces)
     }
     return row.value as? String ?? ""
-  }
-
-  func isSwitchOn(_ controlID: String) -> Bool {
-    let toggle = switchControl(controlID)
-    guard toggle.waitForExistence(timeout: Timeouts.brief) else {
-      return false
-    }
-    return switchIsOn(toggle)
   }
 
   func switchControl(_ controlID: String) -> XCUIElement {
