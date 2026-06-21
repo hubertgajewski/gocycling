@@ -1,5 +1,5 @@
 //
-//  CycleRideUITestCase.swift
+//  CycleUITestCase.swift
 //  Go CyclingUITests
 //
 
@@ -7,9 +7,9 @@ import XCTest
 
 /// Shared launch + Settings reset for Cycle ride UI tests.
 ///
-/// Subclasses `GoCyclingUITestCase` so tab-only smoke tests stay on the base
-/// class without paying for delete-routes / reset-defaults setup.
-class CycleRideUITestCase: GoCyclingUITestCase {
+/// Subclasses `BaseUITestCase` so tab-only smoke tests stay on the base class
+/// without paying for delete-routes / reset-defaults setup.
+class CycleUITestCase: BaseUITestCase {
   private(set) var mainTabs: MainTabBarScreen!
   private(set) var cycle: CycleScreen!
   private(set) var history: HistoryScreen!
@@ -18,6 +18,11 @@ class CycleRideUITestCase: GoCyclingUITestCase {
   /// Override to add launch fixtures (for example auto-pause).
   var launchExtraArguments: [String] {
     [LaunchArgument.cycleControlsFixture]
+  }
+
+  /// Override to choose which local stores Settings → Reset should clear.
+  var resetAreas: ResetAppDataFlow.Areas {
+    .cycleDefaults
   }
 
   override func setUpWithError() throws {
@@ -30,7 +35,7 @@ class CycleRideUITestCase: GoCyclingUITestCase {
       mainTabs.tabContent(for: .cycle),
       timeout: Timeouts.standard
     )
-    ResetAppDataFlow(app: launchedApp, tabs: mainTabs).run()
+    ResetAppDataFlow(app: launchedApp, tabs: mainTabs).run(resetting: resetAreas)
 
     cycle = CycleScreen(app: launchedApp)
     history = HistoryScreen(app: launchedApp)

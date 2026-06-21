@@ -30,6 +30,18 @@ final class SettingsResetScreen {
     )
   }
 
+  func resetStoredStatistics(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    confirmDestructiveAction(
+      button: app.buttons[AccessibilityID.SettingsReset.resetStatisticsButton],
+      alertButtonLabel: AlertLabel.reset,
+      file: file,
+      line: line
+    )
+  }
+
   func resetToDefaultSettings(
     file: StaticString = #filePath,
     line: UInt = #line

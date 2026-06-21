@@ -175,8 +175,12 @@
 		AA0001312026062000000001 /* HistoryScreen+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001322026062000000001 /* HistoryScreen+Assertions.swift */; };
 		AA0001352026062000000001 /* RouteCategorizationScreen+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001362026062000000001 /* RouteCategorizationScreen+Assertions.swift */; };
 		AA0000972026061900000001 /* AccessibilityIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000982026061900000001 /* AccessibilityIDs.swift */; };
-		AA0001012026061900000001 /* GoCyclingUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001022026061900000001 /* GoCyclingUITestCase.swift */; };
-		AA0001232026062000000001 /* CycleRideUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001242026062000000001 /* CycleRideUITestCase.swift */; };
+		AA0001012026061900000001 /* BaseUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001022026061900000001 /* BaseUITestCase.swift */; };
+		AA0001232026062000000001 /* CycleUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001242026062000000001 /* CycleUITestCase.swift */; };
+		AA0001472026062100000001 /* StatisticsUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001482026062100000001 /* StatisticsUITestCase.swift */; };
+		AA0001492026062100000001 /* StatisticsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001502026062100000001 /* StatisticsScreen.swift */; };
+		AA0001512026062100000001 /* StatisticsScreen+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001522026062100000001 /* StatisticsScreen+Assertions.swift */; };
+		AA0001532026062100000001 /* StatisticsSmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001542026062100000001 /* StatisticsSmokeTests.swift */; };
 		AA0001032026061900000001 /* MainTabBarScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001042026061900000001 /* MainTabBarScreen.swift */; };
 		AA0001092026061900000001 /* CycleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001102026061900000001 /* CycleScreen.swift */; };
 		AA0001112026062000000001 /* SettingsResetScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001122026062000000001 /* SettingsResetScreen.swift */; };
@@ -411,8 +415,12 @@
 		AA0001322026062000000001 /* HistoryScreen+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HistoryScreen+Assertions.swift"; sourceTree = "<group>"; };
 		AA0001362026062000000001 /* RouteCategorizationScreen+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RouteCategorizationScreen+Assertions.swift"; sourceTree = "<group>"; };
 		AA0000982026061900000001 /* AccessibilityIDs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityIDs.swift; sourceTree = "<group>"; };
-		AA0001022026061900000001 /* GoCyclingUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoCyclingUITestCase.swift; sourceTree = "<group>"; };
-		AA0001242026062000000001 /* CycleRideUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleRideUITestCase.swift; sourceTree = "<group>"; };
+		AA0001022026061900000001 /* BaseUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseUITestCase.swift; sourceTree = "<group>"; };
+		AA0001242026062000000001 /* CycleUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleUITestCase.swift; sourceTree = "<group>"; };
+		AA0001482026062100000001 /* StatisticsUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsUITestCase.swift; sourceTree = "<group>"; };
+		AA0001502026062100000001 /* StatisticsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsScreen.swift; sourceTree = "<group>"; };
+		AA0001522026062100000001 /* StatisticsScreen+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StatisticsScreen+Assertions.swift"; sourceTree = "<group>"; };
+		AA0001542026062100000001 /* StatisticsSmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsSmokeTests.swift; sourceTree = "<group>"; };
 		AA0001042026061900000001 /* MainTabBarScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarScreen.swift; sourceTree = "<group>"; };
 		AA0001102026061900000001 /* CycleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleScreen.swift; sourceTree = "<group>"; };
 		AA0001122026062000000001 /* SettingsResetScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsResetScreen.swift; sourceTree = "<group>"; };
@@ -891,8 +899,9 @@
 			children = (
 				AA0000982026061900000001 /* AccessibilityIDs.swift */,
 				AA0000942026061900000001 /* AppLauncher.swift */,
-				AA0001022026061900000001 /* GoCyclingUITestCase.swift */,
-				AA0001242026062000000001 /* CycleRideUITestCase.swift */,
+				AA0001022026061900000001 /* BaseUITestCase.swift */,
+				AA0001242026062000000001 /* CycleUITestCase.swift */,
+				AA0001482026062100000001 /* StatisticsUITestCase.swift */,
 				AA0000962026061900000001 /* Timeouts.swift */,
 				AA0001262026062000000001 /* ElementAssertions.swift */,
 			);
@@ -913,6 +922,7 @@
 				AA0001302026062000000001 /* CycleScreen+Assertions.swift */,
 				AA0001322026062000000001 /* HistoryScreen+Assertions.swift */,
 				AA0001362026062000000001 /* RouteCategorizationScreen+Assertions.swift */,
+				AA0001522026062100000001 /* StatisticsScreen+Assertions.swift */,
 			);
 			path = Assertions;
 			sourceTree = "<group>";
@@ -925,6 +935,7 @@
 				AA0001202026062000000001 /* RouteCategorizationScreen.swift */,
 				AA0001122026062000000001 /* SettingsResetScreen.swift */,
 				AA0001042026061900000001 /* MainTabBarScreen.swift */,
+				AA0001502026062100000001 /* StatisticsScreen.swift */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -936,6 +947,7 @@
 				AA0001402026062000000001 /* HistorySmokeTests.swift */,
 				AA0001162026062000000001 /* CycleRideRegressionTests.swift */,
 				AA0000912026061900000001 /* MainTabNavigationTests.swift */,
+				AA0001542026062100000001 /* StatisticsSmokeTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -1332,8 +1344,12 @@
 				AA0001312026062000000001 /* HistoryScreen+Assertions.swift in Sources */,
 				AA0001352026062000000001 /* RouteCategorizationScreen+Assertions.swift in Sources */,
 				AA0000972026061900000001 /* AccessibilityIDs.swift in Sources */,
-				AA0001012026061900000001 /* GoCyclingUITestCase.swift in Sources */,
-				AA0001232026062000000001 /* CycleRideUITestCase.swift in Sources */,
+				AA0001012026061900000001 /* BaseUITestCase.swift in Sources */,
+				AA0001232026062000000001 /* CycleUITestCase.swift in Sources */,
+				AA0001472026062100000001 /* StatisticsUITestCase.swift in Sources */,
+				AA0001492026062100000001 /* StatisticsScreen.swift in Sources */,
+				AA0001512026062100000001 /* StatisticsScreen+Assertions.swift in Sources */,
+				AA0001532026062100000001 /* StatisticsSmokeTests.swift in Sources */,
 				AA0001032026061900000001 /* MainTabBarScreen.swift in Sources */,
 				AA0001092026061900000001 /* CycleScreen.swift in Sources */,
 				AA0001172026062000000001 /* HistoryScreen.swift in Sources */,
