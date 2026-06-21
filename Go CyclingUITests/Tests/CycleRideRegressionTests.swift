@@ -6,7 +6,7 @@
 import XCTest
 
 /// Deep Cycle GUI and route categorization coverage.
-final class CycleRideRegressionTests: CycleTestCase {
+final class CycleRideRegressionTests: CycleUITestCase {
   func testIdleCycleChromeShowsMapMetricsAndLockToggle() throws {
     cycle.assertReadyToStart()
     cycle.assertDefaultMetricsDisplayed()
@@ -96,7 +96,7 @@ final class CycleRideRegressionTests: CycleTestCase {
 }
 
 /// Auto-pause needs an extra launch fixture; separate class keeps launch config explicit.
-final class CycleAutoPauseRegressionTests: CycleTestCase {
+final class CycleAutoPauseRegressionTests: CycleUITestCase {
   override var launchExtraArguments: [String] {
     [
       LaunchArgument.cycleControlsFixture,

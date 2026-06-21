@@ -1,5 +1,5 @@
 //
-//  StatisticsTestCase.swift
+//  StatisticsUITestCase.swift
 //  Go CyclingUITests
 //
 
@@ -9,7 +9,7 @@ import XCTest
 ///
 /// Clears stored routes and statistics so chart/record labels reflect a known
 /// baseline while awards remain locked in UI tests.
-class StatisticsTestCase: CycleTestCase {
+class StatisticsUITestCase: CycleUITestCase {
   private(set) var statistics: StatisticsScreen!
 
   override var resetAreas: ResetAppDataFlow.Areas {

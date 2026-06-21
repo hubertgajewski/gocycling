@@ -175,9 +175,9 @@
 		AA0001312026062000000001 /* HistoryScreen+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001322026062000000001 /* HistoryScreen+Assertions.swift */; };
 		AA0001352026062000000001 /* RouteCategorizationScreen+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001362026062000000001 /* RouteCategorizationScreen+Assertions.swift */; };
 		AA0000972026061900000001 /* AccessibilityIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000982026061900000001 /* AccessibilityIDs.swift */; };
-		AA0001012026061900000001 /* BaseTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001022026061900000001 /* BaseTestCase.swift */; };
-		AA0001232026062000000001 /* CycleTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001242026062000000001 /* CycleTestCase.swift */; };
-		AA0001472026062100000001 /* StatisticsTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001482026062100000001 /* StatisticsTestCase.swift */; };
+		AA0001012026061900000001 /* BaseUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001022026061900000001 /* BaseUITestCase.swift */; };
+		AA0001232026062000000001 /* CycleUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001242026062000000001 /* CycleUITestCase.swift */; };
+		AA0001472026062100000001 /* StatisticsUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001482026062100000001 /* StatisticsUITestCase.swift */; };
 		AA0001492026062100000001 /* StatisticsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001502026062100000001 /* StatisticsScreen.swift */; };
 		AA0001512026062100000001 /* StatisticsScreen+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001522026062100000001 /* StatisticsScreen+Assertions.swift */; };
 		AA0001532026062100000001 /* StatisticsSmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001542026062100000001 /* StatisticsSmokeTests.swift */; };
@@ -415,9 +415,9 @@
 		AA0001322026062000000001 /* HistoryScreen+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HistoryScreen+Assertions.swift"; sourceTree = "<group>"; };
 		AA0001362026062000000001 /* RouteCategorizationScreen+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RouteCategorizationScreen+Assertions.swift"; sourceTree = "<group>"; };
 		AA0000982026061900000001 /* AccessibilityIDs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityIDs.swift; sourceTree = "<group>"; };
-		AA0001022026061900000001 /* BaseTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseTestCase.swift; sourceTree = "<group>"; };
-		AA0001242026062000000001 /* CycleTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleTestCase.swift; sourceTree = "<group>"; };
-		AA0001482026062100000001 /* StatisticsTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsTestCase.swift; sourceTree = "<group>"; };
+		AA0001022026061900000001 /* BaseUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseUITestCase.swift; sourceTree = "<group>"; };
+		AA0001242026062000000001 /* CycleUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleUITestCase.swift; sourceTree = "<group>"; };
+		AA0001482026062100000001 /* StatisticsUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsUITestCase.swift; sourceTree = "<group>"; };
 		AA0001502026062100000001 /* StatisticsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsScreen.swift; sourceTree = "<group>"; };
 		AA0001522026062100000001 /* StatisticsScreen+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StatisticsScreen+Assertions.swift"; sourceTree = "<group>"; };
 		AA0001542026062100000001 /* StatisticsSmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsSmokeTests.swift; sourceTree = "<group>"; };
@@ -899,9 +899,9 @@
 			children = (
 				AA0000982026061900000001 /* AccessibilityIDs.swift */,
 				AA0000942026061900000001 /* AppLauncher.swift */,
-				AA0001022026061900000001 /* BaseTestCase.swift */,
-				AA0001242026062000000001 /* CycleTestCase.swift */,
-				AA0001482026062100000001 /* StatisticsTestCase.swift */,
+				AA0001022026061900000001 /* BaseUITestCase.swift */,
+				AA0001242026062000000001 /* CycleUITestCase.swift */,
+				AA0001482026062100000001 /* StatisticsUITestCase.swift */,
 				AA0000962026061900000001 /* Timeouts.swift */,
 				AA0001262026062000000001 /* ElementAssertions.swift */,
 			);
@@ -1344,9 +1344,9 @@
 				AA0001312026062000000001 /* HistoryScreen+Assertions.swift in Sources */,
 				AA0001352026062000000001 /* RouteCategorizationScreen+Assertions.swift in Sources */,
 				AA0000972026061900000001 /* AccessibilityIDs.swift in Sources */,
-				AA0001012026061900000001 /* BaseTestCase.swift in Sources */,
-				AA0001232026062000000001 /* CycleTestCase.swift in Sources */,
-				AA0001472026062100000001 /* StatisticsTestCase.swift in Sources */,
+				AA0001012026061900000001 /* BaseUITestCase.swift in Sources */,
+				AA0001232026062000000001 /* CycleUITestCase.swift in Sources */,
+				AA0001472026062100000001 /* StatisticsUITestCase.swift in Sources */,
 				AA0001492026062100000001 /* StatisticsScreen.swift in Sources */,
 				AA0001512026062100000001 /* StatisticsScreen+Assertions.swift in Sources */,
 				AA0001532026062100000001 /* StatisticsSmokeTests.swift in Sources */,

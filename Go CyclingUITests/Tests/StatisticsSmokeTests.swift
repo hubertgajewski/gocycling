@@ -6,7 +6,7 @@
 import XCTest
 
 /// Fast Statistics tab smoke coverage after a saved ride updates charts and records.
-final class StatisticsSmokeTests: StatisticsTestCase {
+final class StatisticsSmokeTests: StatisticsUITestCase {
   func testSavedRideStatisticsTabShowsSectionLabels() throws {
     cycle.start()
     cycle.dismissLocationSettingsAlertIfPresent()

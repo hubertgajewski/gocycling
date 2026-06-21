@@ -6,7 +6,7 @@
 import XCTest
 
 /// Fast Cycle happy path: start, pause/resume, stop, save, return to idle Cycle chrome.
-final class CycleRideSmokeTests: CycleTestCase {
+final class CycleRideSmokeTests: CycleUITestCase {
   func testStartPauseResumeStopSavesRideOnCycleTab() throws {
     cycle.start()
     cycle.dismissLocationSettingsAlertIfPresent()

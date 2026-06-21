@@ -1,5 +1,5 @@
 //
-//  CycleTestCase.swift
+//  CycleUITestCase.swift
 //  Go CyclingUITests
 //
 
@@ -7,9 +7,9 @@ import XCTest
 
 /// Shared launch + Settings reset for Cycle ride UI tests.
 ///
-/// Subclasses `BaseTestCase` so tab-only smoke tests stay on the base class
+/// Subclasses `BaseUITestCase` so tab-only smoke tests stay on the base class
 /// without paying for delete-routes / reset-defaults setup.
-class CycleTestCase: BaseTestCase {
+class CycleUITestCase: BaseUITestCase {
   private(set) var mainTabs: MainTabBarScreen!
   private(set) var cycle: CycleScreen!
   private(set) var history: HistoryScreen!

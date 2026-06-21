@@ -1,5 +1,5 @@
 //
-//  BaseTestCase.swift
+//  BaseUITestCase.swift
 //  Go CyclingUITests
 //
 
@@ -9,7 +9,7 @@ import XCTest
 ///
 /// Owns fail-fast behavior, app launch tracking, failure screenshots, and app
 /// termination so individual tests can focus on their workflow assertions.
-class BaseTestCase: XCTestCase {
+class BaseUITestCase: XCTestCase {
   private let appLauncher = AppLauncher()
   private(set) var app: XCUIApplication?
 

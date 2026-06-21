@@ -6,7 +6,7 @@
 import XCTest
 
 /// Fast History tab smoke coverage for empty and populated ride-list states.
-final class HistorySmokeTests: CycleTestCase {
+final class HistorySmokeTests: CycleUITestCase {
   func testHistoryTabShowsEmptyStateLabel() throws {
     mainTabs.select(.history)
     ElementAssertions.assertExists(
