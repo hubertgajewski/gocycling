@@ -19,41 +19,51 @@ struct SettingsView: View {
                         .padding(.all, 10)
                 }
                 Form {
-                    Section(header: Text("Customization")) {
+                    Section(header: Text("Customization")
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.customizationSection)) {
                         ColourView()
                         ChangeAppIconView().environmentObject(IconNames())
                     }
                     .disabled(cyclingStatus.isCycling)
                     .navigationBarTitle("Settings", displayMode: .inline)
-                    Section(header: Text("Cycling Metrics")) {
+                    Section(header: Text("Cycling Metrics")
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.cyclingMetricsSection)) {
                         UnitsView()
                     }
                     .disabled(cyclingStatus.isCycling)
-                    Section(header: Text("Cycling History")) {
+                    Section(header: Text("Cycling History")
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.cyclingHistorySection)) {
                         CyclingHistorySettingsView()
                     }
                     .disabled(cyclingStatus.isCycling)
-                    Section(header: Text("Cycling")) {
+                    Section(header: Text("Cycling")
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.cyclingSection)) {
                         CyclingView()
                     }
                     .disabled(cyclingStatus.isCycling)
-                    Section(header: Text("Sync")) {
+                    Section(header: Text("Sync")
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.syncSection)) {
                         SyncSettingsView()
                     }
                     .disabled(cyclingStatus.isCycling)
-                    Section(header: Text("About the app")) {
+                    Section(header: Text("About the app")
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.aboutSection)) {
                         AboutAppView()
                     }
-                    Section(header: Text("Support")) {
+                    Section(header: Text("Support")
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.supportSection)) {
                         SupportView()
                     }
-                    Section(header: Text("Reset")) {
+                    Section(header: Text("Reset")
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.resetSection)) {
                         ResetView()
                     }
                     .disabled(cyclingStatus.isCycling)
-                    Section(header: Text("Privacy"),
+                    Section(header: Text("Privacy")
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.privacySection),
                             footer: Text("Analytics are completely anonymous and contain no personal or identifiable information. They help prioritize future improvements. You can opt out at any time.")
-                                .fixedSize(horizontal: false, vertical: true)) {
+                                .fixedSize(horizontal: false, vertical: true)
+                                .accessibilityIdentifier(AccessibilityIdentifier.Settings.privacyFooter)) {
                         PrivacySettingsView()
                     }
                 }

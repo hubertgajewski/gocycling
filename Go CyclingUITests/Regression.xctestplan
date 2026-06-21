@@ -17,7 +17,8 @@
         "MainTabNavigationTests",
         "CycleRideSmokeTests",
         "CycleRideRegressionTests",
-        "CycleAutoPauseRegressionTests"
+        "CycleAutoPauseRegressionTests",
+        "SettingsRegressionTests"
       ],
       "target" : {
         "containerPath" : "container:Go Cycling.xcodeproj",

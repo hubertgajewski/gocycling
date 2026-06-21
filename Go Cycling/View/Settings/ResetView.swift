@@ -27,7 +27,7 @@ struct ResetView: View {
             Text("Reset to Default Settings")
                 .foregroundColor(Color(UserPreferences.convertColourChoiceToUIColor(colour: preferences.colourChoiceConverted)))
         }
-        .accessibilityIdentifier(AccessibilityIdentifier.SettingsReset.resetDefaultSettingsButton)
+        .accessibilityIdentifier(AccessibilityIdentifier.Settings.resetDefaultSettingsButton)
         .alert(isPresented: $showingResetToDefaultAlert) {
             Alert(title: Text("Are you sure that you want to reset to the default settings?"),
                   message: Text("This action will return your app to the factory settings."),
@@ -41,7 +41,7 @@ struct ResetView: View {
             Text("Delete All Stored Routes")
                 .foregroundColor(Color(UserPreferences.convertColourChoiceToUIColor(colour: preferences.colourChoiceConverted)))
         }
-        .accessibilityIdentifier(AccessibilityIdentifier.SettingsReset.deleteAllRoutesButton)
+        .accessibilityIdentifier(AccessibilityIdentifier.Settings.deleteAllRoutesButton)
         .alert(isPresented: $showingDeleteAlert) {
             Alert(title: Text("Are you sure that you want to delete all stored cycling routes?"),
                   message: Text("This action is not reversible."),
@@ -55,7 +55,7 @@ struct ResetView: View {
             Text("Reset Stored Statistics")
                 .foregroundColor(Color(UserPreferences.convertColourChoiceToUIColor(colour: preferences.colourChoiceConverted)))
         }
-        .accessibilityIdentifier(AccessibilityIdentifier.SettingsReset.resetStatisticsButton)
+        .accessibilityIdentifier(AccessibilityIdentifier.Settings.resetStatisticsButton)
         .alert(isPresented: $showingResetStatisticsAlert) {
             Alert(title: Text("Are you sure that you want to reset all stored statistics?"),
                   message: Text("This action is not reversible."),

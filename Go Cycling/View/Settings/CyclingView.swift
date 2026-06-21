@@ -22,6 +22,7 @@ struct CyclingView: View {
             get: { preferences.autoLockDisabled },
             set: { preferences.updateBoolPreference(preference: CustomizablePreferences.autoLockDisabled, value: $0) }
         ))
+        .accessibilityIdentifier(AccessibilityIdentifier.Settings.disableAutoLock)
         .onChange(of: preferences.autoLockDisabled) { value in
             UIApplication.shared.isIdleTimerDisabled = value
             telemetryManager.sendSettingsSignal(section: telemetryTabSection, action: TelemetrySettingsAction.AutoLock)
@@ -30,6 +31,7 @@ struct CyclingView: View {
             get: { preferences.autoPauseEnabled },
             set: { preferences.updateBoolPreference(preference: CustomizablePreferences.autoPauseEnabled, value: $0) }
         ))
+        .accessibilityIdentifier(AccessibilityIdentifier.Settings.autoPauseWhenStopped)
         .onChange(of: preferences.autoPauseEnabled) { value in
             telemetryManager.sendSettingsSignal(section: telemetryTabSection, action: TelemetrySettingsAction.AutoPause)
         }

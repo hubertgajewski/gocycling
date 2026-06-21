@@ -25,6 +25,7 @@ struct CyclingHistorySettingsView: View {
                 telemetryManager.sendSettingsSignal(section: telemetryTabSection, action: TelemetrySettingsAction.RoutesEnabled)
             }
         ))
+        .accessibilityIdentifier(AccessibilityIdentifier.Settings.routeCategorizationEnabled)
         Toggle("Deletion Enabled", isOn: Binding(
             get: { preferences.deletionEnabled },
             set: { value in
@@ -32,6 +33,7 @@ struct CyclingHistorySettingsView: View {
                 telemetryManager.sendSettingsSignal(section: telemetryTabSection, action: TelemetrySettingsAction.DeletionEnabled)
             }
         ))
+        .accessibilityIdentifier(AccessibilityIdentifier.Settings.deletionEnabled)
         Toggle("Deletion Confirmation Alert", isOn: Binding(
             get: { preferences.deletionConfirmation },
             set: { value in
@@ -39,6 +41,7 @@ struct CyclingHistorySettingsView: View {
                 telemetryManager.sendSettingsSignal(section: telemetryTabSection, action: TelemetrySettingsAction.DeletionConfirmtion)
             }
         ))
+        .accessibilityIdentifier(AccessibilityIdentifier.Settings.deletionConfirmationAlert)
     }
 }
 

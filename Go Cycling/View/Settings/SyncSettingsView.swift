@@ -42,14 +42,17 @@ struct SyncSettingsView: View {
             Label {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("iCloud")
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.iCloudTitle)
                     Text("Sync all data with iCloud")
                         .font(.caption)
                         .foregroundColor(.secondary)
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.iCloudSubtitle)
                 }
             } icon: {
                 Image(systemName: "icloud")
             }
         }
+        .accessibilityIdentifier(AccessibilityIdentifier.Settings.iCloudSync)
         .onChange(of: preferences.iCloudOn) { _ in
             self.showingAlert = true
             telemetryManager.sendSettingsSignal(section: telemetryTabSection, action: TelemetrySettingsAction.iCloud)
@@ -64,14 +67,17 @@ struct SyncSettingsView: View {
             Label {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Health")
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.healthTitle)
                     Text("Upload data to the Health app")
                         .font(.caption)
                         .foregroundColor(.secondary)
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.healthSubtitle)
                 }
             } icon: {
                 Image(systemName: "heart")
             }
         }
+        .accessibilityIdentifier(AccessibilityIdentifier.Settings.healthSync)
         .onChange(of: preferences.healthSyncEnabled) { value in
             if value { healthKitManager.requestAuthorization() }
             telemetryManager.sendSettingsSignal(section: telemetryTabSection, action: TelemetrySettingsAction.Health)

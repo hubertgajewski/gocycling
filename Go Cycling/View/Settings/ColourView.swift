@@ -41,6 +41,7 @@ struct ColourView: View {
             }
             .navigationBarTitle("Choose your Colour", displayMode: .inline)
             .pickerStyle(.navigationLink)
+            .accessibilityIdentifier(AccessibilityIdentifier.Settings.colourPicker)
         }
         else {
             Picker("Colour", selection: colourBinding) {
@@ -53,6 +54,7 @@ struct ColourView: View {
                 Text("Violet").tag(ColourChoice.violet)
             }
             .navigationBarTitle("Choose your Colour", displayMode: .inline)
+            .accessibilityIdentifier(AccessibilityIdentifier.Settings.colourPicker)
         }
     }
 }
