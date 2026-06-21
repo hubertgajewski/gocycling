@@ -13,7 +13,7 @@ final class HistorySmokeTests: CycleRideUITestCase {
       mainTabs.tabContent(for: .history),
       timeout: Timeouts.standard
     )
-    history.assertEmptyStateLabel("No completed routes to display!")
+    history.assertEmptyStateLabel()
   }
 
   func testSavedRideRowShowsHistoryMetricLabels() throws {
@@ -27,10 +27,6 @@ final class HistorySmokeTests: CycleRideUITestCase {
       timeout: Timeouts.standard
     )
     history.assertRideCount(1)
-    history.assertFirstRideRowLabels([
-      "Distance Cycled",
-      "Cycling Time",
-      "Average Speed",
-    ])
+    history.assertFirstRideRowMetricLabels()
   }
 }

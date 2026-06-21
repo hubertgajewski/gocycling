@@ -61,6 +61,31 @@ extension CycleScreen {
     ElementAssertions.assertExists(stopButton, file: file, line: line)
   }
 
+  func assertReadyForNewRide(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    ElementAssertions.assertExists(startButton, timeout: Timeouts.standard, file: file, line: line)
+    ElementAssertions.assertNotExists(
+      stopButton,
+      timeout: Timeouts.short,
+      file: file,
+      line: line
+    )
+    ElementAssertions.assertNotExists(
+      pauseButton,
+      timeout: Timeouts.short,
+      file: file,
+      line: line
+    )
+    ElementAssertions.assertNotExists(
+      resumeButton,
+      timeout: Timeouts.short,
+      file: file,
+      line: line
+    )
+  }
+
   func assertAutoPaused(
     file: StaticString = #filePath,
     line: UInt = #line

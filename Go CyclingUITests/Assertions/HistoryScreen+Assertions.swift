@@ -37,21 +37,19 @@ extension HistoryScreen {
   }
 
   func assertEmptyStateLabel(
-    _ expectedLabel: String,
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
     ElementAssertions.assertLabel(
       emptyState,
-      equals: expectedLabel,
+      equals: Copy.emptyState,
       timeout: Timeouts.short,
       file: file,
       line: line
     )
   }
 
-  func assertFirstRideRowLabels(
-    _ expectedLabels: [String],
+  func assertFirstRideRowMetricLabels(
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
@@ -61,7 +59,7 @@ extension HistoryScreen {
       file: file,
       line: line
     )
-    for label in expectedLabels {
+    for label in Copy.rideRowMetricLabels {
       ElementAssertions.assertContainsLabel(
         rideRow,
         label,

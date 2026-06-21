@@ -7,6 +7,18 @@ import XCTest
 
 /// Screen object for History tab ride list queries.
 final class HistoryScreen {
+  enum Copy {
+    static let emptyState = "No completed routes to display!"
+    static let distanceCycled = "Distance Cycled"
+    static let cyclingTime = "Cycling Time"
+    static let averageSpeed = "Average Speed"
+    static let rideRowMetricLabels = [
+      distanceCycled,
+      cyclingTime,
+      averageSpeed,
+    ]
+  }
+
   let application: XCUIApplication
 
   init(app: XCUIApplication) {
