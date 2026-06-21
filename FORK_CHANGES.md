@@ -92,11 +92,13 @@ swift test
 
 Reproduce the unit tests locally:
 
+The resolver's optional third argument pins the simulator runtime major version (for example `iOS 17`, `iOS 18`, or `iOS 26`). CI passes each matrix row's `runtime` label so job names match the OS that actually runs. UI matrix rows use `iOS 17` / `iOS 18` / `iOS 26`; unit tests on `macos-26` use `iOS 26`.
+
 ```bash
 cp -n TelemetryDeck.xcconfig.example TelemetryDeck.xcconfig
 mkdir -p TestResults
 rm -rf TestResults/unit.xcresult
-DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17')
+DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17' 'iOS 26')
 xcodebuild \
   -project "Go Cycling.xcodeproj" \
   -scheme "Go Cycling" \
@@ -124,7 +126,7 @@ Reproduce a UI smoke run with coverage for merge, substituting the device name a
 cp -n TelemetryDeck.xcconfig.example TelemetryDeck.xcconfig
 mkdir -p TestResults
 rm -rf TestResults/ui-ios26-iphone.xcresult
-DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17')
+DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17' 'iOS 26')
 xcodebuild \
   -project "Go Cycling.xcodeproj" \
   -scheme "Go Cycling UI Smoke" \
@@ -140,7 +142,7 @@ xcodebuild \
 Reproduce a UI regression run, substituting the device name as needed:
 
 ```bash
-DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17')
+DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17' 'iOS 26')
 xcodebuild \
   -project "Go Cycling.xcodeproj" \
   -scheme "Go Cycling UI Regression" \
@@ -166,7 +168,7 @@ python3 .github/scripts/write-xccov-summary.py TestResults/coverage.json --targe
 Reproduce a UI smoke run without coverage, substituting the device name as needed:
 
 ```bash
-DEST=$(.github/scripts/ios-simulator-destination.sh iPad 'iPad Pro 11-inch (M5)')
+DEST=$(.github/scripts/ios-simulator-destination.sh iPad 'iPad Pro 11-inch (M5)' 'iOS 26')
 xcodebuild \
   -project "Go Cycling.xcodeproj" \
   -scheme "Go Cycling UI Smoke" \

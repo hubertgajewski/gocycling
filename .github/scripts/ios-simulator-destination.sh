@@ -2,17 +2,49 @@
 set -euo pipefail
 
 # Resolves a stable xcodebuild -destination value for an available iOS Simulator.
-# Usage: ios-simulator-destination.sh iPhone|iPad [preferred device name]
+# Usage: ios-simulator-destination.sh iPhone|iPad [preferred device name] [runtime label]
+# Runtime labels match CI matrix values such as "iOS 17", "iOS 18", or "iOS 26".
 
 device_family="${1:?expected iPhone or iPad}"
 preferred="${2:-}"
+requested_runtime="${3:-}"
 
-python3 - "$device_family" "$preferred" <<'PY'
+python3 - "$device_family" "$preferred" "$requested_runtime" <<'PY'
 import json
+import re
 import subprocess
 import sys
 
-family, preferred = sys.argv[1], sys.argv[2]
+family, preferred, requested_runtime = sys.argv[1], sys.argv[2], sys.argv[3]
+
+
+def runtime_major_from_key(runtime_key: str) -> int | None:
+    match = re.search(r"SimRuntime\.iOS-(\d+)", runtime_key)
+    return int(match.group(1)) if match else None
+
+
+def parse_requested_runtime_major(label: str) -> int | None:
+    if not label:
+        return None
+    match = re.match(r"^iOS\s+(\d+)(?:\.\d+)?$", label.strip())
+    if not match:
+        print(f"Unrecognized iOS runtime label: {label!r}", file=sys.stderr)
+        print('Expected a label such as "iOS 17", "iOS 18", or "iOS 26".', file=sys.stderr)
+        raise SystemExit(1)
+    return int(match.group(1))
+
+
+def format_runtime_label(runtime_key: str) -> str:
+    major = runtime_major_from_key(runtime_key)
+    if major is None:
+        return runtime_key
+    match = re.search(rf"SimRuntime\.iOS-{major}-(\d+)", runtime_key)
+    if match:
+        return f"iOS {major}.{match.group(1)}"
+    return f"iOS {major}"
+
+
+requested_major = parse_requested_runtime_major(requested_runtime)
 
 data = json.loads(
     subprocess.check_output(
@@ -25,6 +57,33 @@ ios_runtimes = sorted(
     (runtime for runtime in data["devices"] if "iOS" in runtime and "SimRuntime" in runtime),
     reverse=True,
 )
+if requested_major is not None:
+    matching_runtimes = [
+        runtime
+        for runtime in ios_runtimes
+        if runtime_major_from_key(runtime) == requested_major
+    ]
+    if not matching_runtimes:
+        available_labels = sorted(
+            {
+                format_runtime_label(runtime)
+                for runtime in ios_runtimes
+                if runtime_major_from_key(runtime) is not None
+            }
+        )
+        print(
+            f"No installed iOS {requested_major} simulator runtime is available.",
+            file=sys.stderr,
+        )
+        if available_labels:
+            print(
+                "Installed iOS simulator runtimes: " + ", ".join(available_labels),
+                file=sys.stderr,
+            )
+        else:
+            print("No iOS simulator runtimes are installed.", file=sys.stderr)
+        raise SystemExit(1)
+    ios_runtimes = matching_runtimes
 
 devices: list[dict[str, object]] = []
 for runtime in ios_runtimes:
@@ -112,6 +171,12 @@ for candidate in fallback_names.get(family, []):
 if devices:
     emit(devices[0])
 
-print(f"No available {family} simulator found", file=sys.stderr)
+if requested_major is not None:
+    print(
+        f"No available {family} simulator found for requested runtime iOS {requested_major}.",
+        file=sys.stderr,
+    )
+else:
+    print(f"No available {family} simulator found", file=sys.stderr)
 raise SystemExit(1)
 PY

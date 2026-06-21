@@ -50,6 +50,11 @@ else:
         failures.append("unit-tests must enable Xcode code coverage")
     if "unit-test-coverage-result" not in unit_body:
         failures.append("unit-tests must upload unit.xcresult for coverage merge")
+    if not re.search(
+        r"ios-simulator-destination\.sh\s+iPhone\s+.+\s+['\"]iOS 26['\"]",
+        unit_body,
+    ):
+        failures.append("unit-tests must pass iOS 26 runtime to ios-simulator-destination.sh")
     if "xcrun xccov view --report --json TestResults/unit.xcresult > TestResults/coverage.json" in unit_body:
         failures.append("unit-tests must not publish unit-only coverage; use the coverage job")
     if not coverage_summary.exists():
@@ -145,6 +150,11 @@ else:
         failures.append("ui-tests must enable code coverage for ios26-iphone")
     if "ui-test-coverage-ios26-iphone" not in body:
         failures.append("ui-tests must upload ios26-iphone coverage artifact")
+    if not re.search(
+        r"ios-simulator-destination\.sh\s+.+\s+.+\s+['\"]\$\{\{\s*matrix\.runtime\s*\}\}['\"]",
+        body,
+    ):
+        failures.append("ui-tests must pass matrix.runtime to ios-simulator-destination.sh")
 
 doc_text = "\n".join((workflow, readme, fork_changes))
 if "iOS/iPadOS 14-16" not in doc_text and "iOS/iPadOS 14, 15, or 16" not in doc_text:
@@ -171,6 +181,13 @@ chmod +x "$tmpdir/xcrun"
 cat > "$tmpdir/devices.json" <<'JSON'
 {
   "devices": {
+    "com.apple.CoreSimulator.SimRuntime.iOS-17-5": [
+      {
+        "isAvailable": true,
+        "name": "iPad mini (6th generation)",
+        "udid": "IPAD-MINI-17-5"
+      }
+    ],
     "com.apple.CoreSimulator.SimRuntime.iOS-18-0": [
       {
         "isAvailable": true,
@@ -181,6 +198,13 @@ cat > "$tmpdir/devices.json" <<'JSON'
         "isAvailable": true,
         "name": "iPad (A16)",
         "udid": "IPAD-A16"
+      }
+    ],
+    "com.apple.CoreSimulator.SimRuntime.iOS-26-0": [
+      {
+        "isAvailable": true,
+        "name": "iPad (10th generation)",
+        "udid": "IPAD-10TH-26"
       }
     ]
   }
@@ -193,9 +217,63 @@ destination="$(
   bash "$resolver" iPad "iPad (10th generation)"
 )"
 
+expected="platform=iOS Simulator,id=IPAD-10TH-26"
+if [[ "$destination" != "$expected" ]]; then
+  printf 'Expected newest-runtime iPad fallback %q, got %q\n' "$expected" "$destination" >&2
+  exit 1
+fi
+
+destination="$(
+  SIMCTL_FIXTURE="$tmpdir/devices.json" \
+  PATH="$tmpdir:$PATH" \
+  bash "$resolver" iPad "iPad (10th generation)" "iOS 18"
+)"
+
 expected="platform=iOS Simulator,id=IPAD-A16"
 if [[ "$destination" != "$expected" ]]; then
-  printf 'Expected plain iPad fallback %q, got %q\n' "$expected" "$destination" >&2
+  printf 'Expected iOS 18 runtime iPad fallback %q, got %q\n' "$expected" "$destination" >&2
+  exit 1
+fi
+
+if SIMCTL_FIXTURE="$tmpdir/devices.json" PATH="$tmpdir:$PATH" bash "$resolver" iPad "iPad (10th generation)" "iOS 99" >/dev/null 2>"$tmpdir/missing-runtime.err"; then
+  printf 'Expected missing iOS 99 runtime to fail\n' >&2
+  exit 1
+fi
+if ! grep -qF "No installed iOS 99 simulator runtime is available" "$tmpdir/missing-runtime.err"; then
+  printf 'Expected clear missing-runtime error, got: %s\n' "$(cat "$tmpdir/missing-runtime.err")" >&2
+  exit 1
+fi
+
+if SIMCTL_FIXTURE="$tmpdir/devices.json" PATH="$tmpdir:$PATH" bash "$resolver" iPad "iPad mini (6th generation)" "not-ios" >/dev/null 2>"$tmpdir/bad-label.err"; then
+  printf 'Expected invalid runtime label to fail\n' >&2
+  exit 1
+fi
+if ! grep -qF "Unrecognized iOS runtime label" "$tmpdir/bad-label.err"; then
+  printf 'Expected invalid runtime label error, got: %s\n' "$(cat "$tmpdir/bad-label.err")" >&2
+  exit 1
+fi
+
+destination="$(
+  SIMCTL_FIXTURE="$tmpdir/devices.json" \
+  PATH="$tmpdir:$PATH" \
+  bash "$resolver" iPad "iPad mini (6th generation)" "iOS 17.5"
+)"
+
+expected="platform=iOS Simulator,id=IPAD-MINI-17-5"
+if [[ "$destination" != "$expected" ]]; then
+  printf 'Expected iOS 17.5 runtime iPad match %q, got %q\n' "$expected" "$destination" >&2
+  exit 1
+fi
+
+destination="$(
+  SIMCTL_FIXTURE="$tmpdir/devices.json" \
+  PATH="$tmpdir:$PATH" \
+  bash "$resolver" iPad "iPad (10th generation)" "iOS 26"
+)"
+
+expected="platform=iOS Simulator,id=IPAD-10TH-26"
+if [[ "$destination" != "$expected" ]]; then
+  printf 'Expected iOS 26 runtime iPad match %q, got %q\n' "$expected" "$destination" >&2
   exit 1
 fi
 
