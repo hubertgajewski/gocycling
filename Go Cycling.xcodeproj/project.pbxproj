@@ -163,6 +163,7 @@
 		9DAB831F25FECAD400F5C42E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9DAB831E25FECAD400F5C42E /* Preview Assets.xcassets */; };
 		AA0000902026061900000001 /* MainTabNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000912026061900000001 /* MainTabNavigationTests.swift */; };
 		AA0001072026061900000001 /* CycleRideSmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001142026062000000001 /* CycleRideSmokeTests.swift */; };
+		AA0001392026062000000001 /* HistorySmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001402026062000000001 /* HistorySmokeTests.swift */; };
 		AA0001152026062000000001 /* CycleRideRegressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001162026062000000001 /* CycleRideRegressionTests.swift */; };
 		AA0001172026062000000001 /* HistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001182026062000000001 /* HistoryScreen.swift */; };
 		AA0001192026062000000001 /* RouteCategorizationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001202026062000000001 /* RouteCategorizationScreen.swift */; };
@@ -396,6 +397,7 @@
 		9DAB833625FECAD400F5C42E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA0000912026061900000001 /* MainTabNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabNavigationTests.swift; sourceTree = "<group>"; };
 		AA0001142026062000000001 /* CycleRideSmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleRideSmokeTests.swift; sourceTree = "<group>"; };
+		AA0001402026062000000001 /* HistorySmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistorySmokeTests.swift; sourceTree = "<group>"; };
 		AA0001162026062000000001 /* CycleRideRegressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleRideRegressionTests.swift; sourceTree = "<group>"; };
 		AA0001182026062000000001 /* HistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryScreen.swift; sourceTree = "<group>"; };
 		AA0001202026062000000001 /* RouteCategorizationScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteCategorizationScreen.swift; sourceTree = "<group>"; };
@@ -931,6 +933,7 @@
 			isa = PBXGroup;
 			children = (
 				AA0001142026062000000001 /* CycleRideSmokeTests.swift */,
+				AA0001402026062000000001 /* HistorySmokeTests.swift */,
 				AA0001162026062000000001 /* CycleRideRegressionTests.swift */,
 				AA0000912026061900000001 /* MainTabNavigationTests.swift */,
 			);
@@ -1319,6 +1322,7 @@
 			files = (
 				AA0000902026061900000001 /* MainTabNavigationTests.swift in Sources */,
 				AA0001072026061900000001 /* CycleRideSmokeTests.swift in Sources */,
+				AA0001392026062000000001 /* HistorySmokeTests.swift in Sources */,
 				AA0001152026062000000001 /* CycleRideRegressionTests.swift in Sources */,
 				AA0000932026061900000001 /* AppLauncher.swift in Sources */,
 				AA0000952026061900000001 /* Timeouts.swift in Sources */,

@@ -113,6 +113,7 @@ final class CycleScreen {
   ) {
     completeStop(file: file, line: line)
     categorization.saveWithoutCategory(file: file, line: line)
+    assertReadyForNewRide(file: file, line: line)
   }
 
   // MARK: - Queries
