@@ -39,15 +39,15 @@ Simulator builds typically work with a free Personal Team once signing is config
 
 ## Continuous Integration
 
-GitHub Actions runs on every push to `main` and on pull requests. Jobs run in a fail-fast sequence: **Swift format** → **SwiftPM unit tests** → **unit tests** and **UI smoke tests** in parallel. A formatting or SwiftPM failure does not start simulator jobs. When repository variable `CI_RUN_UNIT_TESTS` is `false`, SwiftPM and Xcode unit jobs are skipped and UI smoke may still run after format passes. Unit and UI simulator jobs are intentionally parallel after SwiftPM so UI feedback is not blocked on the iPhone 17 unit lane.
+GitHub Actions runs on every push to `main` and on pull requests. Jobs run in a fail-fast sequence: **Swift format** → **SwiftPM unit tests** → **unit tests** and **UI tests** in parallel. A formatting or SwiftPM failure does not start simulator jobs. When repository variable `CI_RUN_UNIT_TESTS` is `false`, SwiftPM and Xcode unit jobs are skipped and UI tests may still run after format passes. Unit and UI simulator jobs are intentionally parallel after SwiftPM so UI feedback is not blocked on the iPhone 17 unit lane.
 
 - **Swift format** - `swift-format` linting for `Go CyclingTests` and `Go CyclingUITests`
 - **SwiftPM unit tests** - `swift test` for the package-compatible formatting unit-test slice
 - **Unit tests** - `Go CyclingTests` on an iPhone simulator, with code coverage collected for later merge
-- **UI smoke tests** - `Go CyclingUITests` on representative iPhone and iPad simulators across the hosted `macos-14`, `macos-15`, and `macos-26` runner lines
-- **Combined code coverage** - merges unit-test coverage with the `ios26-iphone` UI smoke run into one `Go Cycling.app` report
+- **UI tests** - `Go CyclingUITests` on representative iPhone and iPad simulators across the hosted `macos-14`, `macos-15`, and `macos-26` runner lines. CI runs the **Smoke** test plan by default (`Go Cycling UI Smoke`); set `CI_RUN_UI_REGRESSION` to `true` or dispatch with `run_regression: true` for the **Regression** plan (`Go Cycling UI Regression`) on the same matrix.
+- **Combined code coverage** - merges unit-test coverage with the `ios26-iphone` UI test run (Smoke by default; Regression when enabled) into one `Go Cycling.app` report
 
-The hosted UI smoke matrix currently requests these simulators:
+The hosted UI test matrix (Smoke or Regression) currently requests these simulators:
 
 - `macos-14` - iPhone SE (3rd generation), iPad mini (6th generation)
 - `macos-15` - iPhone 16, iPad (10th generation)
@@ -55,14 +55,14 @@ The hosted UI smoke matrix currently requests these simulators:
 
 CI copies `TelemetryDeck.xcconfig.example` to `TelemetryDeck.xcconfig` when the gitignored file is absent, so no TelemetryDeck account is required. Simulator builds pass `DEVELOPMENT_TEAM=` so no committed development team is needed.
 CI also passes `-retry-tests-on-failure`, which retries failed tests using Xcode's default maximum of 3 iterations.
-Combined `Go Cycling.app` coverage is generated after unit and UI smoke jobs finish. The `ios26-iphone` matrix entry runs with `-enableCodeCoverage YES`; a follow-up `coverage` job merges that UI result bundle with `TestResults/unit.xcresult` via `xcrun xccov`, summarizes the union in the GitHub Actions run summary, and uploads the combined artifact.
+Combined `Go Cycling.app` coverage is generated after unit and UI test jobs finish. The `ios26-iphone` matrix entry runs with `-enableCodeCoverage YES`; a follow-up `coverage` job merges that UI result bundle with `TestResults/unit.xcresult` via `xcrun xccov`, summarizes the union in the GitHub Actions run summary, and uploads the combined artifact.
 GitHub-hosted CI does not provide iOS/iPadOS 14, 15, or 16 simulator coverage on those runner lines; the deployment target, availability checks, and optional physical-device, self-hosted-runner, or device-cloud testing remain the compatibility path for those OS versions.
 
 ### CI helper scripts
 
 The Tests workflow uses small helpers under `.github/scripts/`:
 
-- **`ios-simulator-destination.sh`** — Resolves a stable `xcodebuild -destination` value for an available iPhone or iPad simulator. Accepts a device family (`iPhone` or `iPad`), an optional preferred device name, and falls back to equivalent devices when the exact name is unavailable on the current runner image. Used by the unit-test and UI-smoke jobs.
+- **`ios-simulator-destination.sh`** — Resolves a stable `xcodebuild -destination` value for an available iPhone or iPad simulator. Accepts a device family (`iPhone` or `iPad`), an optional preferred device name, and falls back to equivalent devices when the exact name is unavailable on the current runner image. Used by the unit-test and UI test jobs.
 
 - **`merge-combined-coverage.sh`** — Exports coverage from a unit `.xcresult` and a UI `.xcresult`, merges them with `xcrun xccov merge`, and writes combined coverage artifacts under an output directory. Used by the `coverage` job and in the local repro steps below.
 
@@ -190,7 +190,7 @@ Current fork-specific differences include:
 - UI testing support through the `-ui-testing` launch argument to avoid location authorization prompts during automated tests.
 - A shared `Go Cycling` Xcode scheme for command-line and CI testing.
 - A focused SwiftPM package slice for package-compatible formatting logic, declared over the existing Xcode-owned source and test directories so `swift test` complements the Xcode test action.
-- GitHub Actions coverage for Swift formatting, SwiftPM unit tests, Xcode unit tests, combined unit-plus-UI `Go Cycling.app` coverage summaries, and UI smoke tests.
+- GitHub Actions coverage for Swift formatting, SwiftPM unit tests, Xcode unit tests, combined unit-plus-UI `Go Cycling.app` coverage summaries, and UI smoke tests (Regression optional via `CI_RUN_UI_REGRESSION`).
 - CI retries for failed XCTest and XCUITest cases via `-retry-tests-on-failure`.
 - Hosted simulator coverage across selected GitHub-hosted macOS runner lines.
 - Test-target `swift-format` enforcement in CI and the committed pre-commit hook.
