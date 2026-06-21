@@ -115,7 +115,7 @@ jobs:
         id: destination
         run: |
           chmod +x .github/scripts/ios-simulator-destination.sh
-          echo "value=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17')" >> "$GITHUB_OUTPUT"
+          echo "value=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17' 'iOS 26')" >> "$GITHUB_OUTPUT"
 
       - name: Run unit tests
         run: |
@@ -224,7 +224,7 @@ jobs:
         id: destination
         run: |
           chmod +x .github/scripts/ios-simulator-destination.sh
-          echo "value=$(.github/scripts/ios-simulator-destination.sh '${{ matrix.family }}' '${{ matrix.device }}')" >> "$GITHUB_OUTPUT"
+          echo "value=$(.github/scripts/ios-simulator-destination.sh '${{ matrix.family }}' '${{ matrix.device }}' '${{ matrix.runtime }}')" >> "$GITHUB_OUTPUT"
 
       - name: Run UI tests
         run: |
