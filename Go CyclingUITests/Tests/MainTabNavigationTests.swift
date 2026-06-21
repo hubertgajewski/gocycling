@@ -9,7 +9,7 @@ import XCTest
 ///
 /// Detailed Cycle, History, Statistics, and Settings workflows belong in
 /// focused tests and screen objects for those tabs.
-final class MainTabNavigationTests: GoCyclingUITestCase {
+final class MainTabNavigationTests: BaseTestCase {
   func testMainTabBarNavigatesToAllTabs() throws {
     let app = launchApp()
     let mainTabs = MainTabBarScreen(app: app)
