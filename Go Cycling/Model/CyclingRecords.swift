@@ -31,15 +31,6 @@ class CyclingRecords: ObservableObject {
     static private let keyTypes = [2, 2, 0, 2, 2, 2, 3, 3, 3, 1] // 0: [Bool], 1: Int, 2: Double, 3: Date
     static private let numberOfUnlockableIcons = 6
     static let awardValues: [Double] = [10.0 * 1000, 25.0 * 1000, 50.0 * 1000, 100.0 * 1000, 250.0 * 1000, 500.0 * 1000]
-    static private let defaultTotalCyclingTime = 0.0
-    static private let defaultTotalCyclingDistance = 0.0
-    static private var defaultUnlockedIcons: [Bool] {
-        [Bool].init(repeating: false, count: CyclingRecords.numberOfUnlockableIcons)
-    }
-    static private let defaultLongestCyclingDistance = 0.0
-    static private let defaultLongestCyclingTime = 0.0
-    static private let defaultFastestAverageSpeed = 0.0
-    static private let defaultTotalCyclingRoutes = 0
     
     init() {
         // First check if iCloud is available
@@ -146,23 +137,23 @@ class CyclingRecords: ObservableObject {
     static private func writeDefaults(iCloud: Bool) {
         // Use NSUbiquitousKeyValueStore for iCloud storage
         if iCloud {
-            NSUbiquitousKeyValueStore.default.set(defaultTotalCyclingTime, forKey: keys[0])
-            NSUbiquitousKeyValueStore.default.set(defaultTotalCyclingDistance, forKey: keys[1])
-            NSUbiquitousKeyValueStore.default.set(defaultUnlockedIcons, forKey: keys[2])
-            NSUbiquitousKeyValueStore.default.set(defaultLongestCyclingDistance, forKey: keys[3])
-            NSUbiquitousKeyValueStore.default.set(defaultLongestCyclingTime, forKey: keys[4])
-            NSUbiquitousKeyValueStore.default.set(defaultFastestAverageSpeed, forKey: keys[5])
-            NSUbiquitousKeyValueStore.default.set(defaultTotalCyclingRoutes, forKey: keys[9])
+            NSUbiquitousKeyValueStore.default.set(0.0, forKey: keys[0])
+            NSUbiquitousKeyValueStore.default.set(0.0, forKey: keys[1])
+            NSUbiquitousKeyValueStore.default.set([Bool].init(repeating: false, count: numberOfUnlockableIcons), forKey: keys[2])
+            NSUbiquitousKeyValueStore.default.set(0.0, forKey: keys[3])
+            NSUbiquitousKeyValueStore.default.set(0.0, forKey: keys[4])
+            NSUbiquitousKeyValueStore.default.set(0.0, forKey: keys[5])
+            NSUbiquitousKeyValueStore.default.set(0 as Int, forKey: keys[9])
         }
         // Use UserDefaults for local storage
         else {
-            UserDefaults.standard.set(defaultTotalCyclingTime, forKey: keys[0])
-            UserDefaults.standard.set(defaultTotalCyclingDistance, forKey: keys[1])
-            UserDefaults.standard.set(defaultUnlockedIcons, forKey: keys[2])
-            UserDefaults.standard.set(defaultLongestCyclingDistance, forKey: keys[3])
-            UserDefaults.standard.set(defaultLongestCyclingTime, forKey: keys[4])
-            UserDefaults.standard.set(defaultFastestAverageSpeed, forKey: keys[5])
-            UserDefaults.standard.set(defaultTotalCyclingRoutes, forKey: keys[9])
+            UserDefaults.standard.set(0.0, forKey: keys[0])
+            UserDefaults.standard.set(0.0, forKey: keys[1])
+            UserDefaults.standard.set([Bool].init(repeating: false, count: numberOfUnlockableIcons), forKey: keys[2])
+            UserDefaults.standard.set(0.0, forKey: keys[3])
+            UserDefaults.standard.set(0.0, forKey: keys[4])
+            UserDefaults.standard.set(0.0, forKey: keys[5])
+            UserDefaults.standard.set(0, forKey: keys[9])
         }
     }
     

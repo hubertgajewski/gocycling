@@ -60,24 +60,6 @@ class Preferences: ObservableObject {
     // Telemetry opt-out is stored locally only (privacy preference should stay device-local)
     static let telemetryEnabledKey = "telemetryEnabled"
     static private let keyTypes = [0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2] // 0: Bool, 1: Int, 2: String
-    // UI-smoke tests need first-launch defaults without writing the normal
-    // initialization keys into the user's preferences.
-    static private let defaultUsingMetric = true
-    static private let defaultDisplayingMetrics = true
-    static private let defaultColourChoice = ColourChoice.blue.rawValue
-    static private let defaultLargeMetrics = true
-    static private let defaultSortingChoice = SortChoice.dateDescending.rawValue
-    static private let defaultDeletionConfirmation = true
-    static private let defaultDeletionEnabled = true
-    static private let defaultNamedRoutes = true
-    static private let defaultSelectedRoute = ""
-    static private let defaultAutoLockDisabled = false
-    static private let defaultHealthSyncEnabled = false
-    static private let defaultAutoPauseEnabled = true
-    static private let defaultMapTypeChoice = MapTypeChoice.standard.rawValue
-    static private let defaultIconIndex = 0
-    static private let defaultICloudOn = false
-    static private let defaultTelemetryEnabled = true
 
     private let launchArguments: [String]
     
@@ -249,39 +231,39 @@ class Preferences: ObservableObject {
     static private func writeDefaults(iCloud: Bool) {
         // Use NSUbiquitousKeyValueStore for iCloud storage
         if iCloud {
-            NSUbiquitousKeyValueStore.default.set(defaultUsingMetric, forKey: keys[0])
-            NSUbiquitousKeyValueStore.default.set(defaultDisplayingMetrics, forKey: keys[1])
-            NSUbiquitousKeyValueStore.default.set(defaultColourChoice, forKey: keys[2])
-            NSUbiquitousKeyValueStore.default.set(defaultLargeMetrics, forKey: keys[3])
-            NSUbiquitousKeyValueStore.default.set(defaultSortingChoice, forKey: keys[4])
-            NSUbiquitousKeyValueStore.default.set(defaultDeletionConfirmation, forKey: keys[5])
-            NSUbiquitousKeyValueStore.default.set(defaultDeletionEnabled, forKey: keys[6])
-            NSUbiquitousKeyValueStore.default.set(defaultNamedRoutes, forKey: keys[7])
-            NSUbiquitousKeyValueStore.default.set(defaultSelectedRoute, forKey: keys[8])
-            NSUbiquitousKeyValueStore.default.set(defaultAutoLockDisabled, forKey: keys[9])
-            NSUbiquitousKeyValueStore.default.set(defaultHealthSyncEnabled, forKey: keys[10])
-            NSUbiquitousKeyValueStore.default.set(defaultAutoPauseEnabled, forKey: keys[11])
-            NSUbiquitousKeyValueStore.default.set(defaultMapTypeChoice, forKey: keys[12])
+            NSUbiquitousKeyValueStore.default.set(true, forKey: keys[0])
+            NSUbiquitousKeyValueStore.default.set(true, forKey: keys[1])
+            NSUbiquitousKeyValueStore.default.set(ColourChoice.blue.rawValue, forKey: keys[2])
+            NSUbiquitousKeyValueStore.default.set(true, forKey: keys[3])
+            NSUbiquitousKeyValueStore.default.set(SortChoice.dateDescending.rawValue, forKey: keys[4])
+            NSUbiquitousKeyValueStore.default.set(true, forKey: keys[5])
+            NSUbiquitousKeyValueStore.default.set(true, forKey: keys[6])
+            NSUbiquitousKeyValueStore.default.set(true, forKey: keys[7])
+            NSUbiquitousKeyValueStore.default.set("", forKey: keys[8])
+            NSUbiquitousKeyValueStore.default.set(false, forKey: keys[9])
+            NSUbiquitousKeyValueStore.default.set(false, forKey: keys[10])
+            NSUbiquitousKeyValueStore.default.set(true, forKey: keys[11])
+            NSUbiquitousKeyValueStore.default.set(MapTypeChoice.standard.rawValue, forKey: keys[12])
         }
         // Use UserDefaults for local storage
         else {
-            UserDefaults.standard.set(defaultUsingMetric, forKey: keys[0])
-            UserDefaults.standard.set(defaultDisplayingMetrics, forKey: keys[1])
-            UserDefaults.standard.set(defaultColourChoice, forKey: keys[2])
-            UserDefaults.standard.set(defaultLargeMetrics, forKey: keys[3])
-            UserDefaults.standard.set(defaultSortingChoice, forKey: keys[4])
-            UserDefaults.standard.set(defaultDeletionConfirmation, forKey: keys[5])
-            UserDefaults.standard.set(defaultDeletionEnabled, forKey: keys[6])
-            UserDefaults.standard.set(defaultNamedRoutes, forKey: keys[7])
-            UserDefaults.standard.set(defaultSelectedRoute, forKey: keys[8])
-            UserDefaults.standard.set(defaultAutoLockDisabled, forKey: keys[9])
-            UserDefaults.standard.set(defaultHealthSyncEnabled, forKey: keys[10])
-            UserDefaults.standard.set(defaultAutoPauseEnabled, forKey: keys[11])
-            UserDefaults.standard.set(defaultMapTypeChoice, forKey: keys[12])
+            UserDefaults.standard.set(true, forKey: keys[0])
+            UserDefaults.standard.set(true, forKey: keys[1])
+            UserDefaults.standard.set(ColourChoice.blue.rawValue, forKey: keys[2])
+            UserDefaults.standard.set(true, forKey: keys[3])
+            UserDefaults.standard.set(SortChoice.dateDescending.rawValue, forKey: keys[4])
+            UserDefaults.standard.set(true, forKey: keys[5])
+            UserDefaults.standard.set(true, forKey: keys[6])
+            UserDefaults.standard.set(true, forKey: keys[7])
+            UserDefaults.standard.set("", forKey: keys[8])
+            UserDefaults.standard.set(false, forKey: keys[9])
+            UserDefaults.standard.set(false, forKey: keys[10])
+            UserDefaults.standard.set(true, forKey: keys[11])
+            UserDefaults.standard.set(MapTypeChoice.standard.rawValue, forKey: keys[12])
         }
 
         // Store iconIndex locally in either case
-        UserDefaults.standard.set(defaultIconIndex, forKey: iconIndexKey)
+        UserDefaults.standard.set(0, forKey: iconIndexKey)
     }
     
     static private func syncLocalAndCloud(
