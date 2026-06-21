@@ -58,6 +58,24 @@ CI also passes `-retry-tests-on-failure`, which retries failed tests using Xcode
 Combined `Go Cycling.app` coverage is generated after unit and UI smoke jobs finish. The `ios26-iphone` matrix entry runs with `-enableCodeCoverage YES`; a follow-up `coverage` job merges that UI result bundle with `TestResults/unit.xcresult` via `xcrun xccov`, summarizes the union in the GitHub Actions run summary, and uploads the combined artifact.
 GitHub-hosted CI does not provide iOS/iPadOS 14, 15, or 16 simulator coverage on those runner lines; the deployment target, availability checks, and optional physical-device, self-hosted-runner, or device-cloud testing remain the compatibility path for those OS versions.
 
+### CI helper scripts
+
+The Tests workflow uses small helpers under `.github/scripts/`:
+
+- **`ios-simulator-destination.sh`** — Resolves a stable `xcodebuild -destination` value for an available iPhone or iPad simulator. Accepts a device family (`iPhone` or `iPad`), an optional preferred device name, and falls back to equivalent devices when the exact name is unavailable on the current runner image. Used by the unit-test and UI-smoke jobs.
+
+- **`merge-combined-coverage.sh`** — Exports coverage from a unit `.xcresult` and a UI `.xcresult`, merges them with `xcrun xccov merge`, and writes combined coverage artifacts under an output directory. Used by the `coverage` job and in the local repro steps below.
+
+- **`write-xccov-summary.py`** — Reads `xcrun xccov view --report --json` output and prints a Markdown coverage table (target summary plus collapsible per-file rows). The `coverage` job appends this to the GitHub Actions job summary.
+
+- **`restore-xcresult-bundle.sh`** — Reconstructs an `.xcresult` bundle from a flattened artifact directory that contains `Info.plist` and `Data/`. CI uploads result bundles in flattened form for artifact size limits; the `coverage` job downloads those artifacts and runs this script before `merge-combined-coverage.sh`. You normally do not need it for local reproduction when you already have real `.xcresult` directories from `xcodebuild`.
+
+- **`validate-ci-simulator-coverage.sh`** — Optional manual check; **not** run in GitHub Actions. It (1) parses `tests.yml` and related docs to catch drift in the simulator matrix, coverage upload/merge wiring, and documentation expectations, and (2) exercises `ios-simulator-destination.sh` and `write-xccov-summary.py` offline with canned `simctl` fixtures so no Xcode run or real simulators are required. Run it before opening a PR that changes CI simulator or coverage wiring:
+
+```bash
+bash .github/scripts/validate-ci-simulator-coverage.sh
+```
+
 ### Reproduce CI Locally
 
 Reproduce the Swift formatting check locally:

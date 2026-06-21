@@ -1,4 +1,19 @@
 #!/usr/bin/env bash
+# validate-ci-simulator-coverage.sh — manual CI wiring check (not run in GitHub Actions).
+#
+# Purpose: Catch accidental drift in the simulator matrix, code-coverage merge pipeline,
+# and ios-simulator-destination.sh resolver without booting Xcode or real simulators.
+#
+# Part 1 (Python): Parse .github/workflows/tests.yml plus README/FORK_CHANGES and fail
+# if required jobs, matrix rows, coverage upload/merge steps, or doc statements are missing.
+#
+# Part 2 (bash fixtures): Exercise ios-simulator-destination.sh and write-xccov-summary.py
+# offline by shadowing xcrun with canned simctl JSON.
+#
+# When to run: Before opening a PR that touches tests.yml, coverage scripts under
+# .github/scripts/, or the simulator resolver. From the repo root:
+#   bash .github/scripts/validate-ci-simulator-coverage.sh
+#
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
