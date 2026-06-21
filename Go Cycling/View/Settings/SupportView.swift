@@ -13,7 +13,9 @@ struct SupportView: View {
     
     var body: some View {
         Link("View Privacy Policy", destination: privacyPolicyURL)
+            .accessibilityIdentifier(AccessibilityIdentifier.Settings.privacyPolicy)
         Link("View Terms and Conditions", destination: termsAndConditionsURL)
+            .accessibilityIdentifier(AccessibilityIdentifier.Settings.termsAndConditions)
     }
 }
 

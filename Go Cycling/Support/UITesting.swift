@@ -95,14 +95,50 @@ enum AccessibilityIdentifier {
         static let existingCategoryRowPrefix = "route-categorization-existing-row-"
     }
 
-    enum SettingsReset {
-        static let deleteAllRoutesButton = "settings-reset-delete-all-routes-button"
-        static let resetStatisticsButton = "settings-reset-stored-statistics-button"
-        static let resetDefaultSettingsButton = "settings-reset-default-settings-button"
-    }
-
     enum History {
         static let emptyState = "history-empty-state"
         static let rideRow = "history-ride-row"
+    }
+
+    enum Settings {
+        static let customizationSection = "settings-section-customization"
+        static let cyclingMetricsSection = "settings-section-cycling-metrics"
+        static let cyclingHistorySection = "settings-section-cycling-history"
+        static let cyclingSection = "settings-section-cycling"
+        static let syncSection = "settings-section-sync"
+        static let aboutSection = "settings-section-about"
+        static let supportSection = "settings-section-support"
+        static let resetSection = "settings-section-reset"
+        static let privacySection = "settings-section-privacy"
+        static let privacyFooter = "settings-privacy-footer"
+
+        static let colourPicker = "settings-colour-picker"
+        static let appIconPicker = "settings-app-icon-picker"
+        static let preferredUnitsLabel = "settings-preferred-units-label"
+        static let preferredUnitsPicker = "settings-preferred-units-picker"
+        static let displayMetricsOnMap = "settings-display-metrics-on-map"
+        static let mapTypePicker = "settings-map-type-picker"
+        static let routeCategorizationEnabled = "settings-route-categorization-enabled"
+        static let deletionEnabled = "settings-deletion-enabled"
+        static let deletionConfirmationAlert = "settings-deletion-confirmation-alert"
+        static let disableAutoLock = "settings-disable-auto-lock"
+        static let autoPauseWhenStopped = "settings-auto-pause-when-stopped"
+        static let iCloudSync = "settings-icloud-sync"
+        static let iCloudTitle = "settings-icloud-title"
+        static let iCloudSubtitle = "settings-icloud-subtitle"
+        static let healthSync = "settings-health-sync"
+        static let healthTitle = "settings-health-title"
+        static let healthSubtitle = "settings-health-subtitle"
+        static let appVersionLabel = "settings-app-version-label"
+        static let appVersionValue = "settings-app-version-value"
+        static let openSource = "settings-open-source"
+        static let share = "settings-share"
+        static let review = "settings-review"
+        static let privacyPolicy = "settings-privacy-policy"
+        static let termsAndConditions = "settings-terms-and-conditions"
+        static let shareAnonymousAnalytics = "settings-share-anonymous-analytics"
+        static let deleteAllRoutesButton = "settings-reset-delete-all-routes-button"
+        static let resetStatisticsButton = "settings-reset-stored-statistics-button"
+        static let resetDefaultSettingsButton = "settings-reset-default-settings-button"
     }
 }

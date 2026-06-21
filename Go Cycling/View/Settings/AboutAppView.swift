@@ -19,11 +19,14 @@ struct AboutAppView: View {
     var body: some View {
         HStack {
             Text("App Version")
+                .accessibilityIdentifier(AccessibilityIdentifier.Settings.appVersionLabel)
             Spacer()
             Text(appVersionNumber)
+                .accessibilityIdentifier(AccessibilityIdentifier.Settings.appVersionValue)
         }
         HStack {
             Text("Go Cycling is Open Source")
+                .accessibilityIdentifier(AccessibilityIdentifier.Settings.openSource)
             Spacer()
             Button(action: {
                 UIApplication.shared.open(openSourceURL, options: [:], completionHandler: nil)
@@ -36,6 +39,7 @@ struct AboutAppView: View {
         }) {
             Text("Share")
         }
+        .accessibilityIdentifier(AccessibilityIdentifier.Settings.share)
         .sheet(isPresented: $isShareSheetPresented, onDismiss: {
         }, content: {
             ActivityViewController(activityItems: [ReviewManager.getProductURL()])
@@ -43,6 +47,7 @@ struct AboutAppView: View {
         
         if let reviewURL = ReviewManager.getWriteReviewURL() {
             Link("Review Go Cycling", destination: reviewURL)
+                .accessibilityIdentifier(AccessibilityIdentifier.Settings.review)
         }
     }
 }

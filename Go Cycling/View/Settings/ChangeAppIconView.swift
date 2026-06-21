@@ -40,6 +40,7 @@ struct ChangeAppIconView: View {
                 }
                 // Use the navigation link picker style (how it looked before iOS 16)
                 .pickerStyle(.navigationLink)
+                .accessibilityIdentifier(AccessibilityIdentifier.Settings.appIconPicker)
                 .onChange(of: preferences.iconIndex) { value in
                     self.changeAppIcon(value: value)
                 }
@@ -60,6 +61,7 @@ struct ChangeAppIconView: View {
                     }
                     .navigationBarTitle("Choose your App Icon", displayMode: .inline)
                 }
+                .accessibilityIdentifier(AccessibilityIdentifier.Settings.appIconPicker)
                 .onChange(of: preferences.iconIndex) { value in
                     self.changeAppIcon(value: value)
                 }

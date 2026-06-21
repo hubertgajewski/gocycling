@@ -8,3 +8,5 @@ Go Cycling.xcodeproj/xcuserdata/*
 
 build/
 .worktrees/
+
+TestResults/

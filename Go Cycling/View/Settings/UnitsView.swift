@@ -20,6 +20,7 @@ struct UnitsView: View {
     var body: some View {
         HStack {
             Text("Prefered Units")
+                .accessibilityIdentifier(AccessibilityIdentifier.Settings.preferredUnitsLabel)
             Spacer()
             Picker("Prefered Units", selection: Binding(
                 get: { preferences.metricsChoiceConverted },
@@ -33,6 +34,7 @@ struct UnitsView: View {
             }
             .frame(maxWidth: 150)
             .pickerStyle(.segmented)
+            .accessibilityIdentifier(AccessibilityIdentifier.Settings.preferredUnitsPicker)
         }
         Toggle("Display Metrics on Map", isOn: Binding(
             get: { preferences.displayingMetrics },
@@ -41,6 +43,7 @@ struct UnitsView: View {
                 telemetryManager.sendSettingsSignal(section: telemetryTabSection, action: TelemetrySettingsAction.MetricsOnMap)
             }
         ))
+        .accessibilityIdentifier(AccessibilityIdentifier.Settings.displayMetricsOnMap)
         if #available(iOS 16.0, *) {
             Picker("Map Type", selection: Binding(
                 get: { preferences.mapTypeChoiceConverted },
@@ -53,6 +56,7 @@ struct UnitsView: View {
                 }
             }
             .pickerStyle(.navigationLink)
+            .accessibilityIdentifier(AccessibilityIdentifier.Settings.mapTypePicker)
         } else {
             Picker("Map Type", selection: Binding(
                 get: { preferences.mapTypeChoiceConverted },
@@ -64,6 +68,7 @@ struct UnitsView: View {
                     Text(choice.rawValue).tag(choice)
                 }
             }
+            .accessibilityIdentifier(AccessibilityIdentifier.Settings.mapTypePicker)
         }
     }
 }

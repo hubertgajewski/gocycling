@@ -23,7 +23,7 @@ final class SettingsResetScreen {
     line: UInt = #line
   ) {
     confirmDestructiveAction(
-      button: app.buttons[AccessibilityID.SettingsReset.deleteAllRoutesButton],
+      button: app.buttons[AccessibilityID.Settings.deleteAllRoutesButton],
       alertButtonLabel: AlertLabel.delete,
       file: file,
       line: line
@@ -35,7 +35,7 @@ final class SettingsResetScreen {
     line: UInt = #line
   ) {
     confirmDestructiveAction(
-      button: app.buttons[AccessibilityID.SettingsReset.resetStatisticsButton],
+      button: app.buttons[AccessibilityID.Settings.resetStatisticsButton],
       alertButtonLabel: AlertLabel.reset,
       file: file,
       line: line
@@ -47,7 +47,7 @@ final class SettingsResetScreen {
     line: UInt = #line
   ) {
     confirmDestructiveAction(
-      button: app.buttons[AccessibilityID.SettingsReset.resetDefaultSettingsButton],
+      button: app.buttons[AccessibilityID.Settings.resetDefaultSettingsButton],
       alertButtonLabel: AlertLabel.reset,
       file: file,
       line: line
@@ -78,13 +78,18 @@ final class SettingsResetScreen {
       return
     }
 
-    var swipes = 0
-    while swipes < maxSwipes {
-      app.swipeUp()
-      swipes += 1
+    for _ in 0..<maxSwipes {
       if element.waitForExistence(timeout: Timeouts.poll) {
         return
       }
+      app.swipeUp()
+    }
+
+    for _ in 0..<maxSwipes {
+      if element.waitForExistence(timeout: Timeouts.poll) {
+        return
+      }
+      app.swipeDown()
     }
 
     ElementAssertions.assertExists(element, file: file, line: line)
