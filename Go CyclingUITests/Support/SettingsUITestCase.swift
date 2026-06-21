@@ -10,7 +10,6 @@ class SettingsUITestCase: BaseUITestCase {
   private(set) var mainTabs: MainTabBarScreen!
   private(set) var settings: SettingsScreen!
   private(set) var reset: SettingsResetScreen!
-  private var shouldRestoreTelemetry = false
 
   override func setUpWithError() throws {
     try super.setUpWithError()
@@ -23,17 +22,5 @@ class SettingsUITestCase: BaseUITestCase {
 
     settings = SettingsScreen(app: launchedApp)
     reset = SettingsResetScreen(app: launchedApp)
-  }
-
-  override func tearDownWithError() throws {
-    if shouldRestoreTelemetry {
-      mainTabs?.select(.settings)
-      settings?.setTelemetryEnabled(true)
-    }
-    try super.tearDownWithError()
-  }
-
-  func markTelemetryForTeardownRestore() {
-    shouldRestoreTelemetry = true
   }
 }

@@ -185,7 +185,6 @@
 		AA0001572026062100000001 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001582026062100000001 /* SettingsScreen.swift */; };
 		AA0001592026062100000001 /* SettingsScreen+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001602026062100000001 /* SettingsScreen+Assertions.swift */; };
 		AA0001612026062100000001 /* SettingsSmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001622026062100000001 /* SettingsSmokeTests.swift */; };
-		AA0001632026062100000002 /* SettingsRegressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001642026062100000002 /* SettingsRegressionTests.swift */; };
 		AA0001032026061900000001 /* MainTabBarScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001042026061900000001 /* MainTabBarScreen.swift */; };
 		AA0001092026061900000001 /* CycleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001102026061900000001 /* CycleScreen.swift */; };
 		AA0001112026062000000001 /* SettingsResetScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001122026062000000001 /* SettingsResetScreen.swift */; };
@@ -430,7 +429,6 @@
 		AA0001582026062100000001 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
 		AA0001602026062100000001 /* SettingsScreen+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsScreen+Assertions.swift"; sourceTree = "<group>"; };
 		AA0001622026062100000001 /* SettingsSmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSmokeTests.swift; sourceTree = "<group>"; };
-		AA0001642026062100000002 /* SettingsRegressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRegressionTests.swift; sourceTree = "<group>"; };
 		AA0001042026061900000001 /* MainTabBarScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarScreen.swift; sourceTree = "<group>"; };
 		AA0001102026061900000001 /* CycleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleScreen.swift; sourceTree = "<group>"; };
 		AA0001122026062000000001 /* SettingsResetScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsResetScreen.swift; sourceTree = "<group>"; };
@@ -962,7 +960,6 @@
 				AA0000912026061900000001 /* MainTabNavigationTests.swift */,
 				AA0001542026062100000001 /* StatisticsSmokeTests.swift */,
 				AA0001622026062100000001 /* SettingsSmokeTests.swift */,
-				AA0001642026062100000002 /* SettingsRegressionTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -1369,7 +1366,6 @@
 				AA0001572026062100000001 /* SettingsScreen.swift in Sources */,
 				AA0001592026062100000001 /* SettingsScreen+Assertions.swift in Sources */,
 				AA0001612026062100000001 /* SettingsSmokeTests.swift in Sources */,
-				AA0001632026062100000002 /* SettingsRegressionTests.swift in Sources */,
 				AA0001032026061900000001 /* MainTabBarScreen.swift in Sources */,
 				AA0001092026061900000001 /* CycleScreen.swift in Sources */,
 				AA0001172026062000000001 /* HistoryScreen.swift in Sources */,

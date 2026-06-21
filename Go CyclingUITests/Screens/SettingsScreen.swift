@@ -59,29 +59,12 @@ final class SettingsScreen {
 
   enum Defaults {
     static let colour = "Blue"
-    static let appIcon = "Default"
-    static let mapType = "Standard"
-    static let semverPattern = #"^\d+\.\d+\.\d+$"#
-
-    static let displayMetricsOnMap = true
     static let routeCategorizationEnabled = true
-    static let deletionEnabled = true
-    static let deletionConfirmationAlert = true
-    static let disableAutoLock = false
-    static let autoPauseWhenStopped = true
-    static let telemetryEnabled = true
   }
 
   enum NonDefaults {
     static let colour = "Red"
-    static let appIcon = "Dark"
-    static let mapType = "Satellite"
     static let units = Copy.imperialUnits
-  }
-
-  struct SyncToggleState: Equatable {
-    let iCloudOn: Bool
-    let healthOn: Bool
   }
 
   let application: XCUIApplication
@@ -161,13 +144,6 @@ final class SettingsScreen {
     }
   }
 
-  func captureSyncToggleStates() -> SyncToggleState {
-    SyncToggleState(
-      iCloudOn: isSwitchOn(AccessibilityID.Settings.iCloudSync),
-      healthOn: isSwitchOn(AccessibilityID.Settings.healthSync)
-    )
-  }
-
   func appIconPickerVisible() -> Bool {
     control(AccessibilityID.Settings.appIconPicker).exists
   }
@@ -192,97 +168,12 @@ final class SettingsScreen {
     )
   }
 
-  func changeAllNonDefaultSettingsExceptSync(
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    // assertFactoryDefaults() ends near Privacy at the bottom; edits start at Colour on top.
-    scrollToTop()
-
-    // Sync toggle mutation is planned for a later phase; leave iCloud/Health untouched.
-    selectNavigationPicker(
-      AccessibilityID.Settings.colourPicker,
-      value: NonDefaults.colour,
-      file: file,
-      line: line
-    )
-    if appIconPickerVisible() {
-      selectNavigationPicker(
-        AccessibilityID.Settings.appIconPicker,
-        value: NonDefaults.appIcon,
-        file: file,
-        line: line
-      )
-    }
-    selectUnits(NonDefaults.units, file: file, line: line)
-    setSwitch(
-      AccessibilityID.Settings.displayMetricsOnMap,
-      on: !Defaults.displayMetricsOnMap,
-      file: file,
-      line: line
-    )
-    selectNavigationPicker(
-      AccessibilityID.Settings.mapTypePicker,
-      value: NonDefaults.mapType,
-      file: file,
-      line: line
-    )
-    setSwitch(
-      AccessibilityID.Settings.routeCategorizationEnabled,
-      on: !Defaults.routeCategorizationEnabled,
-      file: file,
-      line: line
-    )
-    setSwitch(
-      AccessibilityID.Settings.deletionEnabled,
-      on: !Defaults.deletionEnabled,
-      file: file,
-      line: line
-    )
-    setSwitch(
-      AccessibilityID.Settings.deletionConfirmationAlert,
-      on: !Defaults.deletionConfirmationAlert,
-      file: file,
-      line: line
-    )
-    setSwitch(
-      AccessibilityID.Settings.disableAutoLock,
-      on: !Defaults.disableAutoLock,
-      file: file,
-      line: line
-    )
-    setSwitch(
-      AccessibilityID.Settings.autoPauseWhenStopped,
-      on: !Defaults.autoPauseWhenStopped,
-      file: file,
-      line: line
-    )
-    setTelemetryEnabled(false, file: file, line: line)
-  }
-
   func resetToDefaultSettings(
     reset: SettingsResetScreen,
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
     reset.resetToDefaultSettings(file: file, line: line)
-  }
-
-  func isTelemetryEnabled() -> Bool {
-    isSwitchOn(AccessibilityID.Settings.shareAnonymousAnalytics)
-  }
-
-  func setTelemetryEnabled(
-    _ enabled: Bool,
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    setSwitch(
-      AccessibilityID.Settings.shareAnonymousAnalytics,
-      on: enabled,
-      file: file,
-      line: line
-    )
   }
 
   func pickerValue(controlID: String) -> String {
@@ -296,12 +187,6 @@ final class SettingsScreen {
       return String(parts[1]).trimmingCharacters(in: .whitespaces)
     }
     return row.value as? String ?? ""
-  }
-
-  func appVersionLabel() -> String {
-    let element = control(AccessibilityID.Settings.appVersionValue)
-    scrollUntilVisible(element)
-    return element.label
   }
 
   func isSwitchOn(_ controlID: String) -> Bool {
