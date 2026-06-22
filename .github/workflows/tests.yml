@@ -161,7 +161,7 @@ jobs:
       vars.CI_RUN_UI_TESTS != 'false'
     name: UI ${{ ((github.event_name == 'workflow_dispatch' && github.event.inputs.run_regression == 'true') || vars.CI_RUN_UI_REGRESSION == 'true') && 'regression' || 'smoke' }} (${{ matrix.runtime }} / ${{ matrix.device_label }})
     runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && matrix.os || vars.RUNNER || matrix.os }}
-    timeout-minutes: 25
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:

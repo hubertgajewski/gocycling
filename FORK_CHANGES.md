@@ -44,7 +44,7 @@ GitHub Actions runs on every push to `main` and on pull requests. Jobs run in a 
 - **Swift format** - `swift-format` linting for `Go CyclingTests` and `Go CyclingUITests`
 - **SwiftPM unit tests** - `swift test` for the package-compatible formatting unit-test slice
 - **Unit tests** - `Go CyclingTests` on an iPhone simulator, with code coverage collected for later merge
-- **UI tests** - `Go CyclingUITests` on representative iPhone and iPad simulators across the hosted `macos-14`, `macos-15`, and `macos-26` runner lines. CI runs the **Smoke** test plan by default (`Go Cycling UI Smoke`); set `CI_RUN_UI_REGRESSION` to `true` or dispatch with `run_regression: true` for the **Regression** plan (`Go Cycling UI Regression`) on the same matrix.
+- **UI tests** - `Go CyclingUITests` on representative iPhone and iPad simulators across the hosted `macos-14`, `macos-15`, and `macos-26` runner lines, with a **35-minute** job timeout per matrix entry. CI runs the **Smoke** test plan by default (`Go Cycling UI Smoke`); set `CI_RUN_UI_REGRESSION` to `true` or dispatch with `run_regression: true` for the **Regression** plan (`Go Cycling UI Regression`) on the same matrix. Regression runs every Smoke suite plus `CycleRideRegressionTests` and `CycleAutoPauseRegressionTests`.
 - **Combined code coverage** - merges unit-test coverage with the `ios26-iphone` UI test run (Smoke by default; Regression when enabled) into one `Go Cycling.app` report
 
 The hosted UI test matrix (Smoke or Regression) currently requests these simulators:
@@ -179,7 +179,7 @@ xcodebuild \
   test
 ```
 
-Set the `CI_RUN_UI_REGRESSION` repository variable to `true`, or dispatch the Tests workflow with `run_regression: true`, to run the Regression test plan in CI instead of Smoke.
+Set the `CI_RUN_UI_REGRESSION` repository variable to `true`, or dispatch the Tests workflow with `run_regression: true`, to run the Regression test plan in CI instead of Smoke. Regression includes the full Smoke plan (`HistorySmokeTests`, `SettingsSmokeTests`, `StatisticsSmokeTests`, `CycleRideSmokeTests`, `MainTabNavigationTests`) plus cycle regression suites.
 
 ## Feature and Maintenance Differences
 
@@ -187,7 +187,7 @@ Current fork-specific differences include:
 
 - Local build fixes for fork owners: `TelemetryDeck.xcconfig.example`, in-repository default alternate icon paths, generic signing guidance, and explicit `NSUbiquitousKeyValueStore` integer writes.
 - Focused Swift Testing unit coverage for cycling record sorting, aggregation, unlocked-icon, and reset-statistics behavior, plus UI smoke coverage for the main Cycle, History, Statistics, and Settings tabs and a Cycle start-pause-resume-stop-save smoke path.
-- UI smoke and regression test plans (`Smoke.xctestplan`, `Regression.xctestplan`) under `Go CyclingUITests`, with `Go Cycling UI Smoke` and `Go Cycling UI Regression` schemes selecting the tier in CI and locally.
+- UI smoke and regression test plans (`Smoke.xctestplan`, `Regression.xctestplan`) under `Go CyclingUITests`, with `Go Cycling UI Smoke` and `Go Cycling UI Regression` schemes selecting the tier in CI and locally. `Regression.xctestplan` includes every Smoke suite plus `CycleRideRegressionTests` and `CycleAutoPauseRegressionTests`.
 - UI smoke tests use a layered harness under `Go CyclingUITests/`: `Support/` (`Timeouts`, `ElementAssertions`, `BaseUITestCase`, `CycleUITestCase`, `StatisticsUITestCase`, `SettingsUITestCase`), `Screens/` (queries and actions), `Flows/` (`ResetAppDataFlow` with selectable reset areas), `Assertions/` (`Screen+Assertions.swift` composite expectations), and `Tests/` including `HistorySmokeTests`, `StatisticsSmokeTests`, and `SettingsSmokeTests`.
 - UI testing support through the `-ui-testing` launch argument to avoid location authorization prompts during automated tests.
 - A shared `Go Cycling` Xcode scheme for command-line and CI testing.

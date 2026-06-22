@@ -70,6 +70,10 @@ final class StatisticsScreen {
       .firstMatch
   }
 
+  func control(_ identifier: String) -> XCUIElement {
+    application.descendants(matching: .any).matching(identifier: identifier).firstMatch
+  }
+
   func staticText(_ label: String) -> XCUIElement {
     root.staticTexts.matching(NSPredicate(format: "label == %@", label)).firstMatch
   }
@@ -80,19 +84,47 @@ final class StatisticsScreen {
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
-    if element.waitForExistence(timeout: Timeouts.brief) {
+    if isVisibleOnScreen(element, afterWaiting: Timeouts.brief) {
       return
     }
 
-    var swipes = 0
-    while swipes < maxSwipes {
-      application.swipeUp()
-      swipes += 1
-      if element.waitForExistence(timeout: Timeouts.poll) {
+    for _ in 0..<maxSwipes {
+      if isVisibleOnScreen(element, afterWaiting: Timeouts.poll) {
         return
       }
+      application.swipeUp()
     }
 
-    ElementAssertions.assertExists(element, file: file, line: line)
+    for _ in 0..<maxSwipes {
+      if isVisibleOnScreen(element, afterWaiting: Timeouts.poll) {
+        return
+      }
+      application.swipeDown()
+    }
+
+    ElementAssertions.assertExists(element, timeout: Timeouts.standard, file: file, line: line)
+  }
+
+  private func isVisibleOnScreen(_ element: XCUIElement, afterWaiting timeout: TimeInterval) -> Bool
+  {
+    guard element.waitForExistence(timeout: timeout) else {
+      return false
+    }
+
+    if element.isHittable {
+      return true
+    }
+
+    let frame = element.frame
+    guard frame.width > 0, frame.height > 0 else {
+      return false
+    }
+
+    let window = application.windows.element(boundBy: 0)
+    guard window.exists else {
+      return false
+    }
+
+    return window.frame.intersects(frame)
   }
 }

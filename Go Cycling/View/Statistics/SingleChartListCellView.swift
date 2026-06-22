@@ -21,6 +21,7 @@ struct SingleChartListCellView: View {
                 Text(CyclingChartsViewModel.titleStrings[index])
                     .font(.headline)
                     .foregroundColor(Color(UserPreferences.convertColourChoiceToUIColor(colour: preferences.colourChoiceConverted)))
+                    .accessibilityIdentifier(AccessibilityIdentifier.Statistics.chartPeriodIdentifiers[index])
                 Spacer()
             }
             HStack {
