@@ -44,7 +44,7 @@ GitHub Actions runs on every push to `main` and on pull requests. Jobs run in a 
 - **Swift format** - `swift-format` linting for `Go CyclingTests` and `Go CyclingUITests`
 - **SwiftPM unit tests** - `swift test` for the package-compatible formatting unit-test slice
 - **Unit tests** - `Go CyclingTests` on an iPhone simulator, with code coverage collected for later merge
-- **UI tests** - `Go CyclingUITests` on representative iPhone and iPad simulators across the hosted `macos-14`, `macos-15`, and `macos-26` runner lines. CI runs the **Smoke** test plan by default (`Go Cycling UI Smoke`); set `CI_RUN_UI_REGRESSION` to `true` or dispatch with `run_regression: true` for the **Regression** plan (`Go Cycling UI Regression`) on the same matrix. Regression runs every Smoke suite plus `CycleRideRegressionTests` and `CycleAutoPauseRegressionTests`.
+- **UI tests** - `Go CyclingUITests` on representative iPhone and iPad simulators across the hosted `macos-14`, `macos-15`, and `macos-26` runner lines, with a **35-minute** job timeout per matrix entry. CI runs the **Smoke** test plan by default (`Go Cycling UI Smoke`); set `CI_RUN_UI_REGRESSION` to `true` or dispatch with `run_regression: true` for the **Regression** plan (`Go Cycling UI Regression`) on the same matrix. Regression runs every Smoke suite plus `CycleRideRegressionTests` and `CycleAutoPauseRegressionTests`.
 - **Combined code coverage** - merges unit-test coverage with the `ios26-iphone` UI test run (Smoke by default; Regression when enabled) into one `Go Cycling.app` report
 
 The hosted UI test matrix (Smoke or Regression) currently requests these simulators:
