@@ -21,6 +21,8 @@ struct MapView: UIViewRepresentable {
     @Binding var centerMapOnLocation: Bool
     @Binding var cyclingStartTime: Date
     @Binding var timeCycling: TimeInterval
+    /// Drives `updateUIView` when Core Location authorization changes.
+    var locationAuthorizationStatus: CLAuthorizationStatus?
     // Route naming needs the exact saved BikeRide because History ordering
     // can change while the async save finishes.
     var onRouteSaveSuccess: (BikeRide) -> Void = { _ in }
@@ -67,9 +69,7 @@ struct MapView: UIViewRepresentable {
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView(frame: .zero)
         mapView.delegate = context.coordinator
-        // UI-smoke tests are not testing permissions here; hiding user location
-        // avoids MKMapView permission UI that can block the tab smoke flow.
-        mapView.showsUserLocation = UITesting.shouldShowUserLocation
+        mapView.showsUserLocation = true
         mapView.showsCompass = false
         mapView.mapType = preferences.mapTypeChoiceConverted.mkMapType
         mapView.accessibilityIdentifier = AccessibilityIdentifier.Cycle.mapView
@@ -86,12 +86,11 @@ struct MapView: UIViewRepresentable {
             view.mapType = preferredMapType
         }
 
-        let authStatus = locationManager.statusString
-        let isLocationAuthorized = UITesting.shouldTreatLocationAsAuthorized
-            || authStatus == "authorizedAlways"
-            || authStatus == "authorizedWhenInUse"
+        let authStatus = locationAuthorizationStatus ?? locationManager.locationStatus
+        let isLocationAuthorized = authStatus == .authorizedAlways
+            || authStatus == .authorizedWhenInUse
 
-        if UITesting.shouldShowUserLocation && isLocationAuthorized {
+        if isLocationAuthorized {
             if centerMapOnLocation {
                 if view.userTrackingMode != .followWithHeading {
                     view.setUserTrackingMode(.followWithHeading, animated: true)
@@ -187,6 +186,11 @@ var startedCycling = false
 
 struct MapView_Previews: PreviewProvider {
     static var previews: some View {
-        MapView(centerMapOnLocation: .constant(true), cyclingStartTime: .constant(Date()), timeCycling: .constant(10))
+        MapView(
+            centerMapOnLocation: .constant(true),
+            cyclingStartTime: .constant(Date()),
+            timeCycling: .constant(10),
+            locationAuthorizationStatus: .authorizedWhenInUse
+        )
     }
 }

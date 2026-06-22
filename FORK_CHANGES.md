@@ -127,6 +127,8 @@ cp -n TelemetryDeck.xcconfig.example TelemetryDeck.xcconfig
 mkdir -p TestResults
 rm -rf TestResults/ui-ios26-iphone.xcresult
 DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17' 'iOS 26')
+UDID=$(.github/scripts/ui-test-simulator-udid.sh iPhone 'iPhone 17' 'iOS 26')
+UI_TEST_PREFERRED_DEVICE='iPhone 17' SRCROOT="$PWD" .github/scripts/ui-test-simctl-location.sh grant "$UDID"
 xcodebuild \
   -project "Go Cycling.xcodeproj" \
   -scheme "Go Cycling UI Smoke" \
@@ -143,6 +145,8 @@ Reproduce a UI regression run, substituting the device name as needed:
 
 ```bash
 DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17' 'iOS 26')
+UDID=$(.github/scripts/ui-test-simulator-udid.sh iPhone 'iPhone 17' 'iOS 26')
+UI_TEST_PREFERRED_DEVICE='iPhone 17' SRCROOT="$PWD" .github/scripts/ui-test-simctl-location.sh grant "$UDID"
 xcodebuild \
   -project "Go Cycling.xcodeproj" \
   -scheme "Go Cycling UI Regression" \
@@ -169,6 +173,8 @@ Reproduce a UI smoke run without coverage, substituting the device name as neede
 
 ```bash
 DEST=$(.github/scripts/ios-simulator-destination.sh iPad 'iPad Pro 11-inch (M5)' 'iOS 26')
+UDID=$(.github/scripts/ui-test-simulator-udid.sh iPad 'iPad Pro 11-inch (M5)' 'iOS 26')
+UI_TEST_DEVICE_FAMILY=iPad UI_TEST_PREFERRED_DEVICE='iPad Pro 11-inch (M5)' SRCROOT="$PWD" .github/scripts/ui-test-simctl-location.sh grant "$UDID"
 xcodebuild \
   -project "Go Cycling.xcodeproj" \
   -scheme "Go Cycling UI Smoke" \
@@ -187,9 +193,9 @@ Current fork-specific differences include:
 
 - Local build fixes for fork owners: `TelemetryDeck.xcconfig.example`, in-repository default alternate icon paths, generic signing guidance, and explicit `NSUbiquitousKeyValueStore` integer writes.
 - Focused Swift Testing unit coverage for cycling record sorting, aggregation, unlocked-icon, and reset-statistics behavior, plus UI smoke coverage for the main Cycle, History, Statistics, and Settings tabs and a Cycle start-pause-resume-stop-save smoke path.
-- UI smoke and regression test plans (`Smoke.xctestplan`, `Regression.xctestplan`) under `Go CyclingUITests`, with `Go Cycling UI Smoke` and `Go Cycling UI Regression` schemes selecting the tier in CI and locally. `Regression.xctestplan` includes every Smoke suite plus `CycleRideRegressionTests` and `CycleAutoPauseRegressionTests`.
-- UI smoke tests use a layered harness under `Go CyclingUITests/`: `Support/` (`Timeouts`, `ElementAssertions`, `BaseUITestCase`, `CycleUITestCase`, `StatisticsUITestCase`, `SettingsUITestCase`), `Screens/` (queries and actions), `Flows/` (`ResetAppDataFlow` with selectable reset areas), `Assertions/` (`Screen+Assertions.swift` composite expectations), and `Tests/` including `HistorySmokeTests`, `StatisticsSmokeTests`, and `SettingsSmokeTests`.
-- UI testing support through the `-ui-testing` launch argument to avoid location authorization prompts during automated tests.
+- UI smoke and regression test plans (`Smoke.xctestplan`, `Regression.xctestplan`) under `Go CyclingUITests`, with `Go Cycling UI Smoke` and `Go Cycling UI Regression` schemes selecting the tier in CI and locally. `Regression.xctestplan` includes every Smoke suite plus `CycleRideRegressionTests` and `CycleAutoPauseRegressionTests`. A separate `Go Cycling UI Permission` scheme and `Permission.xctestplan` exercise the real system location prompt locally (not in the PR smoke matrix).
+- UI smoke tests use a layered harness under `Go CyclingUITests/`: `Support/` (`Timeouts`, `ElementAssertions`, `BaseUITestCase`, `CycleUITestCase`, `StatisticsUITestCase`, `SettingsUITestCase`, `PermissionUITestCase`, `SystemLocationAlert`), `Screens/` (queries and actions), `Flows/` (`ResetAppDataFlow` with selectable reset areas), `Assertions/` (`Screen+Assertions.swift` composite expectations), and `Tests/` including `HistorySmokeTests`, `StatisticsSmokeTests`, `SettingsSmokeTests`, and `LocationPermissionTests` (permission plan only).
+- Host-side simulator location setup for UI tests: `.github/scripts/ui-test-simctl-location.sh` grants permission and a fixed simulated coordinate before Smoke/Regression runs (scheme Test pre-actions locally; explicit CI step in `.github/workflows/tests.yml`). The app no longer uses a `-ui-testing` launch argument to bypass Core Location authorization. UI tests pass `-ui-testing-skip-review-prompt` so `ReviewManager` does not present the App Store review sheet during smoke flows.
 - A shared `Go Cycling` Xcode scheme for command-line and CI testing.
 - A focused SwiftPM package slice for package-compatible formatting logic, declared over the existing Xcode-owned source and test directories so `swift test` complements the Xcode test action.
 - GitHub Actions coverage for Swift formatting, SwiftPM unit tests, Xcode unit tests, combined unit-plus-UI `Go Cycling.app` coverage summaries, and UI smoke tests (Regression optional via `CI_RUN_UI_REGRESSION`).

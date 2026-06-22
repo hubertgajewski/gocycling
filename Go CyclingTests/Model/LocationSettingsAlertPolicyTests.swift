@@ -33,20 +33,15 @@ struct LocationSettingsAlertPolicyTests {
     }
   }
 
-  @Test("cycle controls fixture activates with dedicated launch argument")
-  func cycleControlsFixtureActivatesWithDedicatedLaunchArgument() {
+  @Test("cycle controls fixture does not activate with unrelated launch arguments")
+  func cycleControlsFixtureDoesNotActivateWithUnrelatedLaunchArguments() {
+    #expect(
+      UITesting.shouldUseCycleControlsFixture(arguments: [
+        "-unrelated-launch-argument"
+      ]) == false)
     #expect(
       UITesting.shouldUseCycleControlsFixture(arguments: [
         UITesting.cycleControlsFixtureArgument
-      ]))
-    #expect(
-      !UITesting.shouldUseCycleControlsFixture(arguments: [
-        UITesting.launchArgument
-      ]))
-    #expect(
-      UITesting.shouldUseCycleControlsFixture(arguments: [
-        UITesting.launchArgument,
-        UITesting.cycleControlsFixtureArgument,
       ]))
   }
 }

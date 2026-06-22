@@ -185,6 +185,9 @@
 		AA0001572026062100000001 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001582026062100000001 /* SettingsScreen.swift */; };
 		AA0001592026062100000001 /* SettingsScreen+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001602026062100000001 /* SettingsScreen+Assertions.swift */; };
 		AA0001612026062100000001 /* SettingsSmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001622026062100000001 /* SettingsSmokeTests.swift */; };
+		AA0001652026062200000001 /* PermissionUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001662026062200000001 /* PermissionUITestCase.swift */; };
+		AA0001672026062200000001 /* LocationPermissionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001682026062200000001 /* LocationPermissionTests.swift */; };
+		AA00016B2026062200000001 /* SystemLocationAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00016A2026062200000001 /* SystemLocationAlert.swift */; };
 		AA0001032026061900000001 /* MainTabBarScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001042026061900000001 /* MainTabBarScreen.swift */; };
 		AA0001092026061900000001 /* CycleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001102026061900000001 /* CycleScreen.swift */; };
 		AA0001112026062000000001 /* SettingsResetScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001122026062000000001 /* SettingsResetScreen.swift */; };
@@ -429,6 +432,10 @@
 		AA0001582026062100000001 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
 		AA0001602026062100000001 /* SettingsScreen+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsScreen+Assertions.swift"; sourceTree = "<group>"; };
 		AA0001622026062100000001 /* SettingsSmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSmokeTests.swift; sourceTree = "<group>"; };
+		AA0001662026062200000001 /* PermissionUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionUITestCase.swift; sourceTree = "<group>"; };
+		AA0001682026062200000001 /* LocationPermissionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermissionTests.swift; sourceTree = "<group>"; };
+		AA0001692026062200000001 /* Permission.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Permission.xctestplan; sourceTree = "<group>"; };
+		AA00016A2026062200000001 /* SystemLocationAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemLocationAlert.swift; sourceTree = "<group>"; };
 		AA0001042026061900000001 /* MainTabBarScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarScreen.swift; sourceTree = "<group>"; };
 		AA0001102026061900000001 /* CycleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleScreen.swift; sourceTree = "<group>"; };
 		AA0001122026062000000001 /* SettingsResetScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsResetScreen.swift; sourceTree = "<group>"; };
@@ -897,6 +904,7 @@
 				AA0000922026061900000001 /* Tests */,
 				AA0001212026062000000001 /* Smoke.xctestplan */,
 				AA0001222026062000000001 /* Regression.xctestplan */,
+				AA0001692026062200000001 /* Permission.xctestplan */,
 				9DAB833625FECAD400F5C42E /* Info.plist */,
 			);
 			path = "Go CyclingUITests";
@@ -907,6 +915,8 @@
 			children = (
 				AA0000982026061900000001 /* AccessibilityIDs.swift */,
 				AA0000942026061900000001 /* AppLauncher.swift */,
+				AA0001662026062200000001 /* PermissionUITestCase.swift */,
+				AA00016A2026062200000001 /* SystemLocationAlert.swift */,
 				AA0001022026061900000001 /* BaseUITestCase.swift */,
 				AA0001242026062000000001 /* CycleUITestCase.swift */,
 				AA0001482026062100000001 /* StatisticsUITestCase.swift */,
@@ -960,6 +970,7 @@
 				AA0000912026061900000001 /* MainTabNavigationTests.swift */,
 				AA0001542026062100000001 /* StatisticsSmokeTests.swift */,
 				AA0001622026062100000001 /* SettingsSmokeTests.swift */,
+				AA0001682026062200000001 /* LocationPermissionTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -1366,6 +1377,9 @@
 				AA0001572026062100000001 /* SettingsScreen.swift in Sources */,
 				AA0001592026062100000001 /* SettingsScreen+Assertions.swift in Sources */,
 				AA0001612026062100000001 /* SettingsSmokeTests.swift in Sources */,
+				AA0001652026062200000001 /* PermissionUITestCase.swift in Sources */,
+				AA00016B2026062200000001 /* SystemLocationAlert.swift in Sources */,
+				AA0001672026062200000001 /* LocationPermissionTests.swift in Sources */,
 				AA0001032026061900000001 /* MainTabBarScreen.swift in Sources */,
 				AA0001092026061900000001 /* CycleScreen.swift in Sources */,
 				AA0001172026062000000001 /* HistoryScreen.swift in Sources */,

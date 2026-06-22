@@ -82,7 +82,7 @@ class ReviewManager {
 
     #if DEBUG
     static func shouldRequestReview(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
-        !UITesting.isEnabled(arguments: arguments)
+        !UITesting.shouldSkipReviewPrompt(arguments: arguments)
     }
     #else
     static func shouldRequestReview(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {

@@ -121,8 +121,8 @@ struct ReviewManagerTests {
     )
   }
 
-  @Test("skips review request when UI testing is enabled")
-  func skipsReviewRequestWhenUITestingIsEnabled() async {
+  @Test("skips review request when UI testing skip-review prompt is enabled")
+  func skipsReviewRequestWhenUITestingSkipReviewPromptIsEnabled() async {
     let snapshot = await PersistedStoreSnapshot(keys: reviewManagerStoreKeys)
     defer { snapshot.restore() }
 
@@ -131,7 +131,7 @@ struct ReviewManagerTests {
     defaults.set(3, forKey: ReviewManager.reviewCountKey)
     defaults.removeObject(forKey: ReviewManager.reviewRequestVersionKey)
 
-    ReviewManager.requestReviewIfAppropriate(arguments: [UITesting.launchArgument])
+    ReviewManager.requestReviewIfAppropriate(arguments: [UITesting.skipReviewPromptArgument])
 
     #expect(defaults.integer(forKey: ReviewManager.reviewCountKey) == 3)
     #expect(defaults.string(forKey: ReviewManager.reviewRequestVersionKey) == nil)

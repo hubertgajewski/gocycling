@@ -30,6 +30,7 @@ struct MapWithSpeedView: View {
                 centerMapOnLocation: $mapCentered,
                 cyclingStartTime: $cyclingStartTime,
                 timeCycling: $timeCycling,
+                locationAuthorizationStatus: locationManager.locationStatus,
                 onRouteSaveSuccess: onRouteSaveSuccess
             )
             VStack {

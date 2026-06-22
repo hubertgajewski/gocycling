@@ -226,10 +226,34 @@ jobs:
           chmod +x .github/scripts/ios-simulator-destination.sh
           echo "value=$(.github/scripts/ios-simulator-destination.sh '${{ matrix.family }}' '${{ matrix.device }}' '${{ matrix.runtime }}')" >> "$GITHUB_OUTPUT"
 
+      - name: Grant simulator location for UI tests
+        env:
+          UI_TEST_FAMILY: ${{ matrix.family }}
+          UI_TEST_DEVICE: ${{ matrix.device }}
+          UI_TEST_RUNTIME: ${{ matrix.runtime }}
+        run: |
+          chmod +x .github/scripts/ui-test-simctl-location.sh .github/scripts/ui-test-simulator-udid.sh
+          udid="$(UI_TEST_PREFERRED_DEVICE="$UI_TEST_DEVICE" .github/scripts/ui-test-simulator-udid.sh "$UI_TEST_FAMILY" "$UI_TEST_DEVICE" "$UI_TEST_RUNTIME")"
+          UI_TEST_DEVICE_FAMILY="$UI_TEST_FAMILY" UI_TEST_PREFERRED_DEVICE="$UI_TEST_DEVICE" \
+            SRCROOT="$GITHUB_WORKSPACE" \
+            .github/scripts/ui-test-simctl-location.sh grant "$udid"
+
       - name: Run UI tests
+        env:
+          UI_TEST_FAMILY: ${{ matrix.family }}
+          UI_TEST_DEVICE: ${{ matrix.device }}
+          UI_TEST_RUNTIME: ${{ matrix.runtime }}
+          NSUnbufferedIO: "YES"
         run: |
           mkdir -p TestResults
           rm -rf TestResults/ui-${{ matrix.id }}.xcresult
+          chmod +x .github/scripts/ui-test-simctl-location.sh .github/scripts/ui-test-simulator-udid.sh
+          # Re-grant after build/install so TCC matches the app under test; the earlier
+          # step boots the simulator before xcodebuild installs the .app.
+          udid="$(UI_TEST_PREFERRED_DEVICE="$UI_TEST_DEVICE" .github/scripts/ui-test-simulator-udid.sh "$UI_TEST_FAMILY" "$UI_TEST_DEVICE" "$UI_TEST_RUNTIME")"
+          UI_TEST_DEVICE_FAMILY="$UI_TEST_FAMILY" UI_TEST_PREFERRED_DEVICE="$UI_TEST_DEVICE" \
+            SRCROOT="$GITHUB_WORKSPACE" \
+            .github/scripts/ui-test-simctl-location.sh grant "$udid"
           if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.run_regression }}" == "true" ]] \
             || [[ "${{ vars.CI_RUN_UI_REGRESSION }}" == "true" ]]; then
             ui_scheme="$XCODE_UI_REGRESSION_SCHEME"
@@ -250,8 +274,6 @@ jobs:
             -retry-tests-on-failure \
             DEVELOPMENT_TEAM= \
             test
-        env:
-          NSUnbufferedIO: "YES"
 
       - name: Upload UI test coverage result
         if: matrix.id == 'ios26-iphone'

@@ -8,16 +8,15 @@ import Foundation
 enum UITesting {
     // UI tests stay black-box so they cannot link app-only helper code; raw
     // launch strings are the stable contract between test target and app.
-    static let launchArgument = "-ui-testing"
     // Cycle controls UI tests need deterministic alerts and timer behavior
     // without applying those fixtures to every UI-testing launch.
     static let cycleControlsFixtureArgument = "-ui-testing-cycle-controls-fixture"
     static let autoPauseFixtureArgument = "-ui-testing-auto-pause-fixture"
+    static let skipReviewPromptArgument = "-ui-testing-skip-review-prompt"
 
     #if DEBUG
-    /// True when the app was launched with `-ui-testing` (location/map seams only).
-    static func isEnabled(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
-        arguments.contains(launchArgument)
+    static func shouldSkipReviewPrompt(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        arguments.contains(skipReviewPromptArgument)
     }
 
     static func shouldUseCycleControlsFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
@@ -27,22 +26,8 @@ enum UITesting {
     static func shouldUseAutoPauseFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
         arguments.contains(autoPauseFixtureArgument)
     }
-
-    /// UI tests skip real location authorization; treat location as authorized so
-    /// completed rides can persist through the normal MapView save path.
-    static var shouldTreatLocationAsAuthorized: Bool {
-        isEnabled()
-    }
-
-    static var shouldRequestLocationAuthorization: Bool {
-        !isEnabled()
-    }
-
-    static var shouldShowUserLocation: Bool {
-        !isEnabled()
-    }
     #else
-    static func isEnabled(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+    static func shouldSkipReviewPrompt(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
         false
     }
 
@@ -53,12 +38,6 @@ enum UITesting {
     static func shouldUseAutoPauseFixture(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
         false
     }
-
-    static var shouldTreatLocationAsAuthorized: Bool { false }
-
-    static var shouldRequestLocationAuthorization: Bool { true }
-
-    static var shouldShowUserLocation: Bool { true }
     #endif
 }
 
