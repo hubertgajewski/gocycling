@@ -28,15 +28,7 @@ class CycleUITestCase: BaseUITestCase {
   override func setUpWithError() throws {
     try super.setUpWithError()
 
-    // Host-side simctl grant can still leave a system sheet on first launch; XCTest's
-    // default interruption handler taps "Don't Allow", which blocks route save.
-    addUIInterruptionMonitor(withDescription: "Allow system location for ride smoke") { alert in
-      guard SystemLocationAlert.isLocationPermissionAlert(alert) else { return false }
-      return SystemLocationAlert.dismiss(alert: alert, preferDeny: false)
-    }
-
     let launchedApp = launchApp(extraArguments: launchExtraArguments)
-    SystemLocationAlert.triggerInterruptionMonitor(on: launchedApp, preferDeny: false)
     mainTabs = MainTabBarScreen(app: launchedApp)
     XCTAssertTrue(mainTabs.waitForMainChrome(), "Expected Cycle tab chrome after launch")
     ElementAssertions.assertExists(

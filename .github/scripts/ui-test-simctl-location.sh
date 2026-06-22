@@ -9,6 +9,7 @@ set -euo pipefail
 #
 # Environment:
 #   UI_TEST_PREFERRED_DEVICE  Simulator name to prefer (default: iPhone 17)
+#   UI_TEST_DEVICE_FAMILY     iPhone or iPad (default: inferred from preferred device)
 #
 # grant resets per-bundle location first, then grants location + location-always.
 # This clears a prior "Don't Allow" from the Permission scheme on the same sim.
@@ -28,6 +29,18 @@ esac
 
 location_services=(location location-always)
 preferred_device="${UI_TEST_PREFERRED_DEVICE:-iPhone 17}"
+preferred_device_family() {
+  if [[ -n "${UI_TEST_DEVICE_FAMILY:-}" ]]; then
+    printf '%s' "$UI_TEST_DEVICE_FAMILY"
+    return 0
+  fi
+  if [[ "$preferred_device" == iPad* ]]; then
+    printf '%s' iPad
+  else
+    printf '%s' iPhone
+  fi
+}
+
 # Fixed coordinate used for UI-test map zoom (Apple Park).
 simulated_latitude="${UI_TEST_SIMULATED_LATITUDE:-37.334606}"
 simulated_longitude="${UI_TEST_SIMULATED_LONGITUDE:--122.009102}"
@@ -104,10 +117,9 @@ destination_simulator_udid() {
 }
 
 preferred_simulator_udid() {
-  local root dest
+  local root
   root="$(repo_root)"
-  dest="$("${root}/.github/scripts/ios-simulator-destination.sh" iPhone "$preferred_device")"
-  printf '%s' "${dest#*id=}"
+  "${root}/.github/scripts/ui-test-simulator-udid.sh" "$(preferred_device_family)" "$preferred_device"
 }
 
 resolve_simulator_udid() {
@@ -144,6 +156,8 @@ ensure_simulator_booted() {
     echo "ui-test-simctl-location: booting simulator ${udid}" >&2
     xcrun simctl boot "$udid" >/dev/null 2>&1 || true
   fi
+  echo "ui-test-simctl-location: waiting for simulator ${udid} to finish booting" >&2
+  xcrun simctl bootstatus "$udid" -b >/dev/null
 }
 
 set_simulated_location() {

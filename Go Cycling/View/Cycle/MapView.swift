@@ -21,9 +21,8 @@ struct MapView: UIViewRepresentable {
     @Binding var centerMapOnLocation: Bool
     @Binding var cyclingStartTime: Date
     @Binding var timeCycling: TimeInterval
-    /// Drives `updateUIView` when Core Location authorization or the first fix changes.
+    /// Drives `updateUIView` when Core Location authorization changes.
     var locationAuthorizationStatus: CLAuthorizationStatus?
-    var hasLocationFix: Bool
     // Route naming needs the exact saved BikeRide because History ordering
     // can change while the async save finishes.
     var onRouteSaveSuccess: (BikeRide) -> Void = { _ in }
@@ -191,8 +190,7 @@ struct MapView_Previews: PreviewProvider {
             centerMapOnLocation: .constant(true),
             cyclingStartTime: .constant(Date()),
             timeCycling: .constant(10),
-            locationAuthorizationStatus: .authorizedWhenInUse,
-            hasLocationFix: false
+            locationAuthorizationStatus: .authorizedWhenInUse
         )
     }
 }

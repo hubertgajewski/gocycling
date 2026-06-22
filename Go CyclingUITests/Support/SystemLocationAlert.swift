@@ -47,11 +47,6 @@ enum SystemLocationAlert {
     if label.contains("location") {
       return true
     }
-    let permissionButtonLabels =
-      denyButtonLabels + denyAlwaysUpgradeButtonLabels + allowButtonLabels
-    for buttonLabel in permissionButtonLabels where alert.buttons[buttonLabel].exists {
-      return true
-    }
     return matchingButton(in: alert, preferDeny: true) != nil
       || matchingButton(in: alert, preferDeny: false) != nil
   }
@@ -72,11 +67,7 @@ enum SystemLocationAlert {
     maxAttempts: Int = 3
   ) {
     for _ in 0..<maxAttempts {
-      if app.buttons.firstMatch.waitForExistence(timeout: 1) {
-        app.buttons.firstMatch.tap()
-      } else {
-        app.tap()
-      }
+      app.tap()
 
       _ = dismissIfPresent(app: app, preferDeny: preferDeny)
 

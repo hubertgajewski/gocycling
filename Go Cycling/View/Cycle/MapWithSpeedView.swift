@@ -26,12 +26,11 @@ struct MapWithSpeedView: View {
 
     var body: some View {
         ZStack {
-        MapView(
+            MapView(
                 centerMapOnLocation: $mapCentered,
                 cyclingStartTime: $cyclingStartTime,
                 timeCycling: $timeCycling,
                 locationAuthorizationStatus: locationManager.locationStatus,
-                hasLocationFix: locationManager.lastLocation != nil,
                 onRouteSaveSuccess: onRouteSaveSuccess
             )
             VStack {

@@ -127,7 +127,7 @@ cp -n TelemetryDeck.xcconfig.example TelemetryDeck.xcconfig
 mkdir -p TestResults
 rm -rf TestResults/ui-ios26-iphone.xcresult
 DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17' 'iOS 26')
-UDID="${DEST#*id=}"
+UDID=$(.github/scripts/ui-test-simulator-udid.sh iPhone 'iPhone 17' 'iOS 26')
 UI_TEST_PREFERRED_DEVICE='iPhone 17' SRCROOT="$PWD" .github/scripts/ui-test-simctl-location.sh grant "$UDID"
 xcodebuild \
   -project "Go Cycling.xcodeproj" \
@@ -145,7 +145,7 @@ Reproduce a UI regression run, substituting the device name as needed:
 
 ```bash
 DEST=$(.github/scripts/ios-simulator-destination.sh iPhone 'iPhone 17' 'iOS 26')
-UDID="${DEST#*id=}"
+UDID=$(.github/scripts/ui-test-simulator-udid.sh iPhone 'iPhone 17' 'iOS 26')
 UI_TEST_PREFERRED_DEVICE='iPhone 17' SRCROOT="$PWD" .github/scripts/ui-test-simctl-location.sh grant "$UDID"
 xcodebuild \
   -project "Go Cycling.xcodeproj" \
@@ -173,8 +173,8 @@ Reproduce a UI smoke run without coverage, substituting the device name as neede
 
 ```bash
 DEST=$(.github/scripts/ios-simulator-destination.sh iPad 'iPad Pro 11-inch (M5)' 'iOS 26')
-UDID="${DEST#*id=}"
-UI_TEST_PREFERRED_DEVICE='iPad Pro 11-inch (M5)' SRCROOT="$PWD" .github/scripts/ui-test-simctl-location.sh grant "$UDID"
+UDID=$(.github/scripts/ui-test-simulator-udid.sh iPad 'iPad Pro 11-inch (M5)' 'iOS 26')
+UI_TEST_DEVICE_FAMILY=iPad UI_TEST_PREFERRED_DEVICE='iPad Pro 11-inch (M5)' SRCROOT="$PWD" .github/scripts/ui-test-simctl-location.sh grant "$UDID"
 xcodebuild \
   -project "Go Cycling.xcodeproj" \
   -scheme "Go Cycling UI Smoke" \

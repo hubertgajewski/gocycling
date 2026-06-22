@@ -15,6 +15,13 @@ class BaseUITestCase: XCTestCase {
 
   override func setUpWithError() throws {
     continueAfterFailure = false
+
+    // Host-side simctl grant can still leave a system sheet on first launch; XCTest's
+    // default interruption handler taps "Don't Allow", which blocks route save.
+    addUIInterruptionMonitor(withDescription: "Allow system location for UI tests") { alert in
+      guard SystemLocationAlert.isLocationPermissionAlert(alert) else { return false }
+      return SystemLocationAlert.dismiss(alert: alert, preferDeny: false)
+    }
   }
 
   override func tearDownWithError() throws {
@@ -41,6 +48,7 @@ class BaseUITestCase: XCTestCase {
       extraArguments: extraArguments,
       environment: environment
     )
+    SystemLocationAlert.triggerInterruptionMonitor(on: launchedApp, preferDeny: false)
     app = launchedApp
     return launchedApp
   }
