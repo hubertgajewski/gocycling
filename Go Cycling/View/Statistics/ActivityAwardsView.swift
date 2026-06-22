@@ -19,7 +19,12 @@ struct ActivityAwardsView: View {
     let telemetryTab = TelemetryTab.Statistics
 
     var body: some View {
-        Section (header: Text(RecordsFormatting.headerStrings[2]), footer: Text(RecordsFormatting.footerStrings[1])) {
+        Section (
+            header: Text(RecordsFormatting.headerStrings[2])
+                .accessibilityIdentifier(AccessibilityIdentifier.Statistics.activityAwardsSection),
+            footer: Text(RecordsFormatting.footerStrings[1])
+                .accessibilityIdentifier(AccessibilityIdentifier.Statistics.awardsFooter)
+        ) {
             VStack {
                 ForEach (0..<Records.awardValues.count, id: \.self) { index in
                     SingleActivityAwardView(progress: activityAwardsViewModel.progressValues[index], iconName: activityAwardsViewModel.getAwardName(index: index, usingMetric: preferences.usingMetric), progressString: activityAwardsViewModel.progressStrings[index], medal: activityAwardsViewModel.medalOrder[index])

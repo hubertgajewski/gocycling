@@ -16,6 +16,9 @@
       "selectedTests" : [
         "MainTabNavigationTests",
         "CycleRideSmokeTests",
+        "HistorySmokeTests",
+        "SettingsSmokeTests",
+        "StatisticsSmokeTests",
         "CycleRideRegressionTests",
         "CycleAutoPauseRegressionTests"
       ],

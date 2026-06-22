@@ -42,9 +42,11 @@ struct SingleActivityAwardView: View {
                     }
                 }
             }
+            .accessibilityIdentifier(AccessibilityIdentifier.Statistics.awardProgress)
             .padding()
             .overlay(LockedIconCoverView(progress: progress))
         }
+        .accessibilityIdentifier(AccessibilityIdentifier.Statistics.awardRow)
     }
 }
 
