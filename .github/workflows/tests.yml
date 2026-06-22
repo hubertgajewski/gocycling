@@ -243,6 +243,7 @@ jobs:
           UI_TEST_FAMILY: ${{ matrix.family }}
           UI_TEST_DEVICE: ${{ matrix.device }}
           UI_TEST_RUNTIME: ${{ matrix.runtime }}
+          NSUnbufferedIO: "YES"
         run: |
           mkdir -p TestResults
           rm -rf TestResults/ui-${{ matrix.id }}.xcresult
@@ -273,8 +274,6 @@ jobs:
             -retry-tests-on-failure \
             DEVELOPMENT_TEAM= \
             test
-        env:
-          NSUnbufferedIO: "YES"
 
       - name: Upload UI test coverage result
         if: matrix.id == 'ios26-iphone'
