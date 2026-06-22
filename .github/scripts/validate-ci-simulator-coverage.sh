@@ -155,6 +155,12 @@ else:
         body,
     ):
         failures.append("ui-tests must pass matrix.runtime to ios-simulator-destination.sh")
+    if "Grant simulator location for UI tests" not in body:
+        failures.append("ui-tests must grant simulator location before running UI tests")
+    if "ui-test-simctl-location.sh grant" not in body:
+        failures.append("ui-tests must invoke ui-test-simctl-location.sh grant")
+    if "matrix.device" not in body or "UI_TEST_PREFERRED_DEVICE" not in body:
+        failures.append("ui-tests location grant must pass matrix.device as UI_TEST_PREFERRED_DEVICE")
 
 doc_text = "\n".join((workflow, readme, fork_changes))
 if "iOS/iPadOS 14-16" not in doc_text and "iOS/iPadOS 14, 15, or 16" not in doc_text:

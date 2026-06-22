@@ -226,6 +226,15 @@ jobs:
           chmod +x .github/scripts/ios-simulator-destination.sh
           echo "value=$(.github/scripts/ios-simulator-destination.sh '${{ matrix.family }}' '${{ matrix.device }}' '${{ matrix.runtime }}')" >> "$GITHUB_OUTPUT"
 
+      - name: Grant simulator location for UI tests
+        run: |
+          chmod +x .github/scripts/ui-test-simctl-location.sh
+          udid="${{ steps.destination.outputs.value }}"
+          udid="${udid#*id=}"
+          UI_TEST_PREFERRED_DEVICE='${{ matrix.device }}' \
+            SRCROOT="$GITHUB_WORKSPACE" \
+            .github/scripts/ui-test-simctl-location.sh grant "$udid"
+
       - name: Run UI tests
         run: |
           mkdir -p TestResults
