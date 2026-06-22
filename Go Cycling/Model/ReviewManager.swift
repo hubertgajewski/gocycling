@@ -41,7 +41,13 @@ class ReviewManager {
         }
     }
     
-    static func requestReviewIfAppropriate() {
+    static func requestReviewIfAppropriate(
+        arguments: [String] = ProcessInfo.processInfo.arguments
+    ) {
+        guard shouldRequestReview(arguments: arguments) else {
+            return
+        }
+
         let defaults = UserDefaults.standard
         let bundle = Bundle.main
 
@@ -73,6 +79,16 @@ class ReviewManager {
         defaults.set(0, forKey: reviewCountKey)
         defaults.set(currentVersion, forKey: reviewRequestVersionKey)
     }
+
+    #if DEBUG
+    static func shouldRequestReview(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        !UITesting.shouldSkipReviewPrompt(arguments: arguments)
+    }
+    #else
+    static func shouldRequestReview(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        true
+    }
+    #endif
     
     static func getProductURL() -> URL {
         return NSURL(string: productURLString)! as URL

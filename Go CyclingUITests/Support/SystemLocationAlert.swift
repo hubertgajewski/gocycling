@@ -65,6 +65,28 @@ enum SystemLocationAlert {
     return true
   }
 
+  /// Nudges XCTest to run registered interruption monitors for any blocking sheet.
+  static func triggerInterruptionMonitor(
+    on app: XCUIApplication,
+    preferDeny: Bool,
+    maxAttempts: Int = 3
+  ) {
+    for _ in 0..<maxAttempts {
+      if app.buttons.firstMatch.waitForExistence(timeout: 1) {
+        app.buttons.firstMatch.tap()
+      } else {
+        app.tap()
+      }
+
+      _ = dismissIfPresent(app: app, preferDeny: preferDeny)
+
+      let springboard = XCUIApplication(bundleIdentifier: springboardBundleID)
+      if !springboard.alerts.firstMatch.exists {
+        break
+      }
+    }
+  }
+
   @discardableResult
   static func dismissIfPresent(app: XCUIApplication? = nil, preferDeny: Bool = true) -> Bool {
     var dismissed = false

@@ -55,6 +55,7 @@ struct ReviewManagerTests {
     let defaults = UserDefaults.standard
     defaults.set(3, forKey: ReviewManager.reviewCountKey)
     defaults.set(false, forKey: ReviewManager.completedRouteKey)
+    defaults.removeObject(forKey: ReviewManager.reviewRequestVersionKey)
 
     ReviewManager.requestReviewIfAppropriate()
 
@@ -70,6 +71,7 @@ struct ReviewManagerTests {
     let defaults = UserDefaults.standard
     defaults.set(true, forKey: ReviewManager.completedRouteKey)
     defaults.set(1, forKey: ReviewManager.reviewCountKey)
+    defaults.removeObject(forKey: ReviewManager.reviewRequestVersionKey)
 
     ReviewManager.requestReviewIfAppropriate()
 
@@ -117,6 +119,22 @@ struct ReviewManagerTests {
       defaults.string(forKey: ReviewManager.reviewRequestVersionKey)
         == Bundle.main.object(forInfoDictionaryKey: bundleVersionKey) as? String
     )
+  }
+
+  @Test("skips review request when UI testing skip-review prompt is enabled")
+  func skipsReviewRequestWhenUITestingSkipReviewPromptIsEnabled() async {
+    let snapshot = await PersistedStoreSnapshot(keys: reviewManagerStoreKeys)
+    defer { snapshot.restore() }
+
+    let defaults = UserDefaults.standard
+    defaults.set(true, forKey: ReviewManager.completedRouteKey)
+    defaults.set(3, forKey: ReviewManager.reviewCountKey)
+    defaults.removeObject(forKey: ReviewManager.reviewRequestVersionKey)
+
+    ReviewManager.requestReviewIfAppropriate(arguments: [UITesting.skipReviewPromptArgument])
+
+    #expect(defaults.integer(forKey: ReviewManager.reviewCountKey) == 3)
+    #expect(defaults.string(forKey: ReviewManager.reviewRequestVersionKey) == nil)
   }
 
   @Test("returns App Store product and write-review URLs")

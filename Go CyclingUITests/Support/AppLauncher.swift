@@ -7,6 +7,7 @@ import XCTest
 
 /// Launch arguments understood by the app's DEBUG-only UI-testing seams.
 enum LaunchArgument {
+  static let skipReviewPrompt = "-ui-testing-skip-review-prompt"
   static let cycleControlsFixture = "-ui-testing-cycle-controls-fixture"
   static let autoPauseFixture = "-ui-testing-auto-pause-fixture"
   static let appleLanguages = "-AppleLanguages"
@@ -22,6 +23,7 @@ enum LaunchArgument {
 /// the system permission sheet does not block unrelated smoke flows.
 struct AppLauncher {
   private let baseArguments = [
+    LaunchArgument.skipReviewPrompt,
     LaunchArgument.appleLanguages, "(en)",
     LaunchArgument.appleLocale, "en_US",
     LaunchArgument.applePersistenceIgnoreState, "YES",

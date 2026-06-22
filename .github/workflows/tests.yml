@@ -161,7 +161,7 @@ jobs:
       vars.CI_RUN_UI_TESTS != 'false'
     name: UI ${{ ((github.event_name == 'workflow_dispatch' && github.event.inputs.run_regression == 'true') || vars.CI_RUN_UI_REGRESSION == 'true') && 'regression' || 'smoke' }} (${{ matrix.runtime }} / ${{ matrix.device_label }})
     runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && matrix.os || vars.RUNNER || matrix.os }}
-    timeout-minutes: 25
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
@@ -239,6 +239,13 @@ jobs:
         run: |
           mkdir -p TestResults
           rm -rf TestResults/ui-${{ matrix.id }}.xcresult
+          # Re-grant after build/install so TCC matches the app under test; the earlier
+          # step boots the simulator before xcodebuild installs the .app.
+          udid="${{ steps.destination.outputs.value }}"
+          udid="${udid#*id=}"
+          UI_TEST_PREFERRED_DEVICE='${{ matrix.device }}' \
+            SRCROOT="$GITHUB_WORKSPACE" \
+            .github/scripts/ui-test-simctl-location.sh grant "$udid"
           if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.run_regression }}" == "true" ]] \
             || [[ "${{ vars.CI_RUN_UI_REGRESSION }}" == "true" ]]; then
             ui_scheme="$XCODE_UI_REGRESSION_SCHEME"

@@ -46,7 +46,12 @@ struct CyclingChartsView: View {
     }
     
     var body: some View {
-        Section (header: Text(RecordsFormatting.headerStrings[1]), footer: Text(RecordsFormatting.footerStrings[0])) {
+        Section (
+            header: Text(RecordsFormatting.headerStrings[1])
+                .accessibilityIdentifier(AccessibilityIdentifier.Statistics.cyclingChartsSection),
+            footer: Text(RecordsFormatting.footerStrings[0])
+                .accessibilityIdentifier(AccessibilityIdentifier.Statistics.chartsFooter)
+        ) {
             if (!self.invalidData) {
                 List {
                     ForEach (0..<3) { index in

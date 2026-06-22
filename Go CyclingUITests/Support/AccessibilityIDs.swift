@@ -47,6 +47,37 @@ enum AccessibilityID {
     static let rideRow = "history-ride-row"
   }
 
+  enum Statistics {
+    static let cyclingChartsSection = "statistics-section-cycling-charts"
+    static let cyclingRecordsSection = "statistics-section-cycling-records"
+    static let activityAwardsSection = "statistics-section-activity-awards"
+    static let chartsFooter = "statistics-charts-footer"
+    static let recordsFooter = "statistics-records-footer"
+    static let awardsFooter = "statistics-awards-footer"
+    static let singleRouteRecordsHeader = "statistics-single-route-records-header"
+    static let cumulativeRecordsHeader = "statistics-cumulative-records-header"
+
+    static let chartPeriod7Days = "statistics-chart-period-7-days"
+    static let chartPeriod5Weeks = "statistics-chart-period-5-weeks"
+    static let chartPeriod30Weeks = "statistics-chart-period-30-weeks"
+
+    static let recordLongestDistance = "statistics-record-longest-distance"
+    static let recordLongestTime = "statistics-record-longest-time"
+    static let recordBestSpeed = "statistics-record-best-speed"
+    static let recordTotalDistance = "statistics-record-total-distance"
+    static let recordTotalTime = "statistics-record-total-time"
+    static let recordTotalRoutes = "statistics-record-total-routes"
+
+    static let awardRow = "statistics-award-row"
+    static let awardProgress = "statistics-award-progress"
+
+    static let chartPeriodIdentifiers = [
+      chartPeriod7Days,
+      chartPeriod5Weeks,
+      chartPeriod30Weeks,
+    ]
+  }
+
   enum Settings {
     static let customizationSection = "settings-section-customization"
     static let cyclingMetricsSection = "settings-section-cycling-metrics"

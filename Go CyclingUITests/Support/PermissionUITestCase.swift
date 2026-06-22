@@ -53,21 +53,13 @@ class PermissionUITestCase: XCTestCase {
   /// The app requests when-in-use and always authorization at launch, so iOS may
   /// present more than one system sheet before the cycle screen is tappable.
   func triggerInterruptionMonitor(on app: XCUIApplication, maxAttempts: Int = 3) {
-    for _ in 0..<maxAttempts {
-      if app.buttons.firstMatch.waitForExistence(timeout: 1) {
-        app.buttons.firstMatch.tap()
-      } else {
-        app.tap()
-      }
-
-      if SystemLocationAlert.dismissIfPresent(app: app, preferDeny: true) {
-        permissionPromptObserved = true
-      }
-
-      let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
-      if !springboard.alerts.firstMatch.exists {
-        break
-      }
+    SystemLocationAlert.triggerInterruptionMonitor(
+      on: app,
+      preferDeny: true,
+      maxAttempts: maxAttempts
+    )
+    if SystemLocationAlert.dismissIfPresent(app: app, preferDeny: true) {
+      permissionPromptObserved = true
     }
   }
 }

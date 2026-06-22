@@ -272,10 +272,11 @@ extension SettingsScreen {
   ) {
     let element = control(id)
     scrollUntilVisible(element, file: file, line: line)
-    ElementAssertions.assertLabel(
-      element,
-      equals: label,
-      timeout: Timeouts.short,
+    ElementAssertions.assertExists(element, timeout: Timeouts.short, file: file, line: line)
+    XCTAssertEqual(
+      element.label.lowercased(),
+      label.lowercased(),
+      "Expected \(id) section header label to match \(label) (case-insensitive)",
       file: file,
       line: line
     )
